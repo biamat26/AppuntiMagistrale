@@ -1,0 +1,104 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{preamble}[2026/10/10 Shared preamble for AppuntiMagistrale]
+
+% ---------- Encoding & language ----------
+\RequirePackage[utf8]{inputenc}
+\RequirePackage[T1]{fontenc}
+\RequirePackage[english]{babel}
+\RequirePackage{lmodern}
+\RequirePackage{microtype}
+
+% ---------- Layout ----------
+\RequirePackage[a4paper,margin=2.5cm]{geometry}
+\RequirePackage{parskip}
+\RequirePackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\nouppercase{\leftmark}}
+\fancyhead[R]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ---------- Math ----------
+\RequirePackage{amsmath,amssymb,amsthm,mathtools}
+\RequirePackage{bm}
+
+% ---------- Graphics, tables, colors ----------
+\RequirePackage[dvipsnames]{xcolor}
+\RequirePackage{graphicx}
+\RequirePackage{booktabs}
+\RequirePackage{tabularx}
+\RequirePackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes,calc}
+\RequirePackage{float}
+\RequirePackage{caption}
+\RequirePackage{subcaption}
+\graphicspath{{figures/}}
+
+% ---------- Lists ----------
+\RequirePackage{enumitem}
+\setlist{nosep,leftmargin=*}
+
+% ---------- Code & algorithms ----------
+\RequirePackage{listings}
+\lstset{
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{RoyalBlue}\bfseries,
+  commentstyle=\color{Gray}\itshape,
+  stringstyle=\color{ForestGreen},
+  numbers=left, numberstyle=\tiny\color{Gray},
+  frame=single, rulecolor=\color{Gray!50},
+  breaklines=true, tabsize=2, showstringspaces=false
+}
+\RequirePackage{algorithm}
+\RequirePackage{algpseudocode}
+
+% ---------- Colored boxes ----------
+\RequirePackage[most]{tcolorbox}
+\tcbuselibrary{theorems}
+
+\newtcbtheorem[number within=chapter]{definition}{Definition}{
+  colback=RoyalBlue!5, colframe=RoyalBlue!75!black, fonttitle=\bfseries,
+  breakable}{def}
+\newtcbtheorem[use counter from=definition]{theorem}{Theorem}{
+  colback=Red!5, colframe=Red!70!black, fonttitle=\bfseries,
+  breakable}{thm}
+\newtcbtheorem[use counter from=definition]{lemma}{Lemma}{
+  colback=Orange!5, colframe=Orange!80!black, fonttitle=\bfseries,
+  breakable}{lem}
+\newtcbtheorem[use counter from=definition]{proposition}{Proposition}{
+  colback=Orange!5, colframe=Orange!80!black, fonttitle=\bfseries,
+  breakable}{prop}
+\newtcbtheorem[use counter from=definition]{example}{Example}{
+  colback=ForestGreen!5, colframe=ForestGreen!70!black, fonttitle=\bfseries,
+  breakable}{ex}
+
+\newtcolorbox{note}{
+  colback=Gray!8, colframe=Gray!60, title=Note, fonttitle=\bfseries,
+  breakable}
+\newtcolorbox{warning}{
+  colback=Yellow!10, colframe=Goldenrod!90!black, title=Warning,
+  fonttitle=\bfseries, breakable}
+\newtcolorbox{summary}{
+  colback=Purple!5, colframe=Purple!70!black, title=Summary,
+  fonttitle=\bfseries, breakable}
+
+% Proofs keep the standard amsthm environment: \begin{proof} ... \end{proof}
+
+% ---------- Handy math macros ----------
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\E}{\mathbb{E}}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Cov}{Cov}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\newcommand{\set}[1]{\left\{#1\right\}}
+\newcommand{\abs}[1]{\left\lvert#1\right\rvert}
+
+% ---------- Links (load last) ----------
+\RequirePackage[colorlinks=true,linkcolor=RoyalBlue,urlcolor=RoyalBlue]{hyperref}
+\RequirePackage{cleveref}
+
+\endinput
