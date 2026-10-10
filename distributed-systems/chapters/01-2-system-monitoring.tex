@@ -1,0 +1,433 @@
+% ============================================================
+%  System monitoring: global states, cuts, logical and vector clocks
+% ============================================================
+
+% The running example used in the figures of this section.
+% p1: e11 send(m1) -> p2, e12 internal, e13 receive(m3)
+% p2: e21 receive(m1), e22 send(m2) -> p3, e23 internal
+% p3: e31 internal, e32 receive(m2), e33 send(m3) -> p1
+\newcommand{\runningexample}{%
+  \proc{2}{p_1}{7.6}
+  \proc{1}{p_2}{7.6}
+  \proc{0}{p_3}{7.6}
+  \node[ev] (a1) at (1.0,2) {};
+  \node[ev] (a2) at (3.0,2) {};
+  \node[ev] (a3) at (6.2,2) {};
+  \node[ev] (b1) at (2.2,1) {};
+  \node[ev] (b2) at (3.4,1) {};
+  \node[ev] (b3) at (6.8,1) {};
+  \node[ev] (c1) at (1.0,0) {};
+  \node[ev] (c2) at (4.4,0) {};
+  \node[ev] (c3) at (5.2,0) {};
+  \draw[msg] (a1) -- node[lbl, above right=-1pt] {$m_1$} (b1);
+  \draw[msg] (b2) -- node[lbl, above right=-1pt] {$m_2$} (c2);
+  \draw[msg] (c3) -- node[lbl, right] {$m_3$} (a3);
+}
+
+\section{System monitoring}
+
+\subsection{Global states and the monitor process}
+
+Before diving in, we recall the notation of the previous section. Each process $p_i$ executes a sequence of events $h_i = e_i^1 e_i^2 \ldots$ (its local history), the global history is $H = h_1 \cup \ldots \cup h_n$ and $e \to e'$ denotes the cause-effect relation, also known as Lamport's \textbf{happened-before} relation. We also add a \textit{fictitious} initial event $e_i^0$ for each process, which simply represents the moment in which $p_i$ starts.
+
+We denote with $\sigma_i^k$ the \textbf{local state} of process $p_i$ immediately after the execution of event $e_i^k$, meaning that $\sigma_i^0$ is the initial state of $p_i$. Intuitively, the local state contains everything that $p_i$ knows: the values of its variables, the messages it has sent and received, and so on.
+
+\begin{frameddefn}{Global state}
+  A global state of the system is an $n$-uple of local states, one for each process:
+  \[\Sigma = (\sigma_1^{k_1}, \ldots, \sigma_n^{k_n})\]
+\end{frameddefn}
+
+Why do we care about global states? Many interesting problems of a distributed system can be stated as a predicate $\Phi$ evaluated on a global state: \curlyquotes{is the system deadlocked?}, \curlyquotes{has the computation terminated?}, \curlyquotes{has the token been lost?}, \curlyquotes{is this object garbage?}. None of these questions can be answered by looking at a single process, since each of them requires knowing what \textit{all} the processes are doing.
+
+To answer such questions, we add to the system a special process $p_0$, called \textbf{monitor process}, whose only task is to collect information about the other processes and evaluate the predicate $\Phi$. The monitor is not a part of the computation: it only observes it. The simplest strategy that comes to mind is the following one: $p_0$ sends a \curlyquotes{state enquiry} message to every process and each process $p_i$ answers with its current local state $\sigma_i$. Once all the answers have been collected, $p_0$ puts them together and evaluates $\Phi$.
+
+Unfortunately, this simple strategy doesn't work. Since the system is asynchronous, the enquiry reaches each process at a \textit{different} (and unpredictable) point of its computation. Hence, the collected local states may describe a situation that never happened and that can never happen.
+
+\begin{framedex}{Ghost deadlock}
+  Suppose that the processes share some resources and that a process $p_i$ that wants a resource held by $p_j$ sends a $\texttt{req}$ message to $p_j$ and then waits until $p_j$ answers with a $\texttt{resp}$ message. We say that $p_i$ \textit{waits for} $p_j$ and the system is deadlocked if the \curlyquotes{waits for} relation contains a cycle.
+
+  Suppose now that the monitor records the state of $p_3$ \textit{after} it received a request from $p_1$, while it records the state of $p_1$ \textit{before} $p_1$ sent that request. In the collected global state, $p_3$ has received a message that $p_1$ has not sent yet: if the other wait-for edges form a cycle together with this one, the monitor will declare a deadlock that doesn't exist. This phenomenon is called a \textbf{ghost deadlock}.
+\end{framedex}
+
+The problem in the above example is that the collected global state contains an \textit{effect} (the reception of a message) without its \textit{cause} (the sending of that message). To formalize this intuition we need the notion of cut.
+
+\subsection{Cuts and consistency}
+
+\begin{frameddefn}{Cut}
+  A cut $C$ of a distributed computation is a subset of the global history $H$ made by a prefix of every local history:
+  \[C = h_1^{c_1} \cup \ldots \cup h_n^{c_n}\]
+  where $h_i^{c_i} = e_i^1 \ldots e_i^{c_i}$. The tuple of the last events $(e_1^{c_1}, \ldots, e_n^{c_n})$ is called the \textbf{frontier} of the cut.
+\end{frameddefn}
+
+Every cut $C$ identifies the global state $\Sigma^C = (\sigma_1^{c_1}, \ldots, \sigma_n^{c_n})$ reached right after the events of the frontier, and vice versa. For this reason, we'll freely switch between cuts and global states. Graphically, a cut is a line that crosses every process line: the events on the left of the line belong to the cut, while the ones on the right don't.
+
+\begin{frameddefn}[label={def:consistent-cut}]{Consistent cut}
+  A cut $C$ is consistent if it is closed with respect to the cause-effect relation, meaning that for all events $e, e' \in H$:
+  \[e' \in C \land e \to e' \implies e \in C\]
+  A global state is said to be consistent if it corresponds to a consistent cut.
+\end{frameddefn}
+
+In other words, a consistent cut never contains an effect without containing all of its causes. We observe that the definition of cut already takes care of the events of the same process: since $C$ contains a prefix of every $h_i$, if $e_i^k \in C$ then all the previous events $e_i^1, \ldots, e_i^{k-1}$ are in $C$ too. Therefore, the only way to break consistency is through messages, as the following proposition shows.
+
+\begin{framedprop}[label={prop:cut-messages}]{}
+  A cut $C$ is consistent if and only if for every message $m$ it holds that:
+  \[\recv(m) \in C \implies \send(m) \in C\]
+\end{framedprop}
+
+\begin{proof}
+  The first direction is trivial: since $\send(m) \to \recv(m)$, if $C$ is consistent and $\recv(m) \in C$ then $\send(m) \in C$.
+
+  Vice versa, suppose that $C$ satisfies the condition on messages and fix two events $e,e'$ such that $e' \in C$ and $e \to e'$. By definition of the cause-effect relation, there is a chain of events
+  \[e = f_0 \to f_1 \to \ldots \to f_\ell = e'\]
+  where each step $f_{t} \to f_{t+1}$ is either a pair of consecutive events of the same process or a pair $(\send(m), \recv(m))$ of the same message. We show by backward induction that $f_t \in C$ for all $t$. The base case $f_\ell = e' \in C$ holds by assumption. Suppose now that $f_{t+1} \in C$. If $f_t$ and $f_{t+1}$ are events of the same process, then $f_t \in C$ since $C$ contains a prefix of each local history. Otherwise, $f_{t+1}$ is the reception of a message sent by $f_t$, hence $f_t \in C$ by the condition on messages. Thus, we conclude that $e = f_0 \in C$.
+\end{proof}
+
+Graphically, the proposition tells us that a cut is inconsistent if and only if some message arrow \textit{enters} the cut from the right, i.e. it goes from the \curlyquotes{future} to the \curlyquotes{past}. Messages crossing the cut from left to right are perfectly fine: they are simply messages that are in transit in the corresponding global state.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[xscale=1.25, yscale=1.1]
+    \runningexample
+    \node[lbl, above=2pt] at (a1) {$e_1^1$};
+    \node[lbl, above=2pt] at (a2) {$e_1^2$};
+    \node[lbl, above=2pt] at (a3) {$e_1^3$};
+    \node[lbl, below=2pt] at (b1) {$e_2^1$};
+    \node[lbl, below left=0pt] at (b2) {$e_2^2$};
+    \node[lbl, below=2pt] at (b3) {$e_2^3$};
+    \node[lbl, below=2pt] at (c1) {$e_3^1$};
+    \node[lbl, below=2pt] at (c2) {$e_3^2$};
+    \node[lbl, below=2pt] at (c3) {$e_3^3$};
+    % consistent cut: frontier (e12, e22, e32)
+    \draw[cutline, RoyalBlue] (4.0,2.45) -- (4.0,1.5) -- (4.75,0.5) -- (4.75,-0.45);
+    \node[RoyalBlue, font=\small] at (4.0,2.7) {$C$};
+    % inconsistent cut: frontier (e13, e21, e31)
+    \draw[cutline, BrickRed] (6.5,2.45) -- (6.5,1.6) -- (2.8,1.3) -- (2.8,0.5) -- (1.6,0.3) -- (1.6,-0.45);
+    \node[BrickRed, font=\small] at (6.5,2.7) {$C'$};
+  \end{tikzpicture}
+  \caption{The cut $C$ (blue) with frontier $(e_1^2, e_2^2, e_3^2)$ is consistent: $m_1$ and $m_2$ are both sent and received inside $C$, while $m_3$ is sent and received outside of it. The cut $C'$ (red) with frontier $(e_1^3, e_2^1, e_3^1)$ is inconsistent: $m_3$ is received inside $C'$ but sent outside of it.}
+  \label{fig:cuts}
+\end{figure}
+
+We now move from cuts to runs, i.e. to the possible orders in which the events of the system can be executed.
+
+\begin{frameddefn}{Run and consistent run}
+  A run $R$ is a total order of the events of $H$ that preserves the order of every local history $h_i$. A run is said to be consistent if it also preserves the cause-effect relation, meaning that for all $e,e' \in H$:
+  \[e \to e' \implies e \text{ comes before } e' \text{ in } R\]
+\end{frameddefn}
+
+A run describes one of the possible \curlyquotes{real} executions of the computation, as if we could watch it with a global clock. A consistent run is one that could actually happen: a message is never received before being sent. We observe that a run $R = e^{(1)} e^{(2)} \ldots$ naturally defines the sequence of cuts $C^0 = \varnothing$, $C^1 = \{e^{(1)}\}$, $C^2 = \{e^{(1)}, e^{(2)}\}$, and so on.
+
+\begin{framedprop}{}
+  If $R$ is a consistent run, then every cut $C^t$ made by the first $t$ events of $R$ is consistent.
+\end{framedprop}
+
+\begin{proof}
+  Fix $e' \in C^t$ and $e \to e'$. Since $R$ is consistent, $e$ comes before $e'$ in $R$, hence it is among the first $t$ events, i.e. $e \in C^t$.
+\end{proof}
+
+\begin{framedobs}{}
+  The above proposition does \underline{not} say that every cut of the computation is consistent: it only concerns the cuts made by the prefixes of a consistent run. For instance, the cut $C'$ of \Cref{fig:cuts} is inconsistent, even though the computation admits many consistent runs.
+\end{framedobs}
+
+Therefore, a consistent run makes the system go through a sequence of consistent global states $\Sigma^0, \Sigma^1, \Sigma^2, \ldots$, where each $\Sigma^{t+1}$ is obtained from $\Sigma^t$ by executing a single event. Conversely, it can be shown that every consistent global state is reached by at least one consistent run (see the solved exercises). Moreover, the union and the intersection of two consistent cuts are still consistent cuts, which means that the consistent global states of a computation form a \textbf{lattice}.
+
+This is the key reason why consistent global states are so useful: even if the system may have never \textit{actually} been in a consistent global state $\Sigma$ during the real execution, there exists a perfectly legal execution that goes through $\Sigma$. Thus, the monitor cannot be fooled by a consistent global state, while it can be fooled by an inconsistent one, like in the ghost deadlock.
+
+\subsection{Observing a computation}
+
+Instead of asking the processes for their states, we now consider a more \curlyquotes{passive} approach: every time a process $p_i$ executes an event $e$, it sends a \textbf{notification} message to the monitor $p_0$ describing $e$. Using the notifications, $p_0$ can reconstruct the computation and any global state of it. Notification messages are not part of the computation: they are not events and they don't affect the clocks that we'll define later on.
+
+We must distinguish between two different actions of $p_0$: \textit{receiving} a notification, i.e. the moment in which the message arrives, and \textit{delivering} it, i.e. the moment in which $p_0$ actually processes it. The monitor is free to receive a notification and keep it on hold before delivering it.
+
+\begin{frameddefn}{Observation}
+  An observation $O$ of a computation is the sequence of events in the order in which the monitor $p_0$ delivers their notifications.
+\end{frameddefn}
+
+Since notifications are delayed arbitrarily, the observation can be very different from what happened. In particular, an observation may not even be a run, since two notifications of the same process may be delivered in the wrong order. And even if the observation is a run, it may not be consistent, as shown in the following figure.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[xscale=1.25, yscale=1.1]
+    \proc{2}{p_1}{6.5}
+    \proc{1}{p_2}{6.5}
+    \proc{0}{p_0}{6.5}
+    \node[ev] (x) at (1,2) {};
+    \node[ev] (y) at (2,1) {};
+    \node[lbl, above=2pt] at (x) {$e_1^1 = \send(m)$};
+    \node[lbl, above right=0pt] at (y) {$e_2^1 = \recv(m)$};
+    \draw[msg] (x) -- (y);
+    \node[ev, gray] (nx) at (5.5,0) {};
+    \node[ev, gray] (ny) at (3,0) {};
+    \draw[ctrl] (x) -- (nx);
+    \draw[ctrl] (y) -- (ny);
+    \node[lbl, below=2pt] at (ny) {notification of $e_2^1$};
+    \node[lbl, below=2pt] at (nx) {notification of $e_1^1$};
+  \end{tikzpicture}
+  \caption{If $p_0$ delivers the notifications in the order of arrival, it observes $O = e_2^1\, e_1^1$, which is a run but not a consistent one: the reception of $m$ is observed before its sending.}
+  \label{fig:bad-observation}
+\end{figure}
+
+Our goal is to design a \textbf{delivery rule}, i.e. a rule that tells $p_0$ when it is safe to deliver a notification, such that every observation is a consistent run. The general idea is to attach a \textbf{timestamp} to each notification and to deliver the notifications in increasing order of timestamp. Of course, this only works if the timestamps respect causality.
+
+\begin{frameddefn}{Clock condition}
+  Let $T : H \to \R$ be a function assigning a timestamp to every event. We say that $T$ satisfies the (weak) clock condition if for all $e, e' \in H$:
+  \[e \to e' \implies T(e) < T(e')\]
+  We say that $T$ satisfies the strong clock condition if for all $e, e' \in H$:
+  \[e \to e' \iff T(e) < T(e')\]
+\end{frameddefn}
+
+We observe that the weak clock condition says nothing about two events with $T(e) < T(e')$: they could be causally related or concurrent. The strong clock condition, instead, completely characterizes the cause-effect relation through the timestamps.
+
+\begin{framedprop}[label={prop:increasing-order}]{}
+  If $T$ satisfies the clock condition and $p_0$ delivers the notifications in increasing order of $T$ (breaking ties arbitrarily), then the observation is a consistent run.
+\end{framedprop}
+
+\begin{proof}
+  If $e \to e'$ then $T(e) < T(e')$, hence the notification of $e$ is delivered before the one of $e'$. Since events of the same process are causally related, this also implies that the local histories are preserved, hence the observation is a run.
+\end{proof}
+
+The above proposition hides a subtle issue: when $p_0$ receives a notification with timestamp $t$, how can it know that no notification with a smaller timestamp will arrive in the future? A notification $m$ is said to be \textbf{stable} at $p_0$ if no future notification can have a timestamp smaller than $T(m)$. The delivery rule must deliver only stable notifications, and the way stability is detected depends on the chosen clock.
+
+\subsection{Real-time clocks}
+
+The most natural timestamp is the real time: suppose that every process has access to a global real-time clock $\RC$ and that it timestamps every event with the time at which it happens. Assuming that the clock has a fine enough resolution (so that two causally related events never get the same value), $\RC$ clearly satisfies the clock condition, since a cause always happens before its effects.
+
+\begin{frameddefn}{Delivery rule DR1}
+  Assume that every notification takes at most $\delta$ time units to reach $p_0$. At time $t$, the monitor $p_0$ delivers all the received notifications with timestamp up to $t - \delta$, in increasing timestamp order.
+\end{frameddefn}
+
+The rule is correct because, at time $t$, every notification with timestamp at most $t - \delta$ has already arrived, hence it is stable. However, DR1 relies on two strong assumptions: the processes need a perfectly synchronized global clock and the system must be \textit{synchronous}, since we need the upper bound $\delta$ on message delays. In an asynchronous system neither of the two is available, so we need a notion of time that can be built using only the messages exchanged by the processes.
+
+\subsection{Logical clocks}
+
+The key insight of Lamport is that we don't need the real time at all: to satisfy the clock condition, it's enough for the timestamps to respect the happened-before relation. Each process keeps a local counter, increments it at every event and attaches it to every message it sends. When a message arrives, the receiver moves its counter forward, past the timestamp of the message.
+
+\begin{frameddefn}{Lamport clock}
+  Each process $p_i$ keeps an integer $\LC_i$, initially set to $0$. Every message $m$ carries a timestamp $\TS(m)$. When $p_i$ executes an event $e$:
+  \begin{itemize}
+    \item If $e$ is an internal or a send event, $p_i$ sets $\LC_i \leftarrow \LC_i + 1$. If $e = \send(m)$, then $\TS(m) = \LC_i$.
+    \item If $e = \recv(m)$, $p_i$ sets $\LC_i \leftarrow \max(\LC_i, \TS(m)) + 1$.
+  \end{itemize}
+  The Lamport clock of the event, denoted with $\LC(e)$, is the value of $\LC_i$ after the execution of $e$.
+\end{frameddefn}
+
+We remark that the only information exchanged is a single integer per message, piggybacked on messages that the processes send anyway. In particular, Lamport clocks require \underline{no} synchronization between the processes and no bound on message delays: they work in any asynchronous system.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[xscale=1.25, yscale=1.1]
+    \runningexample
+    \node[lbl, above=2pt, RoyalBlue] at (a1) {$1$};
+    \node[lbl, above=2pt, RoyalBlue] at (a2) {$2$};
+    \node[lbl, above=2pt, RoyalBlue] at (a3) {$6$};
+    \node[lbl, below=2pt, RoyalBlue] at (b1) {$2$};
+    \node[lbl, below left=0pt, RoyalBlue] at (b2) {$3$};
+    \node[lbl, below=2pt, RoyalBlue] at (b3) {$4$};
+    \node[lbl, below=2pt, RoyalBlue] at (c1) {$1$};
+    \node[lbl, below=2pt, RoyalBlue] at (c2) {$4$};
+    \node[lbl, below=2pt, RoyalBlue] at (c3) {$5$};
+  \end{tikzpicture}
+  \caption{Lamport clocks of the running example. For instance, $\LC(e_3^2) = \max(1, \TS(m_2)) + 1 = \max(1,3)+1 = 4$ and $\LC(e_1^3) = \max(2, \TS(m_3)) + 1 = \max(2,5)+1 = 6$.}
+  \label{fig:lamport}
+\end{figure}
+
+\begin{framedprop}{}
+  The Lamport clock satisfies the clock condition.
+\end{framedprop}
+
+\begin{proof}
+  Suppose that $e \to e'$. Then, there is a chain $e = f_0 \to f_1 \to \ldots \to f_\ell = e'$ in which each step is either a pair of consecutive events of the same process or a pair $(\send(m), \recv(m))$. It's enough to show that the clock strictly increases along each step:
+  \begin{itemize}
+    \item If $f_t$ and $f_{t+1}$ are consecutive events of $p_i$, then $\LC(f_{t+1}) \geq \LC(f_t) + 1$, since both update rules increment the previous value of $\LC_i$ (the second one after taking a maximum).
+    \item If $f_t = \send(m)$ and $f_{t+1} = \recv(m)$, then $\LC(f_{t+1}) \geq \TS(m) + 1 = \LC(f_t) + 1$.
+  \end{itemize}
+  Hence $\LC(e) < \LC(e')$.
+\end{proof}
+
+\begin{framedobs}{}
+  The Lamport clock does \underline{not} satisfy the strong clock condition. In \Cref{fig:lamport}, we have $\LC(e_3^1) = 1 < 2 = \LC(e_1^2)$ but $e_3^1 \cc e_1^2$. Similarly, $\LC(e_2^3) = 4 < 6 = \LC(e_1^3)$ but $e_2^3 \cc e_1^3$. The only thing we can deduce from Lamport clocks is the contrapositive of the clock condition: if $\LC(e) \geq \LC(e')$ then $e \not\to e'$.
+\end{framedobs}
+
+Lamport clocks may assign the same value to two different events (for instance $e_1^2$ and $e_2^1$ above), but this can only happen when the events are concurrent. By breaking the ties with the process identifiers, we obtain a \textbf{total order} of all the events that extends the happened-before relation:
+\[e_i \prec e_j \iff \LC(e_i) < \LC(e_j) \lor \big(\LC(e_i) = \LC(e_j) \land i < j\big)\]
+All the processes can compute this order on their own, without exchanging any extra message. This total order is the main ingredient of Lamport's mutual exclusion algorithm, which we'll discuss later.
+
+Let's go back to the monitor. Since Lamport clocks satisfy the clock condition, by \Cref{prop:increasing-order} it is enough for $p_0$ to deliver stable notifications in increasing timestamp order. To detect stability, we assume that the channels between the processes and $p_0$ are FIFO: since the clock of each process is strictly increasing, the notifications sent by each $p_j$ arrive at $p_0$ with increasing timestamps.
+
+\begin{frameddefn}{Delivery rule DR2}
+  Assuming FIFO channels, a notification $m$ is stable at $p_0$ if $p_0$ has received at least one notification with timestamp greater than $\TS(m)$ from every process. The monitor delivers all the stable notifications in increasing timestamp order (breaking ties with the process identifiers).
+\end{frameddefn}
+
+DR2 works in an asynchronous system, but it has a drawback: the monitor must wait for a notification from \textit{every} process before delivering anything, even if most processes have nothing to do with $m$. If some process stays silent for a long time, every delivery gets blocked. The problem is that Lamport clocks lack the ability of \textbf{gap detection}: given two events $e,e'$ with $\LC(e) < \LC(e')$, we cannot tell whether there is some event $e''$ such that $\LC(e) < \LC(e'') < \LC(e')$. For example, when $p_0$ receives $e_1^3$ with timestamp $6$, it has no way of knowing whether some event with a smaller timestamp is still on its way.
+
+\subsection{Vector clocks}
+
+Lamport clocks compress all the information about the past into a single integer, losing track of \textit{which} events are in the past. Vector clocks fix this by keeping a counter for each process. To understand them, we first introduce the causal history of an event.
+
+\begin{frameddefn}{Causal history}
+  The causal history of an event $e \in H$ is the set of events that precede it, together with $e$ itself:
+  \[\theta(e) = \{e' \in H \mid e' \to e\} \cup \{e\}\]
+\end{frameddefn}
+
+Clearly, $e \to e'$ if and only if $e \in \theta(e')$ and $e \neq e'$. Moreover, we observe that $\theta(e)$ is always a consistent cut: if $e'' \to e'$ and $e' \in \theta(e)$, then $e'' \to e$ by transitivity. In particular, $\theta(e) \cap h_j$ is a prefix of $h_j$ for every process $p_j$, which means that it can be fully described by a single number: its length. This is exactly what a vector clock stores.
+
+\begin{frameddefn}{Vector clock}
+  Each process $p_i$ keeps a vector $\VC_i$ of $n$ integers, initially set to $[0, \ldots, 0]$. Every message $m$ carries a vector timestamp $\TS(m)$. When $p_i$ executes an event $e$:
+  \begin{itemize}
+    \item If $e$ is an internal or a send event, $p_i$ sets $\VC_i[i] \leftarrow \VC_i[i] + 1$. If $e = \send(m)$, then $\TS(m) = \VC_i$.
+    \item If $e = \recv(m)$, $p_i$ first sets $\VC_i[j] \leftarrow \max(\VC_i[j], \TS(m)[j])$ for every $j \in [n]$ and then $\VC_i[i] \leftarrow \VC_i[i] + 1$.
+  \end{itemize}
+  The vector clock of the event, denoted with $\VC(e)$, is the value of $\VC_i$ after the execution of $e$.
+\end{frameddefn}
+
+\begin{framedobs}{}
+  Only the entry of the process executing the event is incremented: on a reception, the other entries are updated with the maximum, \underline{without} adding $1$. Moreover, each message carries the \textit{whole} vector, hence vector clocks have an overhead of $n$ integers per message, compared to the single integer of Lamport clocks. It has been shown that, in general, no smaller timestamp can characterize causality exactly.
+\end{framedobs}
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[xscale=1.25, yscale=1.1]
+    \runningexample
+    \node[lbl, above=2pt, RoyalBlue] at (a1) {$[1,0,0]$};
+    \node[lbl, above=2pt, RoyalBlue] at (a2) {$[2,0,0]$};
+    \node[lbl, above=2pt, RoyalBlue] at (a3) {$[3,2,3]$};
+    \node[lbl, below=2pt, RoyalBlue] at (b1) {$[1,1,0]$};
+    \node[lbl, above right=0pt, RoyalBlue] at (b2) {$[1,2,0]$};
+    \node[lbl, below=2pt, RoyalBlue] at (b3) {$[1,3,0]$};
+    \node[lbl, below=2pt, RoyalBlue] at (c1) {$[0,0,1]$};
+    \node[lbl, below left=0pt, RoyalBlue] at (c2) {$[1,2,2]$};
+    \node[lbl, below right=0pt, RoyalBlue] at (c3) {$[1,2,3]$};
+  \end{tikzpicture}
+  \caption{Vector clocks of the running example. For instance, $\VC(e_1^3)$ is obtained by taking the component-wise maximum between $[2,0,0]$ and $\TS(m_3) = [1,2,3]$, i.e. $[2,2,3]$, and then incrementing the first entry.}
+  \label{fig:vector}
+\end{figure}
+
+\begin{framedlem}[label={lem:vc-count}]{}
+  For every event $e$ and every process $p_j$, the value $\VC(e)[j]$ is the number of events of $p_j$ in the causal history of $e$:
+  \[\VC(e)[j] = \abs{\theta(e) \cap h_j}\]
+\end{framedlem}
+
+\begin{proof}
+  We proceed by induction on the events, taken in the order of any consistent run, so that the sending of a message is always handled before its reception. Let $p_i$ be the process executing $e = e_i^k$. If $e$ is an internal or send event, then $\theta(e_i^k) = \theta(e_i^{k-1}) \cup \{e_i^k\}$: the only new event belongs to $p_i$, which matches the increment of the $i$-th entry. If $e = \recv(m)$, then:
+  \[\theta(e_i^k) = \theta(e_i^{k-1}) \cup \theta(\send(m)) \cup \{e_i^k\}\]
+  Since both $\theta(e_i^{k-1}) \cap h_j$ and $\theta(\send(m)) \cap h_j$ are prefixes of $h_j$, their union is the longest of the two, hence its size is the maximum of the two sizes. This matches the component-wise maximum, while the new event $e_i^k$ matches the increment of the $i$-th entry.
+\end{proof}
+
+To compare vectors, we use the component-wise order: we write $V \leq V'$ when $V[j] \leq V'[j]$ for all $j \in [n]$, and $V < V'$ when $V \leq V'$ and $V \neq V'$. We observe that this is only a partial order: for instance, $[1,3,0]$ and $[3,2,3]$ are incomparable.
+
+\begin{framedthm}{Strong clock condition}
+  The vector clock satisfies the strong clock condition, i.e. for all $e, e' \in H$:
+  \[e \to e' \iff \VC(e) < \VC(e')\]
+\end{framedthm}
+
+\begin{proof}
+  Since every $\theta(\cdot) \cap h_j$ is a prefix of $h_j$, by \Cref{lem:vc-count} we have that $\theta(e) \subseteq \theta(e')$ if and only if $\VC(e) \leq \VC(e')$, and also that $\theta(e) = \theta(e')$ if and only if $\VC(e) = \VC(e')$.
+
+  If $e \to e'$, then $\theta(e) \subseteq \theta(e')$ by transitivity. Moreover, the inclusion is strict since $e' \in \theta(e')$ but $e' \notin \theta(e)$ (otherwise $e' \to e \to e'$, which is impossible). Hence $\VC(e) < \VC(e')$.
+
+  Vice versa, if $\VC(e) < \VC(e')$ then $\theta(e) \subsetneq \theta(e')$. Thus, $e \in \theta(e')$ and $e \neq e'$, meaning that $e \to e'$.
+\end{proof}
+
+\begin{framedcor}{Concurrency test}
+  Two events $e,e'$ are concurrent if and only if their vector clocks are incomparable, i.e. $\VC(e) \not\leq \VC(e')$ and $\VC(e') \not\leq \VC(e)$.
+\end{framedcor}
+
+In \Cref{fig:vector}, we can now immediately see that $e_2^3 \cc e_1^3$, since $[1,3,0]$ and $[3,2,3]$ are incomparable, while $e_2^2 \to e_1^3$, since $[1,2,0] < [3,2,3]$. Comparing two vectors requires $O(n)$ operations, but when we know which processes executed the events we can do much better.
+
+\begin{framedprop}{Simple strong clock condition}
+  Let $e_i$ be an event of $p_i$ and let $e_j$ be an event of $p_j$, with $e_i \neq e_j$. Then:
+  \[e_i \to e_j \iff \VC(e_i)[i] \leq \VC(e_j)[i]\]
+  As a consequence, $e_i \cc e_j$ if and only if $\VC(e_i)[i] > \VC(e_j)[i]$ and $\VC(e_j)[j] > \VC(e_i)[j]$.
+\end{framedprop}
+
+\begin{proof}
+  If $e_i = e_i^k$ then $\VC(e_i)[i] = k$. By \Cref{lem:vc-count}, $\VC(e_j)[i] \geq k$ holds if and only if the first $k$ events of $p_i$ are in $\theta(e_j)$, i.e. if and only if $e_i^k \in \theta(e_j)$. Since $e_i \neq e_j$, this means $e_i \to e_j$. The second statement follows by applying the first one in both directions.
+\end{proof}
+
+In words: \curlyquotes{$e_j$ knows about $e_i$} if and only if the $i$-th entry of $e_j$ is at least as large as the position of $e_i$ in $h_i$. The same idea gives a test to check whether a cut is consistent by only looking at its frontier.
+
+\begin{framedprop}{Consistency test}
+  A cut $C$ with frontier $(e_1^{c_1}, \ldots, e_n^{c_n})$ is consistent if and only if for all $i,j \in [n]$:
+  \[\VC(e_j^{c_j})[i] \leq \VC(e_i^{c_i})[i] = c_i\]
+  where the vector clock of the fictitious initial events is $[0, \ldots, 0]$.
+\end{framedprop}
+
+\begin{proof}
+  The cut is consistent if and only if it contains the causal history of each of its events. Since the causal history of an event is contained in the causal history of any later event of the same process, it's enough to check the frontier: $C$ is consistent if and only if $\theta(e_j^{c_j}) \subseteq C$ for all $j$. Since both sets contain a prefix of each $h_i$, this is true if and only if $\abs{\theta(e_j^{c_j}) \cap h_i} \leq c_i$ for all $i$, which is the statement by \Cref{lem:vc-count}.
+\end{proof}
+
+In other words, a cut is consistent when no process on the frontier \curlyquotes{knows more} about $p_i$ than $p_i$ itself. Let's check it on \Cref{fig:cuts}. The frontier of $C$ has clocks $[2,0,0]$, $[1,2,0]$, $[1,2,2]$: on each column, the diagonal entry ($2$, $2$ and $2$) is the maximum, hence $C$ is consistent. The frontier of $C'$ has clocks $[3,2,3]$, $[1,1,0]$, $[0,0,1]$: the third column contains $3$ in the clock of $e_1^3$ but only $1$ in the clock of $e_3^1$, meaning that $p_1$ knows about an event of $p_3$ which is not in the cut, so $C'$ is inconsistent.
+
+Finally, vector clocks have the gap detection ability that Lamport clocks lack.
+
+\begin{framedprop}{Weak gap detection}
+  Let $e_i, e_j$ be two events of processes $p_i$ and $p_j$. If $\VC(e_i)[k] < \VC(e_j)[k]$ for some $k \neq j$, then there exists an event $e_k$ of $p_k$ such that:
+  \[e_k \not\to e_i \quad \text{and} \quad e_k \to e_j\]
+\end{framedprop}
+
+\begin{proof}
+  Let $t = \VC(e_j)[k]$ and consider $e_k = e_k^t$. By \Cref{lem:vc-count}, $e_k^t \in \theta(e_j)$ and, since $k \neq j$, we have $e_k^t \neq e_j$, hence $e_k^t \to e_j$. On the other hand, $\theta(e_i)$ contains only the first $\VC(e_i)[k] < t$ events of $p_k$, hence $e_k^t \notin \theta(e_i)$ and so $e_k^t \not\to e_i$.
+\end{proof}
+
+This is exactly what the monitor needs: by looking at the vector timestamp of a notification, $p_0$ knows \textit{exactly} which events of every process precede it, and so how many notifications it is still missing.
+
+\subsection{Causal delivery}
+
+Using vector clocks, we can give the monitor a delivery rule that doesn't need to wait for all the processes. First, we define what we want to achieve.
+
+\begin{frameddefn}{Causal delivery}
+  A process $p$ respects causal delivery if, for any two messages $m, m'$ sent to $p$:
+  \[\send(m) \to \send(m') \implies \text{$p$ delivers $m$ before $m'$}\]
+\end{frameddefn}
+
+We observe that causal delivery generalizes FIFO delivery: FIFO only concerns messages sent by the same process, while causal delivery also concerns messages sent by different processes that are causally related.
+
+\begin{framedprop}{}
+  If the monitor $p_0$ respects causal delivery, then every observation is a consistent run.
+\end{framedprop}
+
+\begin{proof}
+  Each process sends the notification of an event immediately after executing it. Hence, if $e \to e'$ then the sending of the notification of $e$ happens before the sending of the notification of $e'$. By causal delivery, $p_0$ delivers the notification of $e$ first.
+\end{proof}
+
+To implement causal delivery, each notification of an event $e$ carries the timestamp $\TS(m) = \VC(e)$, and the monitor keeps a vector $D$ where $D[j]$ is the number of notifications from $p_j$ that it has delivered so far. Since every event is notified and, as we'll see, notifications of each process are delivered in order, $D[j]$ is also the number of events of $p_j$ that $p_0$ has already observed.
+
+\begin{frameddefn}{Delivery rule DR3}
+  The monitor $p_0$ delivers a notification $m$ sent by $p_j$ as soon as both of the following conditions hold:
+  \begin{enumerate}
+    \item $D[j] = \TS(m)[j] - 1$
+    \item $D[k] \geq \TS(m)[k]$ for all $k \neq j$
+  \end{enumerate}
+  After delivering $m$, the monitor sets $D[j] \leftarrow D[j] + 1$.
+\end{frameddefn}
+
+The first condition says that $m$ is the \textit{next} notification of $p_j$: all the previous events of $p_j$ have already been delivered. The second condition says that all the events of the other processes that causally precede the event of $m$ have already been delivered too. Together, by \Cref{lem:vc-count}, they guarantee that the whole causal history of the event has been observed before the event itself.
+
+\begin{framedobs}{}
+  DR3 doesn't require the channels to be FIFO: the first condition already forces the notifications of each process to be delivered in order, regardless of the order of arrival. Moreover, unlike DR2, a notification can be delivered without waiting for the processes that are not in its causal past.
+\end{framedobs}
+
+\begin{framedex}{}
+  Consider \Cref{fig:vector} and suppose that the notification of $e_1^3$, with timestamp $[3,2,3]$, is the first one to arrive. With $D = [0,0,0]$, the first condition fails ($D[1] = 0 \neq 2$), hence $p_0$ waits. After receiving and delivering, in a valid order, the notifications of $e_1^1, e_1^2, e_2^1, e_2^2, e_3^1, e_3^2, e_3^3$, we get $D = [2,2,3]$ and the notification of $e_1^3$ can finally be delivered. Note that the notification of $e_2^3$ is not needed, since $e_2^3$ is not in the causal history of $e_1^3$.
+\end{framedex}
+
+\subsection{Summary}
+
+\begin{table}[H]
+  \centering
+  \renewcommand{\arraystretch}{1.3}
+  \begin{tabular}{@{}lccc@{}}
+    \toprule
+    & \textbf{Real-time} & \textbf{Lamport} & \textbf{Vector} \\
+    \midrule
+    Clock condition & \checkmark & \checkmark & \checkmark \\
+    Strong clock condition & $\times$ & $\times$ & \checkmark \\
+    Gap detection & -- & $\times$ & \checkmark{} (weak) \\
+    Stability detected by & bound $\delta$ & all processes & causal past only \\
+    Requires a synchronous system & \checkmark & $\times$ & $\times$ \\
+    Timestamp size per message & $O(1)$ & $O(1)$ & $O(n)$ \\
+    Delivery rule for the monitor & DR1 & DR2 (FIFO) & DR3 \\
+    \bottomrule
+  \end{tabular}
+  \caption{Comparison of the three clocks.}
+\end{table}

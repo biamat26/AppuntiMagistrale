@@ -52,37 +52,69 @@
 \RequirePackage{algorithm}
 \RequirePackage{algpseudocode}
 
-% ---------- Colored boxes ----------
+% ---------- Framed boxes (style inspired by the Nyx notes) ----------
 \RequirePackage[most]{tcolorbox}
-\tcbuselibrary{theorems}
+\RequirePackage{etoolbox}
 
-\newtcbtheorem[number within=chapter]{definition}{Definition}{
-  colback=RoyalBlue!5, colframe=RoyalBlue!75!black, fonttitle=\bfseries,
-  breakable}{def}
-\newtcbtheorem[use counter from=definition]{theorem}{Theorem}{
-  colback=Red!5, colframe=Red!70!black, fonttitle=\bfseries,
-  breakable}{thm}
-\newtcbtheorem[use counter from=definition]{lemma}{Lemma}{
-  colback=Orange!5, colframe=Orange!80!black, fonttitle=\bfseries,
-  breakable}{lem}
-\newtcbtheorem[use counter from=definition]{proposition}{Proposition}{
-  colback=Orange!5, colframe=Orange!80!black, fonttitle=\bfseries,
-  breakable}{prop}
-\newtcbtheorem[use counter from=definition]{example}{Example}{
-  colback=ForestGreen!5, colframe=ForestGreen!70!black, fonttitle=\bfseries,
-  breakable}{ex}
+% \newframedbox{env}{Name}{color}
+% Usage: \begin{frameddefn}{Title} ... \end{frameddefn}
+%        \begin{frameddefn}[label={def:x}]{Title} ... \end{frameddefn}
+\newcommand{\newframedbox}[3]{%
+  \newtcolorbox[auto counter, number within=chapter]{#1}[2][]{%
+    enhanced, breakable,
+    colback=white, colframe=#3!55!white, boxrule=0.6pt, arc=2pt,
+    left=6pt, right=6pt, top=8pt, bottom=6pt,
+    before skip=12pt, after skip=10pt,
+    fonttitle=\bfseries\color{black},
+    attach boxed title to top left={xshift=8mm, yshift*=-\tcboxedtitleheight/2},
+    boxed title style={colback=#3!35!white, colframe=#3!35!white,
+      sharp corners, boxrule=0pt,
+      interior code={\fill[#3!35!white] ([xshift=-3mm]frame.south west)
+        -- ([xshift=3mm]frame.south east) -- (frame.north east)
+        -- (frame.north west) -- cycle;}},
+    title={#2~\thetcbcounter\ifstrempty{##2}{}{: ##2}},
+    ##1}}
 
-\newtcolorbox{note}{
-  colback=Gray!8, colframe=Gray!60, title=Note, fonttitle=\bfseries,
-  breakable}
-\newtcolorbox{warning}{
-  colback=Yellow!10, colframe=Goldenrod!90!black, title=Warning,
-  fonttitle=\bfseries, breakable}
-\newtcolorbox{summary}{
-  colback=Purple!5, colframe=Purple!70!black, title=Summary,
-  fonttitle=\bfseries, breakable}
+\newframedbox{frameddefn}{Definition}{ForestGreen}
+\newframedbox{framedthm}{Theorem}{BrickRed}
+\newframedbox{framedlem}{Lemma}{Orange}
+\newframedbox{framedprop}{Proposition}{RoyalBlue}
+\newframedbox{framedcor}{Corollary}{RoyalBlue}
+\newframedbox{framedobs}{Observation}{Goldenrod}
+\newframedbox{framedex}{Example}{TealBlue}
+\newframedbox{framedprob}{Problem}{Purple}
+\newframedbox{framedalgo}{Algorithm}{Gray}
 
-% Proofs keep the standard amsthm environment: \begin{proof} ... \end{proof}
+% Proofs: standard amsthm \begin{proof} ... \end{proof}
+
+% ---------- Space-time diagrams ----------
+% \proc{y}{name}{x_end}         process line at height y
+% \node[ev] (a) at (x,y) {};    event dot
+% \draw[msg] (a) -- (b);        message arrow
+\tikzset{
+  ev/.style={circle, fill=black, inner sep=0pt, minimum size=4pt},
+  msg/.style={-{Stealth[length=2.2mm]}, thick},
+  ctrl/.style={-{Stealth[length=2mm]}, dashed, gray},
+  cutline/.style={very thick, rounded corners=4pt},
+  lbl/.style={font=\scriptsize},
+}
+\newcommand{\proc}[3]{%
+  \draw[-{Latex}, gray!70] (0,#1) -- (#3,#1);
+  \node[left] at (0,#1) {$#2$};}
+
+% ---------- Notation macros (same as the reference notes) ----------
+\newcommand{\soe}[2]{\left\{\begin{array}{#1}#2\end{array}\right.}
+\newcommand{\abk}[1]{\left\langle #1 \right\rangle}
+\newcommand{\rbk}[1]{\left( #1 \right)}
+\newcommand{\sbk}[1]{\left[ #1 \right]}
+\newcommand{\curlyquotes}[1]{``#1''}
+\newcommand{\send}{\mathrm{send}}
+\newcommand{\recv}{\mathrm{receive}}
+\newcommand{\LC}{\mathrm{LC}}
+\newcommand{\VC}{\mathrm{VC}}
+\newcommand{\RC}{\mathrm{RC}}
+\newcommand{\TS}{\mathrm{TS}}
+\newcommand{\cc}{\mathrel{\|}}   % concurrency
 
 % ---------- Handy math macros ----------
 \newcommand{\N}{\mathbb{N}}
@@ -100,5 +132,16 @@
 % ---------- Links (load last) ----------
 \RequirePackage[colorlinks=true,linkcolor=RoyalBlue,urlcolor=RoyalBlue]{hyperref}
 \RequirePackage{cleveref}
+% Names used by \cref/\Cref for the framed boxes
+\newcommand{\crefbox}[3]{\crefname{tcb@cnt@#1}{#2}{#3}\Crefname{tcb@cnt@#1}{#2}{#3}}
+\crefbox{frameddefn}{Definition}{Definitions}
+\crefbox{framedthm}{Theorem}{Theorems}
+\crefbox{framedlem}{Lemma}{Lemmas}
+\crefbox{framedprop}{Proposition}{Propositions}
+\crefbox{framedcor}{Corollary}{Corollaries}
+\crefbox{framedobs}{Observation}{Observations}
+\crefbox{framedex}{Example}{Examples}
+\crefbox{framedprob}{Problem}{Problems}
+\crefbox{framedalgo}{Algorithm}{Algorithms}
 
 \endinput

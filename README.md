@@ -24,7 +24,15 @@ latexmk -pdf main.tex
 
 ## Available environments
 
-- `definition`, `theorem`, `lemma`, `proposition`, `example` — numbered boxes:
-  `\begin{definition}{Title}{label} ... \end{definition}` (reference with `\cref{def:label}`)
-- `note`, `warning`, `summary` — unnumbered boxes
-- `proof`, `algorithm` + `algorithmic`, `lstlisting`
+Numbered framed boxes (per chapter): `frameddefn`, `framedthm`, `framedlem`, `framedprop`,
+`framedcor`, `framedobs`, `framedex`, `framedprob`, `framedalgo`.
+
+```latex
+\begin{frameddefn}[label={def:cut}]{Cut}
+  ...
+\end{frameddefn}
+% reference with \Cref{def:cut}
+```
+
+Space-time diagrams (TikZ): `\proc{y}{p_1}{x_end}` draws a process line,
+`\node[ev] (a) at (x,y) {};` an event, `\draw[msg] (a) -- (b);` a message.
