@@ -1,0 +1,213 @@
+% ============================================================
+%  Basic notions: system model, CAP, safety/liveness, events, happened-before
+% ============================================================
+
+% The running example used in the figures of this chapter.
+% p1: e11 send(m1) -> p2, e12 internal, e13 receive(m3)
+% p2: e21 receive(m1), e22 send(m2) -> p3, e23 internal
+% p3: e31 internal, e32 receive(m2), e33 send(m3) -> p1
+\newcommand{\runningexample}{%
+  \proc{2}{p_1}{7.6}
+  \proc{1}{p_2}{7.6}
+  \proc{0}{p_3}{7.6}
+  \node[ev] (a1) at (1.0,2) {};
+  \node[ev] (a2) at (3.0,2) {};
+  \node[ev] (a3) at (6.2,2) {};
+  \node[ev] (b1) at (2.2,1) {};
+  \node[ev] (b2) at (3.4,1) {};
+  \node[ev] (b3) at (6.8,1) {};
+  \node[ev] (c1) at (1.0,0) {};
+  \node[ev] (c2) at (4.4,0) {};
+  \node[ev] (c3) at (5.2,0) {};
+  \draw[msg] (a1) -- node[lbl, above right=-1pt] {$m_1$} (b1);
+  \draw[msg] (b2) -- node[lbl, above right=-1pt] {$m_2$} (c2);
+  \draw[msg] (c3) -- node[lbl, right] {$m_3$} (a3);
+}
+
+\section{Basic notions}
+
+\subsection{What is a distributed system?}
+
+\begin{frameddefn}{Distributed system}
+  A distributed system is a collection of autonomous processes $p_1, \ldots, p_n$, usually running on different machines, that cooperate to solve a common problem and that communicate \underline{only} by exchanging messages over a network.
+\end{frameddefn}
+
+The key word in the definition is \textit{only}: the processes don't share any memory and they don't share any clock. Everything a process knows about the others comes from the messages it has received, which may be arbitrarily old by the time they are read. Typical examples are replicated databases, cloud storage, blockchains, the DNS and large-scale web services.
+
+Why do we build distributed systems in the first place? There are several reasons:
+\begin{itemize}
+  \item \textbf{Scalability}: a single machine has limited resources, while a distributed system can grow by adding machines.
+  \item \textbf{Fault tolerance}: if data and computations are replicated on several machines, the system can keep working even when some of them fail.
+  \item \textbf{Geographic distribution}: users and data are spread around the world, and serving them from nearby machines reduces latency.
+  \item \textbf{Resource sharing}: different machines can share data, storage and computing power.
+\end{itemize}
+
+These advantages come at a price. Distributed systems are intrinsically hard because of three features that a single computer doesn't have:
+\begin{enumerate}
+  \item \textbf{Concurrency}: the processes run in parallel and interleave their actions in unpredictable ways.
+  \item \textbf{No global clock}: each machine has its own clock and clocks are never perfectly synchronized, hence processes cannot agree on \textit{when} something happened.
+  \item \textbf{Independent failures}: a machine or a link can fail while the rest of the system keeps working, and the other processes may not be able to tell a failed process from a slow one.
+\end{enumerate}
+
+A famous informal definition by Lamport captures the last point well: a distributed system is one in which a machine you have never heard of can crash and stop your own computer from working.
+
+\subsection{The system model}
+
+To reason formally about algorithms we need a \textbf{model}, i.e. a precise list of assumptions on what processes and channels can and cannot do. The same problem can be easy in one model and impossible in another, so the model is always the first thing to check when reading a result.
+
+\paragraph{Processes.} The system is made of $n$ processes $\Pi = \{p_1, \ldots, p_n\}$. Each process executes a sequential program: it performs local computations, sends messages and receives messages, one action at a time.
+
+\paragraph{Channels.} Unless stated otherwise, we assume that the network is \textit{fully connected} (every pair of processes can communicate directly) and that channels are \textbf{reliable}:
+\begin{itemize}
+  \item every message sent to a correct process is eventually received;
+  \item every message is received at most once (no duplication);
+  \item every received message was actually sent by someone (no creation).
+\end{itemize}
+Reliability says nothing about the order of delivery: messages can be delivered in a different order from the one in which they were sent. When we also require messages between the same pair of processes to be delivered in sending order, we speak of \textbf{FIFO channels}.
+
+\paragraph{Timing.} The most important assumption concerns time.
+
+\begin{frameddefn}{Synchronous and asynchronous systems}
+  A distributed system is \textbf{synchronous} if there are known upper bounds on the time needed by a process to execute a step, on the time needed by a message to be delivered and on the drift of the local clocks. A system is \textbf{asynchronous} if no such bounds exist.
+\end{frameddefn}
+
+In a synchronous system a process can use timeouts: if a message doesn't arrive within the bound, its sender has surely failed. In an asynchronous system this is impossible, since a slow process is indistinguishable from a crashed one.
+
+\begin{framedobs}{}
+  Every algorithm that is correct in the asynchronous model is also correct in the synchronous one, since every synchronous execution is in particular a legal asynchronous execution. The opposite is false: for instance, failure detection through timeouts only works in the synchronous model.
+\end{framedobs}
+
+Real systems are somewhere in between: most of the time messages are fast, but there are periods (congestion, garbage collection, network problems) in which they are arbitrarily slow. This is captured by the \textbf{partially synchronous} model, in which the bounds exist but are unknown, or hold only after some unknown point in time. Many practical protocols, such as Paxos and Raft, are designed to be always safe in the asynchronous model while relying on partial synchrony only to make progress.
+
+\begin{framedobs}{FLP impossibility}
+  Fischer, Lynch and Paterson (1985) proved that, in an asynchronous system, there is no deterministic algorithm that solves consensus if even a single process may crash. This is the main reason why asynchrony is such a strong assumption, and why practical protocols either use randomization or rely on partial synchrony.
+\end{framedobs}
+
+\paragraph{Failures.} Processes can fail in different ways, from the most benign to the most severe:
+\begin{itemize}
+  \item \textbf{Crash} (or \textit{crash-stop}): the process stops executing and never recovers.
+  \item \textbf{Omission}: the process occasionally fails to send or receive some messages.
+  \item \textbf{Byzantine} (or \textit{arbitrary}): the process can behave in any way, including sending wrong or contradictory messages, for instance because it has been compromised by an attacker.
+\end{itemize}
+A process that never fails is called \textbf{correct}. Algorithms are usually designed to tolerate up to $f$ faulty processes out of $n$, and the relation between $f$ and $n$ depends on the failure type.
+
+\subsection{The CAP theorem}
+
+When data is replicated on several machines, we would like the system to behave as if there was a single copy, to always answer requests and to survive network failures. The CAP theorem tells us that we can't have all three at the same time.
+
+\begin{frameddefn}{Consistency, availability, partition tolerance}
+  Consider a system that stores data replicated on several nodes.
+  \begin{itemize}
+    \item \textbf{Consistency}: every read returns the value of the most recent completed write, as if there was a single copy of the data (formally, the system is \textit{linearizable}).
+    \item \textbf{Availability}: every request received by a non-failed node eventually gets a response.
+    \item \textbf{Partition tolerance}: the system keeps working even if the network loses an arbitrary number of messages between nodes, splitting them into groups that cannot communicate (a \textit{partition}).
+  \end{itemize}
+\end{frameddefn}
+
+\begin{framedthm}{CAP theorem (Brewer 2000, Gilbert and Lynch 2002)}
+  In an asynchronous network, no replicated system can guarantee consistency, availability and partition tolerance at the same time.
+\end{framedthm}
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[node distance=1.2cm, font=\small]
+    \node[draw, rounded corners, minimum width=1.4cm, minimum height=0.8cm] (n1) at (0,0) {$N_1: x=1$};
+    \node[draw, rounded corners, minimum width=1.4cm, minimum height=0.8cm] (n2) at (5,0) {$N_2: x=0$};
+    \draw[BrickRed, very thick, decorate, decoration={zigzag, amplitude=2pt, segment length=6pt}] (2.5,-1.1) -- (2.5,1.1);
+    \node[BrickRed, font=\scriptsize] at (2.5,1.35) {partition};
+    \node (c1) at (0,-1.8) {client $A$};
+    \node (c2) at (5,-1.8) {client $B$};
+    \draw[msg] (c1) -- node[left, lbl] {write $x=1$} (n1);
+    \draw[msg] (c2) -- node[right, lbl] {read $x$} (n2);
+    \draw[ctrl] (n1) -- node[above, lbl] {update lost} (2.3,0);
+  \end{tikzpicture}
+  \caption{During a partition, $N_2$ cannot learn about the write received by $N_1$. When $B$ reads $x$, $N_2$ must either answer $0$ (giving up consistency) or not answer until the partition heals (giving up availability).}
+\end{figure}
+
+\begin{proof}[Proof idea]
+  Consider two nodes $N_1, N_2$ holding a copy of $x = 0$ and suppose that the network partitions them, losing every message between them. A client writes $x = 1$ on $N_1$: by availability, $N_1$ must accept the write and answer. Then another client reads $x$ from $N_2$: by availability, $N_2$ must answer, but since no message from $N_1$ can reach it, it can only answer $0$, violating consistency.
+\end{proof}
+
+\begin{framedobs}{}
+  The theorem is often summarized as \curlyquotes{pick two out of three}, but this is misleading. In a real network partitions \textit{will} happen and cannot be prevented, so partition tolerance is not optional. The correct reading is the following: \textit{when a partition occurs}, the system must choose between consistency and availability. When there is no partition, a system can provide both. Systems that choose consistency are called \textbf{CP} (e.g.\ systems based on Paxos or Raft), while systems that choose availability are called \textbf{AP} (e.g.\ Dynamo-style key-value stores).
+\end{framedobs}
+
+\subsection{Safety and liveness}
+
+When we specify what a distributed algorithm must do, it's useful to split its requirements into two families.
+
+\begin{frameddefn}{Safety and liveness}
+  A \textbf{safety} property states that \curlyquotes{nothing bad ever happens}: it can be violated in a finite prefix of an execution, and once violated it can never be repaired. A \textbf{liveness} property states that \curlyquotes{something good eventually happens}: it can never be violated by a finite prefix, since the good thing may still happen later.
+\end{frameddefn}
+
+For instance, in mutual exclusion \curlyquotes{at most one process is in the critical section at any time} is a safety property, while \curlyquotes{every process that requests the critical section eventually enters it} is a liveness property. In consensus, \curlyquotes{all processes that decide, decide the same value} is a safety property, while \curlyquotes{every correct process eventually decides} is a liveness property.
+
+This distinction matters because the two kinds of properties fail in different ways. An algorithm that does nothing at all is trivially safe but not live, and an algorithm that answers immediately at random is live but not safe: the challenge is to guarantee both. By the FLP result, in an asynchronous system with crashes, consensus algorithms like Paxos guarantee safety always and liveness only under additional assumptions.
+
+\subsection{Distributed computations}
+
+We now describe formally what happens during the execution of a distributed algorithm. The execution of each process is a sequence of \textbf{events}, i.e. atomic actions that change its local state. We consider three kinds of events:
+\begin{itemize}
+  \item \textbf{internal events}, which only affect the local state of the process;
+  \item \textbf{send events}, written $\send_j(m)$ or simply $\send(m)$, in which the process sends message $m$ to process $p_j$;
+  \item \textbf{receive events}, written $\recv_j(m)$ or simply $\recv(m)$, in which the process receives message $m$ from process $p_j$.
+\end{itemize}
+We denote with $e_i^k$ the $k$-th event executed by process $p_i$.
+
+\begin{frameddefn}{Local and global history}
+  The local history of process $p_i$ is the sequence of its events $h_i = e_i^1 e_i^2 \ldots$, and we write $h_i^k = e_i^1 \ldots e_i^k$ for its prefix of length $k$. The global history of the computation is the set of all its events:
+  \[H = h_1 \cup \ldots \cup h_n\]
+\end{frameddefn}
+
+We observe that each local history is totally ordered, since each process executes one event at a time, but the global history is just a set: it doesn't tell us in which order the events of different processes happened. In an asynchronous system there is no global clock that could timestamp the events, so this order can't be observed directly. Distributed computations are usually represented through \textbf{space-time diagrams}, in which each process is a horizontal line with time flowing from left to right, events are dots and messages are arrows.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[xscale=1.25, yscale=1.1]
+    \runningexample
+    \node[lbl, above=2pt] at (a1) {$e_1^1$};
+    \node[lbl, above=2pt] at (a2) {$e_1^2$};
+    \node[lbl, above=2pt] at (a3) {$e_1^3$};
+    \node[lbl, below=2pt] at (b1) {$e_2^1$};
+    \node[lbl, below left=0pt] at (b2) {$e_2^2$};
+    \node[lbl, below=2pt] at (b3) {$e_2^3$};
+    \node[lbl, below=2pt] at (c1) {$e_3^1$};
+    \node[lbl, below=2pt] at (c2) {$e_3^2$};
+    \node[lbl, below=2pt] at (c3) {$e_3^3$};
+  \end{tikzpicture}
+  \caption{The running example of this chapter. Events $e_1^2$, $e_2^3$ and $e_3^1$ are internal, $e_1^1$, $e_2^2$ and $e_3^3$ are send events, while $e_2^1$, $e_3^2$ and $e_1^3$ are receive events.}
+  \label{fig:running-example}
+\end{figure}
+
+Even without a global clock, some events are clearly ordered: an event of $p_i$ happens before the following events of $p_i$, and the sending of a message happens before its reception. Lamport's idea is that these are the \textit{only} orderings we can be sure of, and that every other ordering comes from combining them.
+
+\begin{frameddefn}{Happened-before relation}
+  The happened-before (or cause-effect) relation $\to\ \subseteq H \times H$ is the smallest relation that satisfies the following three rules:
+  \begin{enumerate}
+    \item \textit{Local order}: if $e_i^k, e_i^{k'} \in h_i$ with $k < k'$, then $e_i^k \to e_i^{k'}$.
+    \item \textit{Messages}: if $e = \send(m)$ and $e' = \recv(m)$ for the same message $m$, then $e \to e'$.
+    \item \textit{Transitivity}: if $e \to e'$ and $e' \to e''$, then $e \to e''$.
+  \end{enumerate}
+\end{frameddefn}
+
+Equivalently, $e \to e'$ if and only if in the space-time diagram there is a path from $e$ to $e'$ that moves forward along process lines and follows message arrows. The intuition is that $e \to e'$ when $e$ \textit{may have influenced} $e'$: some information produced by $e$ may have reached the process of $e'$ before $e'$ was executed.
+
+\begin{framedobs}{}
+  The relation $\to$ is a \textbf{strict partial order}: it is transitive by definition, and it is irreflexive since a message can't be received before being sent, so no path in the diagram can come back to its starting event. It is only \textit{partial} because some pairs of events are not ordered at all.
+\end{framedobs}
+
+\begin{frameddefn}{Concurrent events}
+  Two events $e,e' \in H$ are concurrent, written $e \cc e'$, if $e \not\to e'$ and $e' \not\to e$.
+\end{frameddefn}
+
+Two events are concurrent when neither of them can have influenced the other. This doesn't mean that they happened \curlyquotes{at the same time}: in real time one of them happened first, but no process could have noticed it.
+
+\begin{framedex}{}
+  In \Cref{fig:running-example} we have the chain
+  \[e_1^1 \to e_2^1 \to e_2^2 \to e_3^2 \to e_3^3 \to e_1^3\]
+  hence, for instance, $e_1^1 \to e_1^3$ both through local order and through the chain of messages, and $e_2^2 \to e_1^3$ through $m_2$ and $m_3$. On the other hand, $e_3^1 \cc e_1^2$, since no path connects them, and similarly $e_2^3 \cc e_1^3$: $e_2^3$ comes after the sending of $m_2$, but no message leaves $p_2$ after $e_2^3$.
+\end{framedex}
+
+\begin{framedobs}{}
+  Concurrency is \underline{not} transitive. In \Cref{fig:running-example} we have $e_1^1 \cc e_3^1$ and $e_3^1 \cc e_1^2$, but $e_1^1 \to e_1^2$. Hence, concurrency is not an equivalence relation and it can't be used to split the events into \curlyquotes{simultaneous} groups.
+\end{framedobs}

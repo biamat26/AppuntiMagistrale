@@ -2,33 +2,11 @@
 %  System monitoring: global states, cuts, logical and vector clocks
 % ============================================================
 
-% The running example used in the figures of this section.
-% p1: e11 send(m1) -> p2, e12 internal, e13 receive(m3)
-% p2: e21 receive(m1), e22 send(m2) -> p3, e23 internal
-% p3: e31 internal, e32 receive(m2), e33 send(m3) -> p1
-\newcommand{\runningexample}{%
-  \proc{2}{p_1}{7.6}
-  \proc{1}{p_2}{7.6}
-  \proc{0}{p_3}{7.6}
-  \node[ev] (a1) at (1.0,2) {};
-  \node[ev] (a2) at (3.0,2) {};
-  \node[ev] (a3) at (6.2,2) {};
-  \node[ev] (b1) at (2.2,1) {};
-  \node[ev] (b2) at (3.4,1) {};
-  \node[ev] (b3) at (6.8,1) {};
-  \node[ev] (c1) at (1.0,0) {};
-  \node[ev] (c2) at (4.4,0) {};
-  \node[ev] (c3) at (5.2,0) {};
-  \draw[msg] (a1) -- node[lbl, above right=-1pt] {$m_1$} (b1);
-  \draw[msg] (b2) -- node[lbl, above right=-1pt] {$m_2$} (c2);
-  \draw[msg] (c3) -- node[lbl, right] {$m_3$} (a3);
-}
-
 \section{System monitoring}
 
 \subsection{Global states and the monitor process}
 
-Before diving in, we recall the notation of the previous section. Each process $p_i$ executes a sequence of events $h_i = e_i^1 e_i^2 \ldots$ (its local history), the global history is $H = h_1 \cup \ldots \cup h_n$ and $e \to e'$ denotes the cause-effect relation, also known as Lamport's \textbf{happened-before} relation. We also add a \textit{fictitious} initial event $e_i^0$ for each process, which simply represents the moment in which $p_i$ starts.
+In this section we keep using the notation of the previous one: $h_i$ is the local history of $p_i$, $H$ is the global history and $e \to e'$ is the happened-before relation. We also add a \textit{fictitious} initial event $e_i^0$ for each process, which simply represents the moment in which $p_i$ starts.
 
 We denote with $\sigma_i^k$ the \textbf{local state} of process $p_i$ immediately after the execution of event $e_i^k$, meaning that $\sigma_i^0$ is the initial state of $p_i$. Intuitively, the local state contains everything that $p_i$ knows: the values of its variables, the messages it has sent and received, and so on.
 
