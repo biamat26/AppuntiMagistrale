@@ -137,15 +137,17 @@ Depending on whether these quantities are bounded, and on whether the processes 
   \begin{itemize}
     \item \textbf{synchronous} if there are \textit{known} upper bounds on process speed, on message delay and on clock drift;
     \item \textbf{asynchronous} if there are no bounds at all: steps and messages can take an arbitrary (but finite) amount of time;
-    \item \textbf{partially synchronous} if the bounds exist but are \textit{unknown} to the processes, or if they are known but hold only after some unknown point in time, called \textit{Global Stabilization Time} (GST).
+    \item \textbf{eventually synchronous} (or \textit{partially synchronous}) if the bounds exist but are \textit{unknown} to the processes, or if they are known but hold only after some unknown point in time, called \textit{Global Stabilization Time} (GST).
   \end{itemize}
 \end{frameddefn}
 
-The synchronous model is the most convenient for the algorithm designer, since processes can reason about time, but it is also the least realistic. The asynchronous model is the opposite: it assumes nothing, so an algorithm that works in it works in any real network, but many problems become much harder (or even impossible) to solve. The partially synchronous model is the compromise used by most practical systems.
+The synchronous model is the most convenient for the algorithm designer, since processes can reason about time, but it is also the least realistic. The asynchronous model is the opposite: it assumes nothing, so an algorithm that works in it works in any real network, but many problems become much harder (or even impossible) to solve. The eventually synchronous model is the compromise used by most practical systems.
 
-\subsection{Executions}
+\section{Executions}
 
-To compare the timing models formally, we describe what a run of the whole system looks like using the process model introduced above.
+The process model tells us what a single process does in a step. We now describe what a run of the \textit{whole} system looks like, and how the timing model constrains it.
+
+\subsection{Configurations}
 
 \begin{frameddefn}{Configuration}
   A configuration of the system is a vector containing the state of every process together with the content of all the buffers:
@@ -153,16 +155,15 @@ To compare the timing models formally, we describe what a run of the whole syste
   A configuration is \textit{initial} if $q_j \in Q_{in}$ for every process $p_j$ and all the buffers are empty.
 \end{frameddefn}
 
-The system moves from a configuration to the next one through a single \textbf{step} (or \textit{event}), which can be of the two kinds already described:
+In other words, a configuration is a \curlyquotes{photograph} of the entire system at a given moment. The system moves from a configuration to the next one through a single \textbf{event} (or \textit{step}), which can be of two kinds:
 \begin{itemize}
-  \item a \textit{computation step} $\Exec(j)$, in which process $p_j$ applies its transition function $P_j$, empties $\InBuf_j$ and adds the new messages to $\OutBuf_j$;
-  \item a \textit{delivery step} $\Del(m,i,j)$, in which the message $m$ sent by $p_i$ to $p_j$ is moved from $\OutBuf_i$ to $\InBuf_j$.
+  \item a \textit{computation event} $\Exec(j)$, in which process $p_j$ applies its transition function $P_j$, empties $\InBuf_j$ and adds the new messages to $\OutBuf_j$;
+  \item a \textit{delivery event} $\Del(i,j,m)$, in which the message $m$ sent by $p_i$ to $p_j$ is moved from $\OutBuf_i$ to $\InBuf_j$.
 \end{itemize}
 
 \begin{figure}[H]
   \centering
   \begin{tikzpicture}[
-      pbox/.style={draw=RoyalBlue, fill=gray!12, minimum width=3.2cm, minimum height=1.1cm},
       mbox/.style={draw, fill=black!85, text=white, font=\scriptsize, inner sep=1.5pt, minimum width=0.45cm},
     ]
     % C0
@@ -177,22 +178,22 @@ The system moves from a configuration to the next one through a single \textbf{s
     \node[font=\bfseries] at (-1.2,-6.4) {$C_2$};
     \dsproc{0}{-6.8}{Process 1}{q'}{}{}
     \dsproc{6}{-6.8}{Process 2}{q_2}{m'}{}
-    % steps
+    % events
     \draw[msg, BrickRed] (-1.2,0.0) -- node[left, font=\small, align=right] {$\Exec(1)$\\[1pt] {\scriptsize $p_1$ consumes $m$}\\[-1pt] {\scriptsize and sends $m'$}} (-1.2,-2.6);
-    \draw[msg, BrickRed] (-1.2,-3.4) -- node[left, font=\small, align=right] {$\Del(m',1,2)$\\[1pt] {\scriptsize the network moves}\\[-1pt] {\scriptsize $m'$ to $p_2$}} (-1.2,-6.0);
+    \draw[msg, BrickRed] (-1.2,-3.4) -- node[left, font=\small, align=right] {$\Del(1,2,m')$\\[1pt] {\scriptsize the network moves}\\[-1pt] {\scriptsize $m'$ to $p_2$}} (-1.2,-6.0);
   \end{tikzpicture}
-  \caption{An execution made of two steps. In $C_0$, process $p_1$ has a message $m$ in its input buffer. The computation step $\Exec(1)$ consumes $m$, changes the state of $p_1$ from $q$ to $q'$ and puts the new message $m'$, addressed to $p_2$, in $\OutBuf_1$. Then, the delivery step $\Del(m',1,2)$ moves $m'$ from $\OutBuf_1$ to $\InBuf_2$. The state of $p_2$ doesn't change: $p_2$ will read $m'$ only at its next computation step.}
+  \caption{Two events and the configurations they produce. In $C_0$, process $p_1$ has a message $m$ in its input buffer. The computation event $\Exec(1)$ consumes $m$, changes the state of $p_1$ from $q$ to $q'$ and puts the new message $m'$, addressed to $p_2$, in $\OutBuf_1$. Then, the delivery event $\Del(1,2,m')$ moves $m'$ from $\OutBuf_1$ to $\InBuf_2$. The state of $p_2$ doesn't change: $p_2$ will read $m'$ only at its next computation event.}
   \label{fig:execution-steps}
 \end{figure}
 
-\begin{framedex}{The steps of \Cref{fig:execution-steps}}
-  In the computation step $\Exec(1)$, the transition function of $p_1$ is applied to its state and to the content of its input buffer:
+\begin{framedex}{The events of \Cref{fig:execution-steps}}
+  In the computation event $\Exec(1)$, the transition function of $p_1$ is applied to its state and to the content of its input buffer:
   \begin{align*}
     P_1(q, \{m\}) &= (q', \{\abk{1,2,m'}\}) \\
     \OutBuf_1 &\leftarrow \OutBuf_1 \cup \{\abk{1,2,m'}\} \\
     \InBuf_1 &\leftarrow \varnothing
   \end{align*}
-  In the delivery step $\Del(m',1,2)$ no process executes anything: the network moves the message from the output buffer of $p_1$ to the input buffer of $p_2$:
+  In the delivery event $\Del(1,2,m')$ no process executes anything: the network moves the message from the output buffer of $p_1$ to the input buffer of $p_2$:
   \begin{align*}
     \OutBuf_1 &\leftarrow \OutBuf_1 \setminus \{\abk{1,2,m'}\} \\
     \InBuf_2 &\leftarrow \InBuf_2 \cup \{\abk{1,2,m'}\}
@@ -200,31 +201,147 @@ The system moves from a configuration to the next one through a single \textbf{s
 \end{framedex}
 
 \begin{frameddefn}{Execution}
-  An execution is an (infinite) alternating sequence of configurations and steps
-  \[C_0,\ \phi_1,\ C_1,\ \phi_2,\ C_2,\ \ldots\]
-  where $C_0$ is an initial configuration and each $C_k$ is the configuration obtained by applying the step $\phi_k$ to $C_{k-1}$.
+  An execution is an (infinite) alternating sequence of configurations and events
+  \[E = C_0,\ e_0,\ C_1,\ e_1,\ C_2,\ \ldots\]
+  where $C_0$ is an initial configuration and each $C_{k+1}$ is the configuration obtained by applying the event $e_k$ to $C_k$.
 \end{frameddefn}
 
-We observe that steps are \textit{atomic} and happen one at a time: even if in reality two processes act at the same instant, we can always describe the execution as an interleaving of their steps, since a process cannot observe what another one is doing in the same instant. Not every sequence of steps is acceptable, though: the timing model decides which executions are \textbf{admissible}.
+We observe that events are \textit{atomic} and happen one at a time: even if in reality two processes act at the same instant, we can always describe the execution as an interleaving of their events, since a process cannot observe what another one is doing in the same instant. Not every sequence of events is acceptable, though: the timing model decides which executions are \textbf{admissible}. We now see the two extreme cases.
 
-\paragraph{Asynchronous executions.} In the asynchronous model the only requirement is that nothing is postponed forever.
+\subsection{Asynchronous executions}
 
-\begin{frameddefn}{Asynchronous execution}
-  An execution is an admissible asynchronous execution if:
+In an asynchronous system there are no bounds on process speed and message delay. Hence, the order in which events happen is completely arbitrary. It's useful to think of it as chosen by a \textbf{scheduler} (or \textit{adversary}) that tries to make the algorithm fail: at every moment, it picks which process executes next and which message gets delivered. It can make a process very slow, deliver messages in any order and delay a message for as long as it wants. An algorithm is correct in the asynchronous model only if it is correct against \textit{every} possible scheduler.
+
+\paragraph{Fairness.} There is only one thing that the scheduler can't do: postpone something forever.
+
+\begin{frameddefn}{Fair execution}
+  An execution $E$ is fair if:
   \begin{enumerate}
-    \item every (correct) process performs infinitely many computation steps;
-    \item every message that is sent is eventually delivered.
+    \item every process $p_i$ executes infinitely many local steps $\Exec(i)$;
+    \item every message that is sent is eventually delivered by a $\Del(i,j,m)$ event.
   \end{enumerate}
 \end{frameddefn}
 
-These two conditions are \textit{fairness} conditions: they forbid a process from being ignored forever and a message from staying in an output buffer forever, but they put no limit on how long this can take. Apart from this, the order of the steps is completely arbitrary. It's useful to think of it as chosen by an \textbf{adversary} (or \textit{scheduler}) that tries to make the algorithm fail: it can make a process very slow, deliver messages in any order and delay a message for as long as it wants. An algorithm is correct in the asynchronous model only if it is correct for \textit{every} admissible execution, i.e. against every possible adversary.
+Why do we need fairness? Without it the scheduler could prevent any progress, and no algorithm could ever achieve anything. For instance, the scheduler could:
+\begin{itemize}
+  \item never schedule $\Exec(j)$ for some process $p_j$, so that $p_j$ never does anything;
+  \item keep a message $m$ in $\OutBuf_i$ forever, so that its receiver never learns about it.
+\end{itemize}
+Consider a process $p_1$ that sends a request to $p_2$ and waits for the answer. If the scheduler never delivers the request, or never lets $p_2$ execute, the answer never arrives and $p_1$ waits forever, even though no process has failed. No algorithm could guarantee that something good eventually happens, i.e. no algorithm could satisfy a liveness property. Fairness rules this out, but it doesn't say \textit{when} things happen: a message can still be delayed for an arbitrarily long (finite) time. In the following, the executions of an asynchronous system will always be assumed to be fair.
 
-\paragraph{Synchronous executions.} In the synchronous model, instead, the processes proceed together in \textbf{rounds}.
+\paragraph{Local executions.} A single process doesn't see the whole execution: it only sees its own events and the messages delivered to it.
+
+\begin{frameddefn}{Local execution}
+  The local execution (or \textit{local view}) of process $p_j$ in an execution $E$, denoted with $E|p_j$, is the subsequence of the events of $E$ that affect $p_j$, i.e. its computation events $\Exec(j)$ and the deliveries $\Del(i,j,m)$ of messages addressed to $p_j$, taken in their original order.
+\end{frameddefn}
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}{0.48\textwidth}
+    \centering
+    \begin{tikzpicture}[xscale=1.05, yscale=0.85]
+      \foreach \x/\c in {0.4/0, 1.4/1, 2.4/2, 3.4/3, 4.4/4} {
+        \draw[dashed, gray!50] (\x,-0.4) -- (\x,3.4);
+        \node[font=\scriptsize, gray] at (\x,-0.7) {$C_{\c}$};
+      }
+      \proc{3}{p_0}{4.8}
+      \proc{2}{p_1}{4.8}
+      \proc{1}{p_2}{4.8}
+      \proc{0}{p_3}{4.8}
+      \node[ev] (a) at (0.9,3) {};
+      \node[ev] (b) at (1.9,2) {};
+      \node[ev] (c) at (2.9,0) {};
+      \node[ev] (d) at (3.9,1) {};
+      \node[lbl, above=1pt] at (a) {$e_0$};
+      \node[lbl, below=1pt] at (b) {$e_1$};
+      \node[lbl, below=1pt] at (c) {$e_2$};
+      \node[lbl, above=1pt] at (d) {$e_3$};
+      \draw[msg] (a) -- node[lbl, above right=-2pt] {$m$} (b);
+      \draw[msg] (c) -- node[lbl, below right=-2pt] {$m'$} (d);
+    \end{tikzpicture}
+    \caption{Execution $E$.}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.48\textwidth}
+    \centering
+    \begin{tikzpicture}[xscale=1.05, yscale=0.85]
+      \foreach \x/\c in {0.4/0, 1.4/1, 2.4/2, 3.4/3, 4.4/4} {
+        \draw[dashed, gray!50] (\x,-0.4) -- (\x,3.4);
+        \node[font=\scriptsize, gray] at (\x,-0.7) {$C'_{\c}$};
+      }
+      \proc{3}{p_0}{4.8}
+      \proc{2}{p_1}{4.8}
+      \proc{1}{p_2}{4.8}
+      \proc{0}{p_3}{4.8}
+      \node[ev] (c) at (0.9,0) {};
+      \node[ev] (d) at (1.9,1) {};
+      \node[ev] (a) at (2.9,3) {};
+      \node[ev] (b) at (3.9,2) {};
+      \node[lbl, above=1pt] at (a) {$e_0$};
+      \node[lbl, below=1pt] at (b) {$e_1$};
+      \node[lbl, below=1pt] at (c) {$e_2$};
+      \node[lbl, above=1pt] at (d) {$e_3$};
+      \draw[msg] (a) -- node[lbl, above right=-2pt] {$m$} (b);
+      \draw[msg] (c) -- node[lbl, below right=-2pt] {$m'$} (d);
+    \end{tikzpicture}
+    \caption{Execution $E'$.}
+  \end{subfigure}
+  \caption{Two executions with the same events in a different order: $e_0 = \Exec(0)$ sends $m$ to $p_1$, $e_1 = \Del(0,1,m)$, $e_2 = \Exec(3)$ sends $m'$ to $p_2$ and $e_3 = \Del(3,2,m')$. The dashed lines mark the configurations between consecutive events.}
+  \label{fig:local-executions}
+\end{figure}
+
+\begin{framedex}{}
+  In the execution $E$ of \Cref{fig:local-executions}, the local executions of $p_1$ and $p_2$ are:
+  \[E|p_1 = \rbk{\Del(0,1,m), \ldots} \qquad E|p_2 = \rbk{\Del(3,2,m'), \ldots}\]
+  Process $p_1$ only sees that $m$ has arrived: it doesn't see $e_2$ and $e_3$, and it doesn't know whether they happened before or after $e_1$.
+\end{framedex}
+
+The execution $E'$ in \Cref{fig:local-executions} is different from $E$: the events of $p_3$ and $p_2$ happen \textit{before} the ones of $p_0$ and $p_1$, so the two executions go through different configurations. However, every process sees exactly the same thing in both executions:
+\[E|p_j = E'|p_j \quad \text{for every } j \in \{0,1,2,3\}\]
+Hence, different executions can give the same local executions. When this happens for a process $p_j$, we say that $p_j$ \textbf{cannot distinguish} $E$ from $E'$: no matter what algorithm it runs, its states and its messages are exactly the same in the two executions, since they only depend on its local execution.
+
+\begin{frameddefn}{Indistinguishability}
+  Two executions $E$ and $E'$ are indistinguishable for process $p_j$ if $E|p_j = E'|p_j$. They are indistinguishable if they are indistinguishable for every process, i.e. if $E|p_j = E'|p_j$ for all $j$.
+\end{frameddefn}
+
+The example generalizes. Consider two consecutive events of an execution that affect different processes and such that the second one is not the delivery of a message produced by the first one. Swapping them doesn't change any local execution, and the resulting execution is still fair. Repeating such swaps, we can build many executions which are all indistinguishable from the original one, even though they go through different configurations. This leads to a fundamental result.
+
+\begin{framedthm}{}
+  In an asynchronous system it is impossible to reconstruct the exact execution.
+\end{framedthm}
+
+\begin{proof}[Proof idea]
+  Everything a process knows comes from its local execution, and every piece of information it can share with the others is a message produced by its transition function, which again only depends on its local execution. By the above argument, for most executions $E$ there is a different execution $E'$ such that $E|p_j = E'|p_j$ for every $j$. In $E$ and $E'$ every process goes through the same states and sends the same messages, hence no process, and no observer that only receives information from the processes, can tell whether the real execution was $E$ or $E'$.
+\end{proof}
+
+\begin{framedobs}{}
+  This is why, in an asynchronous system, we can't rely on the real order of events. What processes \textit{can} know is the order imposed by their local executions and by messages: in \Cref{fig:local-executions}, $e_0$ must come before $e_1$ in every execution, since $m$ can't be delivered before being sent, while the relative order of $e_0$ and $e_2$ can't be determined. This is exactly the idea behind the happened-before relation that we'll define in \Cref{sec:distributed-computations}.
+\end{framedobs}
+
+\subsection{Synchronous executions}
+
+In this course we will see three definitions of synchrony:
+\begin{itemize}
+  \item \textbf{asynchronous systems}, discussed above;
+  \item \textbf{eventually-synchronous systems}, which behave asynchronously for an unknown (but finite) amount of time and then become synchronous (module M2);
+  \item \textbf{synchronous systems}.
+\end{itemize}
+
+\begin{frameddefn}{Synchronous system}
+  A system is synchronous if there is:
+  \begin{itemize}
+    \item a fixed bound on the delay of messages;
+    \item a fixed bound on the execution time of the actions executed by processes;
+    \item a fixed bound on the time between the execution of two actions.
+  \end{itemize}
+\end{frameddefn}
+
+With these bounds, the processes can organize the computation in \textbf{rounds}: each round lasts a fixed amount of time, long enough for every process to execute a step and for every message to arrive, and a process simply waits for the end of the round before reading its input buffer. This gives the following execution model.
 
 \begin{frameddefn}{Synchronous execution}
-  An execution is an admissible synchronous execution if it is divided into rounds $1, 2, 3, \ldots$ such that, in each round:
+  An execution is a synchronous execution if it is divided into rounds $1, 2, 3, \ldots$ such that, in each round:
   \begin{enumerate}
-    \item every process performs exactly one computation step;
+    \item every process executes exactly one computation event $\Exec(j)$;
     \item every message sent during the round is delivered before the next round starts.
   \end{enumerate}
 \end{frameddefn}
@@ -281,14 +398,14 @@ In other words, in each round every process reads all the messages sent to it in
 \end{figure}
 
 \begin{framedobs}{}
-  If the processes don't fail and the algorithm is deterministic, a synchronous execution is completely determined by the initial configuration: the order of the steps inside a round doesn't matter, since every message is read only in the next round. In the asynchronous model, instead, the same initial configuration gives rise to infinitely many different executions, one for each choice of the adversary. This is why proving correctness is so much harder in the asynchronous model.
+  If the processes don't fail and the algorithm is deterministic, a synchronous execution is completely determined by the initial configuration: the order of the events inside a round doesn't matter, since every message is read only in the next round. In the asynchronous model, instead, the same initial configuration gives rise to infinitely many different executions, one for each choice of the scheduler. This is why proving correctness is so much harder in the asynchronous model.
 \end{framedobs}
 
 \begin{framedobs}{}
-  Every admissible synchronous execution is also an admissible asynchronous execution: in each round every process takes a step and every message is delivered, so both fairness conditions hold. Hence, an algorithm that is correct for every asynchronous execution is also correct for every synchronous one.
+  Every synchronous execution is also a fair asynchronous execution: in each round every process takes a step and every message is delivered, so both fairness conditions hold. Hence, an algorithm that is correct for every asynchronous execution is also correct for every synchronous one.
 \end{framedobs}
 
-The two definitions of \curlyquotes{synchronous} we have seen (known bounds and execution in rounds) are closely related. If the bounds on process speed and message delay are known, the processes can \textit{simulate} rounds: each round lasts a fixed amount of time, long enough for every process to take a step and for every message to arrive, and a process simply waits for the end of the round before reading its input buffer. This also gives a natural way to measure time:
+The rounds also give a natural way to measure time:
 \begin{itemize}
   \item in the synchronous model, the \textbf{time complexity} of an algorithm is the number of rounds it needs;
   \item in the asynchronous model, we normalize the maximum message delay of the execution to $1$ time unit and measure time in these units.
@@ -369,7 +486,7 @@ For instance, in mutual exclusion \curlyquotes{at most one process is in the cri
 
 This distinction matters because the two kinds of properties fail in different ways. An algorithm that does nothing at all is trivially safe but not live, and an algorithm that answers immediately at random is live but not safe: the challenge is to guarantee both. By the FLP result, in an asynchronous system with crashes, consensus algorithms like Paxos guarantee safety always and liveness only under additional assumptions.
 
-\subsection{Distributed computations}
+\subsection{Distributed computations}\label{sec:distributed-computations}
 
 We now describe formally what happens during the execution of a distributed algorithm. The execution of each process is a sequence of \textbf{events}, i.e. atomic actions that change its local state. We consider three kinds of events:
 \begin{itemize}
