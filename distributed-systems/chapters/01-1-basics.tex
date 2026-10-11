@@ -110,7 +110,7 @@ In words: the transition function takes the current state $q$ and the received m
   The assumptions on channels and timing that we discuss below are exactly assumptions on \textit{when} and \textit{in which order} delivery steps can happen.
 \end{framedobs}
 
-The \textbf{global state} (or \textit{configuration}) of the system is the collection of the states of all the processes together with the contents of all their buffers. We'll come back to global states in the next section, where they will be central.
+The \textbf{global state} (or \textit{configuration}) of the system is the collection of the states of all the processes together with the contents of all their buffers. We'll come back to global states later, where they will be central.
 
 \subsection{Channels}
 Unless stated otherwise, we assume that the network is \textit{fully connected} (every pair of processes can communicate directly) and that channels are \textbf{reliable}:
@@ -202,7 +202,7 @@ In other words, a configuration is a \curlyquotes{photograph} of the entire syst
 
 \begin{frameddefn}{Execution}
   An execution is an (infinite) alternating sequence of configurations and events
-  \[E = C_0,\ e_0,\ C_1,\ e_1,\ C_2,\ \ldots\]
+  \[\Exe = C_0,\ e_0,\ C_1,\ e_1,\ C_2,\ \ldots\]
   where $C_0$ is an initial configuration and each $C_{k+1}$ is the configuration obtained by applying the event $e_k$ to $C_k$.
 \end{frameddefn}
 
@@ -215,7 +215,7 @@ In an asynchronous system there are no bounds on process speed and message delay
 \paragraph{Fairness.} There is only one thing that the scheduler can't do: postpone something forever.
 
 \begin{frameddefn}{Fair execution}
-  An execution $E$ is fair if:
+  An execution $\Exe$ is fair if:
   \begin{enumerate}
     \item every process $p_i$ executes infinitely many local steps $\Exec(i)$;
     \item every message that is sent is eventually delivered by a $\Del(i,j,m)$ event.
@@ -232,7 +232,7 @@ Consider a process $p_1$ that sends a request to $p_2$ and waits for the answer.
 \paragraph{Local executions.} A single process doesn't see the whole execution: it only sees its own events and the messages delivered to it.
 
 \begin{frameddefn}{Local execution}
-  The local execution (or \textit{local view}) of process $p_j$ in an execution $E$, denoted with $E|p_j$, is the subsequence of the events of $E$ that affect $p_j$, i.e. its computation events $\Exec(j)$ and the deliveries $\Del(i,j,m)$ of messages addressed to $p_j$, taken in their original order.
+  The local execution (or \textit{local view}) of process $p_j$ in an execution $\Exe$, denoted with $\Exe|p_j$, is the subsequence of the events of $\Exe$ that affect $p_j$, i.e. its computation events $\Exec(j)$ and the deliveries $\Del(i,j,m)$ of messages addressed to $p_j$, taken in their original order.
 \end{frameddefn}
 
 \begin{figure}[H]
@@ -259,7 +259,7 @@ Consider a process $p_1$ that sends a request to $p_2$ and waits for the answer.
       \draw[msg] (a) -- node[lbl, above right=-2pt] {$m$} (b);
       \draw[msg] (c) -- node[lbl, below right=-2pt] {$m'$} (d);
     \end{tikzpicture}
-    \caption{Execution $E$.}
+    \caption{Execution $\Exe$.}
   \end{subfigure}
   \hfill
   \begin{subfigure}{0.48\textwidth}
@@ -284,24 +284,24 @@ Consider a process $p_1$ that sends a request to $p_2$ and waits for the answer.
       \draw[msg] (a) -- node[lbl, above right=-2pt] {$m$} (b);
       \draw[msg] (c) -- node[lbl, below right=-2pt] {$m'$} (d);
     \end{tikzpicture}
-    \caption{Execution $E'$.}
+    \caption{Execution $\Exe'$.}
   \end{subfigure}
   \caption{Two executions with the same events in a different order: $e_0 = \Exec(0)$ sends $m$ to $p_1$, $e_1 = \Del(0,1,m)$, $e_2 = \Exec(3)$ sends $m'$ to $p_2$ and $e_3 = \Del(3,2,m')$. The dashed lines mark the configurations between consecutive events.}
   \label{fig:local-executions}
 \end{figure}
 
 \begin{framedex}{}
-  In the execution $E$ of \Cref{fig:local-executions}, the local executions of $p_1$ and $p_2$ are:
-  \[E|p_1 = \rbk{\Del(0,1,m), \ldots} \qquad E|p_2 = \rbk{\Del(3,2,m'), \ldots}\]
+  In the execution $\Exe$ of \Cref{fig:local-executions}, the local executions of $p_1$ and $p_2$ are:
+  \[\Exe|p_1 = \rbk{\Del(0,1,m), \ldots} \qquad \Exe|p_2 = \rbk{\Del(3,2,m'), \ldots}\]
   Process $p_1$ only sees that $m$ has arrived: it doesn't see $e_2$ and $e_3$, and it doesn't know whether they happened before or after $e_1$.
 \end{framedex}
 
-The execution $E'$ in \Cref{fig:local-executions} is different from $E$: the events of $p_3$ and $p_2$ happen \textit{before} the ones of $p_0$ and $p_1$, so the two executions go through different configurations. However, every process sees exactly the same thing in both executions:
-\[E|p_j = E'|p_j \quad \text{for every } j \in \{0,1,2,3\}\]
-Hence, different executions can give the same local executions. When this happens for a process $p_j$, we say that $p_j$ \textbf{cannot distinguish} $E$ from $E'$: no matter what algorithm it runs, its states and its messages are exactly the same in the two executions, since they only depend on its local execution.
+The execution $\Exe'$ in \Cref{fig:local-executions} is different from $\Exe$: the events of $p_3$ and $p_2$ happen \textit{before} the ones of $p_0$ and $p_1$, so the two executions go through different configurations. However, every process sees exactly the same thing in both executions:
+\[\Exe|p_j = \Exe'|p_j \quad \text{for every } j \in \{0,1,2,3\}\]
+Hence, different executions can give the same local executions. When this happens for a process $p_j$, we say that $p_j$ \textbf{cannot distinguish} $\Exe$ from $\Exe'$: no matter what algorithm it runs, its states and its messages are exactly the same in the two executions, since they only depend on its local execution.
 
 \begin{frameddefn}{Indistinguishability}
-  Two executions $E$ and $E'$ are indistinguishable for process $p_j$ if $E|p_j = E'|p_j$. They are indistinguishable if they are indistinguishable for every process, i.e. if $E|p_j = E'|p_j$ for all $j$.
+  Two executions $\Exe$ and $\Exe'$ are indistinguishable for process $p_j$ if $\Exe|p_j = \Exe'|p_j$. They are indistinguishable if they are indistinguishable for every process, i.e. if $\Exe|p_j = \Exe'|p_j$ for all $j$.
 \end{frameddefn}
 
 The example generalizes. Consider two consecutive events of an execution that affect different processes and such that the second one is not the delivery of a message produced by the first one. Swapping them doesn't change any local execution, and the resulting execution is still fair. Repeating such swaps, we can build many executions which are all indistinguishable from the original one, even though they go through different configurations. This leads to a fundamental result.
@@ -311,11 +311,11 @@ The example generalizes. Consider two consecutive events of an execution that af
 \end{framedthm}
 
 \begin{proof}[Proof idea]
-  Everything a process knows comes from its local execution, and every piece of information it can share with the others is a message produced by its transition function, which again only depends on its local execution. By the above argument, for most executions $E$ there is a different execution $E'$ such that $E|p_j = E'|p_j$ for every $j$. In $E$ and $E'$ every process goes through the same states and sends the same messages, hence no process, and no observer that only receives information from the processes, can tell whether the real execution was $E$ or $E'$.
+  Everything a process knows comes from its local execution, and every piece of information it can share with the others is a message produced by its transition function, which again only depends on its local execution. By the above argument, for most executions $\Exe$ there is a different execution $\Exe'$ such that $\Exe|p_j = \Exe'|p_j$ for every $j$. In $\Exe$ and $\Exe'$ every process goes through the same states and sends the same messages, hence no process, and no observer that only receives information from the processes, can tell whether the real execution was $\Exe$ or $\Exe'$.
 \end{proof}
 
 \begin{framedobs}{}
-  This is why, in an asynchronous system, we can't rely on the real order of events. What processes \textit{can} know is the order imposed by their local executions and by messages: in \Cref{fig:local-executions}, $e_0$ must come before $e_1$ in every execution, since $m$ can't be delivered before being sent, while the relative order of $e_0$ and $e_2$ can't be determined. This is exactly the idea behind the happened-before relation that we'll define in \Cref{sec:distributed-computations}.
+  This is why, in an asynchronous system, we can't rely on the real order of events. What processes \textit{can} know is the order imposed by their local executions and by messages: in \Cref{fig:local-executions}, $e_0$ must come before $e_1$ in every execution, since $m$ can't be delivered before being sent, while the relative order of $e_0$ and $e_2$ can't be determined. This is exactly the idea behind the happened-before relation, which we'll define later in the course.
 \end{framedobs}
 
 \subsection{Synchronous executions}
@@ -411,145 +411,372 @@ The rounds also give a natural way to measure time:
   \item in the asynchronous model, we normalize the maximum message delay of the execution to $1$ time unit and measure time in these units.
 \end{itemize}
 
-\section{Synchronous and asynchronous systems}
+\section{Models for process failures}
 
-In a synchronous system a process can use timeouts: if a message doesn't arrive within the bound, its sender has surely failed. In an asynchronous system this is impossible, since a slow process is indistinguishable from a crashed one.
-
-\begin{framedobs}{}
-  We have seen that every algorithm that is correct in the asynchronous model is also correct in the synchronous one. The opposite is false: for instance, failure detection through timeouts only works in the synchronous model.
-\end{framedobs}
-
-Real systems are somewhere in between: most of the time messages are fast, but there are periods (congestion, garbage collection, network problems) in which they are arbitrarily slow. This is exactly what the \textbf{partially synchronous} model of \Cref{def:timing-models} captures. Many practical protocols, such as Paxos and Raft, are designed to be always safe in the asynchronous model while relying on partial synchrony only to make progress.
-
-\begin{framedobs}{FLP impossibility}
-  Fischer, Lynch and Paterson (1985) proved that, in an asynchronous system, there is no deterministic algorithm that solves consensus if even a single process may crash. This is the main reason why asynchrony is such a strong assumption, and why practical protocols either use randomization or rely on partial synchrony.
-\end{framedobs}
-
-\paragraph{Failures.} Processes can fail in different ways, from the most benign to the most severe:
+So far we have assumed that every process always follows its automaton. In a real system, however, machines crash, software has bugs and some nodes may even be controlled by an attacker. A \textbf{failure model} describes \textit{how} a process can deviate from its expected behaviour. There are two main models:
 \begin{itemize}
-  \item \textbf{Crash} (or \textit{crash-stop}): the process stops executing and never recovers.
-  \item \textbf{Omission}: the process occasionally fails to send or receive some messages.
-  \item \textbf{Byzantine} (or \textit{arbitrary}): the process can behave in any way, including sending wrong or contradictory messages, for instance because it has been compromised by an attacker.
+  \item \textbf{crash-stop failures}, in which a process simply stops;
+  \item \textbf{Byzantine failures}, in which a process can behave in an arbitrary way.
 \end{itemize}
-A process that never fails is called \textbf{correct}. Algorithms are usually designed to tolerate up to $f$ faulty processes out of $n$, and the relation between $f$ and $n$ depends on the failure type.
 
-\subsection{The CAP theorem}
+We observe that failure models are \textit{independent} from timing models: we can consider crash failures in a synchronous system, Byzantine failures in an asynchronous one, and so on. To describe failures inside an execution, we add a new kind of event for each model.
 
-When data is replicated on several machines, we would like the system to behave as if there was a single copy, to always answer requests and to survive network failures. The CAP theorem tells us that we can't have all three at the same time.
+\subsection{Crash-stop failures}
 
-\begin{frameddefn}{Consistency, availability, partition tolerance}
-  Consider a system that stores data replicated on several nodes.
-  \begin{itemize}
-    \item \textbf{Consistency}: every read returns the value of the most recent completed write, as if there was a single copy of the data (formally, the system is \textit{linearizable}).
-    \item \textbf{Availability}: every request received by a non-failed node eventually gets a response.
-    \item \textbf{Partition tolerance}: the system keeps working even if the network loses an arbitrary number of messages between nodes, splitting them into groups that cannot communicate (a \textit{partition}).
-  \end{itemize}
+\begin{frameddefn}{Crash-stop failure}
+  The event $\Crash(j)$ represents the crash of process $p_j$. After this event, $p_j$ does nothing: every following $\Exec(j)$ leaves its state unchanged and sends no messages. A process that crashes never recovers.
 \end{frameddefn}
 
-\begin{framedthm}{CAP theorem (Brewer 2000, Gilbert and Lynch 2002)}
-  In an asynchronous network, no replicated system can guarantee consistency, availability and partition tolerance at the same time.
-\end{framedthm}
-
-\begin{figure}[H]
-  \centering
-  \begin{tikzpicture}[node distance=1.2cm, font=\small]
-    \node[draw, rounded corners, minimum width=1.4cm, minimum height=0.8cm] (n1) at (0,0) {$N_1: x=1$};
-    \node[draw, rounded corners, minimum width=1.4cm, minimum height=0.8cm] (n2) at (5,0) {$N_2: x=0$};
-    \draw[BrickRed, very thick, decorate, decoration={zigzag, amplitude=2pt, segment length=6pt}] (2.5,-1.1) -- (2.5,1.1);
-    \node[BrickRed, font=\scriptsize] at (2.5,1.35) {partition};
-    \node (c1) at (0,-1.8) {client $A$};
-    \node (c2) at (5,-1.8) {client $B$};
-    \draw[msg] (c1) -- node[left, lbl] {write $x=1$} (n1);
-    \draw[msg] (c2) -- node[right, lbl] {read $x$} (n2);
-    \draw[ctrl] (n1) -- node[above, lbl] {update lost} (2.3,0);
-  \end{tikzpicture}
-  \caption{During a partition, $N_2$ cannot learn about the write received by $N_1$. When $B$ reads $x$, $N_2$ must either answer $0$ (giving up consistency) or not answer until the partition heals (giving up availability).}
-\end{figure}
-
-\begin{proof}[Proof idea]
-  Consider two nodes $N_1, N_2$ holding a copy of $x = 0$ and suppose that the network partitions them, losing every message between them. A client writes $x = 1$ on $N_1$: by availability, $N_1$ must accept the write and answer. Then another client reads $x$ from $N_2$: by availability, $N_2$ must answer, but since no message from $N_1$ can reach it, it can only answer $0$, violating consistency.
-\end{proof}
-
-\begin{framedobs}{}
-  The theorem is often summarized as \curlyquotes{pick two out of three}, but this is misleading. In a real network partitions \textit{will} happen and cannot be prevented, so partition tolerance is not optional. The correct reading is the following: \textit{when a partition occurs}, the system must choose between consistency and availability. When there is no partition, a system can provide both. Systems that choose consistency are called \textbf{CP} (e.g.\ systems based on Paxos or Raft), while systems that choose availability are called \textbf{AP} (e.g.\ Dynamo-style key-value stores).
-\end{framedobs}
-
-\subsection{Safety and liveness}
-
-When we specify what a distributed algorithm must do, it's useful to split its requirements into two families.
-
-\begin{frameddefn}{Safety and liveness}
-  A \textbf{safety} property states that \curlyquotes{nothing bad ever happens}: it can be violated in a finite prefix of an execution, and once violated it can never be repaired. A \textbf{liveness} property states that \curlyquotes{something good eventually happens}: it can never be violated by a finite prefix, since the good thing may still happen later.
-\end{frameddefn}
-
-For instance, in mutual exclusion \curlyquotes{at most one process is in the critical section at any time} is a safety property, while \curlyquotes{every process that requests the critical section eventually enters it} is a liveness property. In consensus, \curlyquotes{all processes that decide, decide the same value} is a safety property, while \curlyquotes{every correct process eventually decides} is a liveness property.
-
-This distinction matters because the two kinds of properties fail in different ways. An algorithm that does nothing at all is trivially safe but not live, and an algorithm that answers immediately at random is live but not safe: the challenge is to guarantee both. By the FLP result, in an asynchronous system with crashes, consensus algorithms like Paxos guarantee safety always and liveness only under additional assumptions.
-
-\subsection{Distributed computations}\label{sec:distributed-computations}
-
-We now describe formally what happens during the execution of a distributed algorithm. The execution of each process is a sequence of \textbf{events}, i.e. atomic actions that change its local state. We consider three kinds of events:
-\begin{itemize}
-  \item \textbf{internal events}, which only affect the local state of the process;
-  \item \textbf{send events}, written $\send_j(m)$ or simply $\send(m)$, in which the process sends message $m$ to process $p_j$;
-  \item \textbf{receive events}, written $\recv_j(m)$ or simply $\recv(m)$, in which the process receives message $m$ from process $p_j$.
-\end{itemize}
-We denote with $e_i^k$ the $k$-th event executed by process $p_i$.
-
-\begin{frameddefn}{Local and global history}
-  The local history of process $p_i$ is the sequence of its events $h_i = e_i^1 e_i^2 \ldots$, and we write $h_i^k = e_i^1 \ldots e_i^k$ for its prefix of length $k$. The global history of the computation is the set of all its events:
-  \[H = h_1 \cup \ldots \cup h_n\]
-\end{frameddefn}
-
-We observe that each local history is totally ordered, since each process executes one event at a time, but the global history is just a set: it doesn't tell us in which order the events of different processes happened. In an asynchronous system there is no global clock that could timestamp the events, so this order can't be observed directly. Distributed computations are usually represented through \textbf{space-time diagrams}, in which each process is a horizontal line with time flowing from left to right, events are dots and messages are arrows.
+The crash only affects the process, not the network. Hence, the messages that $p_j$ had already put in $\OutBuf_j$ before crashing can still be delivered, and the messages addressed to $p_j$ can still be delivered into $\InBuf_j$, but $p_j$ will never read them.
 
 \begin{figure}[H]
   \centering
   \begin{tikzpicture}[xscale=1.25, yscale=1.1]
-    \runningexample
-    \node[lbl, above=2pt] at (a1) {$e_1^1$};
-    \node[lbl, above=2pt] at (a2) {$e_1^2$};
-    \node[lbl, above=2pt] at (a3) {$e_1^3$};
-    \node[lbl, below=2pt] at (b1) {$e_2^1$};
-    \node[lbl, below left=0pt] at (b2) {$e_2^2$};
-    \node[lbl, below=2pt] at (b3) {$e_2^3$};
-    \node[lbl, below=2pt] at (c1) {$e_3^1$};
-    \node[lbl, below=2pt] at (c2) {$e_3^2$};
-    \node[lbl, below=2pt] at (c3) {$e_3^3$};
+    \proc{2}{p_0}{8.2}
+    \node[left] at (0,1) {$p_1$};
+    \draw[gray!70] (0,1) -- (3.6,1);
+    \draw[gray!40, dashed] (3.6,1) -- (8.2,1);
+    \proc{0}{p_2}{8.2}
+    \node[ev] (a0) at (0.8,2) {};
+    \node[ev] (a1) at (4.8,2) {};
+    \node[ev] (b0) at (1.8,1) {};
+    \node[ev] (b1) at (2.8,1) {};
+    \node[ev] (c0) at (0.4,0) {};
+    \node[ev] (c1) at (4.4,0) {};
+    \node[ev] (c2) at (7.0,0) {};
+    \node[lbl, above=2pt] at (a0) {$e_1$};
+    \node[lbl, above=2pt] at (a1) {$e_5$};
+    \node[lbl, above=2pt] at (b0) {$e_2$};
+    \node[lbl, above=2pt] at (b1) {$e_3$};
+    \node[lbl, below=2pt] at (c0) {$e_0$};
+    \node[lbl, below=2pt] at (c1) {$e_4$};
+    \node[lbl, below=2pt] at (c2) {$e_6$};
+    \draw[msg] (a0) -- (b0);
+    \draw[msg] (b1) -- (c1);
+    \draw[msg] (c0) -- (a1);
+    \draw[msg] (a1) -- (6.0,1);
+    \node[BrickRed, font=\bfseries, scale=1.6] at (3.6,1) {$\times$};
+    \node[BrickRed, font=\scriptsize, above right=2pt and 0pt] at (3.6,1) {$\Crash(1)$};
+    \node[gray, font=\scriptsize, above] at (7.4,1.05) {does nothing};
   \end{tikzpicture}
-  \caption{The running example of this chapter. Events $e_1^2$, $e_2^3$ and $e_3^1$ are internal, $e_1^1$, $e_2^2$ and $e_3^3$ are send events, while $e_2^1$, $e_3^2$ and $e_1^3$ are receive events.}
-  \label{fig:running-example}
+  \caption{A crash-stop failure. Process $p_1$ behaves correctly up to $e_3$, then crashes. The message sent at $e_3$ was already in $\OutBuf_1$, so it is still delivered to $p_2$. The message sent by $p_0$ at $e_5$ is delivered to $p_1$, but $p_1$ will never process it: from the outside, $p_1$ simply looks silent.}
+  \label{fig:crash}
 \end{figure}
 
-Even without a global clock, some events are clearly ordered: an event of $p_i$ happens before the following events of $p_i$, and the sending of a message happens before its reception. Lamport's idea is that these are the \textit{only} orderings we can be sure of, and that every other ordering comes from combining them.
+\subsection{Byzantine failures}
 
-\begin{frameddefn}{Happened-before relation}
-  The happened-before (or cause-effect) relation $\to\ \subseteq H \times H$ is the smallest relation that satisfies the following three rules:
-  \begin{enumerate}
-    \item \textit{Local order}: if $e_i^k, e_i^{k'} \in h_i$ with $k < k'$, then $e_i^k \to e_i^{k'}$.
-    \item \textit{Messages}: if $e = \send(m)$ and $e' = \recv(m)$ for the same message $m$, then $e \to e'$.
-    \item \textit{Transitivity}: if $e \to e'$ and $e' \to e''$, then $e \to e''$.
-  \end{enumerate}
+\begin{frameddefn}{Byzantine failure}
+  The event $\Byz(j)$ represents a Byzantine failure of process $p_j$. After this event, $p_j$ behaves in an arbitrary way: when we have $\Exec(j)$, we no longer follow the automaton of $p_j$, so its state can change arbitrarily and it can send any message to any process.
 \end{frameddefn}
 
-Equivalently, $e \to e'$ if and only if in the space-time diagram there is a path from $e$ to $e'$ that moves forward along process lines and follows message arrows. The intuition is that $e \to e'$ when $e$ \textit{may have influenced} $e'$: some information produced by $e$ may have reached the process of $e'$ before $e'$ was executed.
+A Byzantine process can do anything: send wrong values, send \textit{different} values to different processes, pretend to have received messages it never got, stay silent for a while and then come back, or coordinate with other Byzantine processes. Byzantine failures model both arbitrary software and hardware faults and \textbf{malicious} behaviour, e.g.\ a node controlled by an attacker. This is why they are central in security-related systems such as blockchains.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[xscale=1.25, yscale=1.1]
+    \proc{2}{p_0}{8.2}
+    \node[left] at (0,1) {$p_1$};
+    \draw[gray!70] (0,1) -- (3.6,1);
+    \draw[BrickRed!60, thick] (3.6,1) -- (8.2,1);
+    \proc{0}{p_2}{8.2}
+    \node[ev] (a0) at (0.8,2) {};
+    \node[ev] (a1) at (5.6,2) {};
+    \node[ev] (b0) at (1.8,1) {};
+    \node[ev] (b1) at (2.8,1) {};
+    \node[ev, BrickRed] (b2) at (4.6,1) {};
+    \node[ev, BrickRed] (b3) at (6.6,1) {};
+    \node[ev] (c0) at (4.0,0) {};
+    \node[ev] (c1) at (5.6,0) {};
+    \node[ev] (c2) at (7.6,0) {};
+    \draw[msg] (a0) -- node[lbl, above right=-2pt] {$x?$} (b0);
+    \draw[msg] (b1) -- node[lbl, below left=-2pt] {$x=5$} (c0);
+    \draw[msg, BrickRed] (b2) -- node[lbl, above left=-1pt, text=BrickRed] {$x=0$} (a1);
+    \draw[msg, BrickRed] (b2) -- node[lbl, below left=-2pt, text=BrickRed] {$x=7$} (c1);
+    \draw[msg, BrickRed] (b3) -- (c2);
+    \node[BrickRed, font=\scriptsize\bfseries] at (3.6,1.08) {$\blacktriangledown$};
+    \node[BrickRed, font=\scriptsize, above=5pt] at (3.6,1) {$\Byz(1)$};
+    \node[BrickRed, font=\scriptsize, above] at (7.3,1.05) {arbitrary};
+  \end{tikzpicture}
+  \caption{A Byzantine failure. Process $p_1$ behaves correctly up to the event $\Byz(1)$: for instance, it tells $p_2$ that $x = 5$. After $\Byz(1)$ it no longer follows its automaton: it sends $x = 0$ to $p_0$ and $x = 7$ to $p_2$, i.e. two contradictory values, and then keeps sending arbitrary messages.}
+  \label{fig:byzantine}
+\end{figure}
+
+\subsection{Comparing the two models}
+
+A Byzantine process can behave in \textit{any} way, and in particular it can decide to stop doing anything forever. Hence, every behaviour of a crashed process is also a possible behaviour of a Byzantine process: crash-stop failures are a special case of Byzantine failures.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}
+    \draw[thick, BrickRed!70, fill=BrickRed!8] (0,0) ellipse (3.6cm and 1.7cm);
+    \draw[thick, RoyalBlue!70, fill=RoyalBlue!10] (0.9,-0.2) ellipse (1.9cm and 0.9cm);
+    \node[BrickRed!80!black, font=\small\bfseries] at (-1.9,0.9) {Byzantine failures};
+    \node[RoyalBlue!80!black, font=\small\bfseries] at (0.9,-0.2) {Crash-stop failures};
+  \end{tikzpicture}
+  \caption{Crash-stop failures are a subset of Byzantine failures.}
+  \label{fig:failure-inclusion}
+\end{figure}
 
 \begin{framedobs}{}
-  The relation $\to$ is a \textbf{strict partial order}: it is transitive by definition, and it is irreflexive since a message can't be received before being sent, so no path in the diagram can come back to its starting event. It is only \textit{partial} because some pairs of events are not ordered at all.
+  An algorithm that tolerates $f$ Byzantine processes also tolerates $f$ crashed processes, but not vice versa. Tolerating Byzantine failures is much more expensive: typically, it requires more processes, more messages and more rounds. For example, many problems that can be solved with $n > 2f$ processes under crash failures need $n > 3f$ processes under Byzantine failures.
 \end{framedobs}
 
-\begin{frameddefn}{Concurrent events}
-  Two events $e,e' \in H$ are concurrent, written $e \cc e'$, if $e \not\to e'$ and $e' \not\to e$.
+\subsection{Correct processes and the bound on failures}
+
+\begin{frameddefn}{Correct and faulty processes}
+  A process is \textbf{correct} in an execution if it never experiences a failure event, i.e. neither $\Crash(j)$ nor $\Byz(j)$ appears in the execution. Otherwise, it is \textbf{faulty}.
 \end{frameddefn}
 
-Two events are concurrent when neither of them can have influenced the other. This doesn't mean that they happened \curlyquotes{at the same time}: in real time one of them happened first, but no process could have noticed it.
+We stress that being correct is a property of the \textit{whole} execution, and that the processes don't know who is correct. In an asynchronous system this is unavoidable: a crashed process and a very slow one produce the same local executions at every other process, so they are indistinguishable. At any moment, a process that has been silent for a long time may have crashed or may be about to send its next message.
 
-\begin{framedex}{}
-  In \Cref{fig:running-example} we have the chain
-  \[e_1^1 \to e_2^1 \to e_2^2 \to e_3^2 \to e_3^3 \to e_1^3\]
-  hence, for instance, $e_1^1 \to e_1^3$ both through local order and through the chain of messages, and $e_2^2 \to e_1^3$ through $m_2$ and $m_3$. On the other hand, $e_3^1 \cc e_1^2$, since no path connects them, and similarly $e_2^3 \cc e_1^3$: $e_2^3$ comes after the sending of $m_2$, but no message leaves $p_2$ after $e_2^3$.
-\end{framedex}
+\begin{frameddefn}{Failure bound}
+  We denote with $f$ the maximum number of processes that can experience a failure event in an execution.
+\end{frameddefn}
+
+Usually we bound $f$, since without any bound no algorithm can guarantee anything. A natural bound is $f \leq n-1$, meaning that at least one process is correct. Many algorithms require stronger bounds, such as $f < n/2$ (a majority of correct processes) or $f < n/3$, and the bound on $f$ will be one of the first things to check for every algorithm we'll see.
+
+Finally, we \textbf{never} make assumptions on \textit{when} a failure event happens. A failure can occur at any point of the execution: at the very beginning, in the middle of a protocol or right before the last step. As for the order of events, it's useful to think that the scheduler also chooses \textit{which} processes fail (at most $f$ of them) and \textit{when}, and it will choose the worst possible moment for the algorithm.
 
 \begin{framedobs}{}
-  Concurrency is \underline{not} transitive. In \Cref{fig:running-example} we have $e_1^1 \cc e_3^1$ and $e_3^1 \cc e_1^2$, but $e_1^1 \to e_1^2$. Hence, concurrency is not an equivalence relation and it can't be used to split the events into \curlyquotes{simultaneous} groups.
+  With failures, the fairness conditions of an asynchronous execution only apply to correct processes: a crashed process stops executing local steps, and there is no guarantee on the messages it would have sent after crashing.
+\end{framedobs}
+
+\section{Distributed abstractions}
+
+\subsection{The road to build a distributed abstraction}
+
+Now that we have a precise model of processes, executions and failures, we can describe the general method that we'll follow for every problem in this course. Building a distributed abstraction always goes through four steps:
+\begin{enumerate}
+  \item \textbf{Define a system model}: which timing model (synchronous, asynchronous, \ldots), which failure model (crash-stop, Byzantine) and how many failures $f$ we tolerate.
+  \item \textbf{Formalize the problem with an abstraction}: design an abstract formal object that captures the problem that we want to solve, and specify \textit{unambiguously} the properties that it must satisfy.
+  \item \textbf{Implement the abstraction} with a distributed protocol, i.e. an automaton for each process.
+  \item \textbf{Prove that the protocol implements the abstraction}, i.e. that every execution of the protocol in the chosen system model satisfies all the properties of the abstraction.
+\end{enumerate}
+
+The second step is the most delicate one. An abstraction is described only by its \textit{interface} (the events through which it interacts with the outside world) and by its \textit{properties}, without saying anything about how it is implemented. This allows us to use an abstraction as a black box to build more complex ones: once we have proved that a protocol implements it, we can forget about the protocol and only use the properties.
+
+\paragraph{Interface of an abstraction.} Each abstraction is a module that lives inside every process and communicates with the layers above and below it through events, as in \Cref{fig:process-model}:
+\begin{itemize}
+  \item \textbf{requests} are events that the upper layer (the application, or another abstraction) sends \textit{to} the module, asking it to do something;
+  \item \textbf{indications} are events that the module sends \textit{to} the upper layer, notifying it that something has happened.
+\end{itemize}
+We write events as $\abk{\textit{Name} \mid \textit{parameters}}$.
+
+\subsection{Abstracting a real communication link}
+
+As a first example, we apply the method to the most basic component of a distributed system: the communication link between two processes. Real networks are not reliable: packets get lost because of congestion or corrupted bits, they may be retransmitted and duplicated by lower layers, but at least they are not invented by the network. Informally, we have:
+
+\begin{framedobs}{Informal description}
+  We have a link that loses messages with a certain probability $pr$, the channel can duplicate a message a finite number of times, and it does not create messages from thin air.
+\end{framedobs}
+
+This description is intuitive but not precise enough to prove anything. In particular, the probability $pr$ is annoying: we would like to reason about executions without computing probabilities. The idea is to capture only its \textit{consequence}: if a message is sent over and over again, sooner or later one of the copies gets through. Indeed, if each copy is lost independently with probability $pr < 1$, the probability that the first $k$ copies are all lost is $pr^k$, which goes to $0$ as $k \to \infty$.
+
+\paragraph{Interface.} A link exposes two events:
+\begin{itemize}
+  \item \textbf{Request} $\abk{\textit{Send} \mid q, m}$: send a message $m$ to process $q$;
+  \item \textbf{Indication} $\abk{\textit{Deliver} \mid p, m}$: deliver a message $m$ sent by process $p$.
+\end{itemize}
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[font=\small]
+    \node[draw=RoyalBlue, fill=gray!12, minimum width=3.6cm, minimum height=0.9cm] (app1) at (0,2.4) {Process $p$ (upper layer)};
+    \node[draw=RoyalBlue, fill=RoyalBlue!10, minimum width=3.6cm, minimum height=0.9cm] (fl1) at (0,0.8) {Fair-lossy link};
+    \node[draw=RoyalBlue, fill=gray!12, minimum width=3.6cm, minimum height=0.9cm] (app2) at (6,2.4) {Process $q$ (upper layer)};
+    \node[draw=RoyalBlue, fill=RoyalBlue!10, minimum width=3.6cm, minimum height=0.9cm] (fl2) at (6,0.8) {Fair-lossy link};
+    \draw[msg] ([xshift=-0.6cm]app1.south) -- node[left, font=\scriptsize] {$\abk{\textit{Send} \mid q, m}$} ([xshift=-0.6cm]fl1.north);
+    \draw[msg] ([xshift=0.6cm]fl2.north) -- node[right, font=\scriptsize] {$\abk{\textit{Deliver} \mid p, m}$} ([xshift=0.6cm]app2.south);
+    \draw[msg, dashed, gray] (fl1.south) .. controls (1.5,-0.6) and (4.5,-0.6) .. node[below, font=\scriptsize] {network} (fl2.south);
+  \end{tikzpicture}
+  \caption{The interface of a link. The upper layer of $p$ issues the request $\abk{\textit{Send} \mid q, m}$; the link of $q$ issues the indication $\abk{\textit{Deliver} \mid p, m}$ to the upper layer of $q$.}
+  \label{fig:link-interface}
+\end{figure}
+
+\paragraph{Properties.} The informal description is turned into three properties.
+
+\begin{frameddefn}[label={def:fair-lossy}]{Fair-lossy link}
+  A fair-lossy link satisfies the following properties:
+  \begin{itemize}[leftmargin=3.4em]
+    \item[\textbf{FL1}] \textbf{(Fair-loss)} If a correct process $p$ sends $m$ infinitely often to a correct process $q$, then $q$ delivers $m$ an infinite number of times.
+    \item[\textbf{FL2}] \textbf{(Finite duplication)} If a correct process $p$ sends $m$ a finite number of times to $q$, then $q$ cannot deliver $m$ an infinite number of times.
+    \item[\textbf{FL3}] \textbf{(No creation)} If some process $q$ delivers a message $m$ with sender $p$, then $m$ was sent by $p$ to $q$.
+  \end{itemize}
+\end{frameddefn}
+
+Each property corresponds to a piece of the informal description:
+\begin{itemize}
+  \item FL1 captures \curlyquotes{loses messages with a certain probability}: the link can lose any single message, but it can't lose \textit{all} the copies of a message that is sent infinitely many times. We observe that both processes must be correct: if $q$ crashes, it obviously can't deliver anything.
+  \item FL2 captures \curlyquotes{can duplicate a message a finite number of times}: duplicates are allowed, but only finitely many for each send.
+  \item FL3 captures \curlyquotes{does not create messages from thin air}: every delivered message was really sent, and by the process that appears as its sender.
+\end{itemize}
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[xscale=1.25, yscale=1.4]
+    \proc{1}{p}{8.4}
+    \proc{0}{q}{8.4}
+    \foreach \x/\l in {0.6/1, 2.2/2, 3.8/3, 5.4/4, 7.0/5} {
+      \node[ev] (s\l) at (\x,1) {};
+    }
+    \node[lbl, above=2pt] at (s1) {$\textit{Send}(m)$};
+    \node[lbl, above=2pt] at (s2) {$\textit{Send}(m)$};
+    \node[lbl, above=2pt] at (s3) {$\textit{Send}(m)$};
+    \node[lbl, above=2pt] at (s4) {$\textit{Send}(m)$};
+    \node[lbl, above=2pt] at (s5) {$\textit{Send}(m)$};
+    % lost
+    \draw[msg, -] (s1) -- (1.2,0.55);
+    \node[BrickRed, font=\bfseries] at (1.25,0.5) {$\times$};
+    \draw[msg, -] (s3) -- (4.4,0.55);
+    \node[BrickRed, font=\bfseries] at (4.45,0.5) {$\times$};
+    % delivered
+    \node[ev] (d1) at (2.8,0) {};
+    \node[ev] (d2) at (3.7,0) {};
+    \node[ev] (d3) at (6.3,0) {};
+    \node[ev] (d4) at (7.8,0) {};
+    \draw[msg] (s2) -- (d1);
+    \draw[msg] (s2) -- (d2);
+    \draw[msg] (s4) -- (d3);
+    \draw[msg] (s5) -- (d4);
+    \node[lbl, below=2pt] at (d1) {$\textit{Deliver}(m)$};
+    \node[lbl, below=10pt] at (d2) {(duplicate)};
+    \node[lbl, below=2pt] at (d3) {$\textit{Deliver}(m)$};
+    \node[lbl, below=2pt] at (d4) {$\textit{Deliver}(m)$};
+    \node[gray] at (8.0,0.5) {$\cdots$};
+  \end{tikzpicture}
+  \caption{A possible behaviour of a fair-lossy link. Process $p$ keeps sending $m$ to $q$: some copies are lost ($\times$), one copy is delivered twice (duplication), but since $m$ is sent infinitely often, it is delivered infinitely often.}
+  \label{fig:fair-loss}
+\end{figure}
+
+
+\begin{framedobs}{}
+  A fair-lossy link gives very weak guarantees: a single $\abk{\textit{Send} \mid q, m}$ may never be delivered, and a message may be delivered more than once. It is however a realistic model of a real network, and it is the starting point to build stronger links on top of it: for instance, by retransmitting every message forever we exploit FL1, and by filtering out duplicates at the receiver we fix the problems caused by FL2.
+\end{framedobs}
+
+\subsection{Safety and liveness properties}
+
+When we specify an abstraction, its properties are usually of two very different kinds, and specifications typically combine both of them.
+
+\begin{frameddefn}[label={def:safety}]{Safety property}
+  A safety property is a property that, if violated at some time $t$, can never be satisfied after $t$. Formally, if a safety property is violated in an execution $\Exe$, then there is a finite prefix $\Exe'$ of $\Exe$ such that \textit{any} extension of $\Exe'$ also violates the property.
+\end{frameddefn}
+
+Informally, a safety property states that \textbf{something bad cannot happen}. If the bad thing happens, we can point to the exact moment in which it happened, and nothing that happens later can repair it.
+
+\begin{frameddefn}[label={def:liveness}]{Liveness property}
+  A liveness property is a property that cannot be violated in a finite execution. Formally, for any finite execution $\Exe$ that does not satisfy a liveness property, there is an extension of $\Exe$ that satisfies it.
+\end{frameddefn}
+
+Informally, a liveness property states that \textbf{something good will eventually happen}. At any finite moment the good thing may not have happened yet, but there is always hope that it will happen later.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[
+      evbox/.style={draw=gray!70, fill=gray!8, minimum width=1.05cm, minimum height=0.55cm, font=\scriptsize},
+      badbox/.style={evbox, draw=BrickRed, fill=BrickRed!15},
+      goodbox/.style={evbox, draw=ForestGreen, fill=ForestGreen!15, minimum width=1.6cm},
+      extbox/.style={evbox, draw=gray!50, fill=white, dashed},
+    ]
+    % safety
+    \node[font=\small\bfseries, anchor=west] at (-0.6,1.0) {Safety};
+    \node[evbox] (s1) at (0.0,0) {$e_1$};
+    \node[evbox, right=0.1cm of s1] (s2) {$e_2$};
+    \node[evbox, right=0.1cm of s2] (s3) {$e_3$};
+    \node[badbox, right=0.1cm of s3] (s4) {$e_4$};
+    \node[extbox, right=0.1cm of s4] (s5) {$e_5$};
+    \node[extbox, right=0.1cm of s5] (s6) {$e_6$};
+    \node[right=0.1cm of s6, gray] {$\cdots$};
+    \draw[decorate, decoration={brace, amplitude=4pt, mirror}, thick] ([yshift=-3pt]s1.south west) -- node[below=5pt, font=\scriptsize] {finite prefix $\Exe'$} ([yshift=-3pt]s4.south east);
+    \draw[decorate, decoration={brace, amplitude=4pt}, gray] ([yshift=3pt]s5.north west) -- node[above=5pt, font=\scriptsize, xshift=0.7cm] {any extension: still violated} ([yshift=3pt]s6.north east);
+    \node[BrickRed, font=\scriptsize, above=2pt, xshift=-0.3cm] at (s4.north) {bad event};
+    % liveness
+    \node[font=\small\bfseries, anchor=west] at (-0.6,-2.0) {Liveness};
+    \node[evbox] (l1) at (0.0,-3) {$e_1$};
+    \node[evbox, right=0.1cm of l1] (l2) {$e_2$};
+    \node[evbox, right=0.1cm of l2] (l3) {$e_3$};
+    \node[evbox, right=0.1cm of l3] (l4) {$e_4$};
+    \node[evbox, right=0.1cm of l4] (l5) {$e_5$};
+    \node[goodbox, right=0.1cm of l5] (l6) {$\Del(p,q,m)$};
+    \draw[decorate, decoration={brace, amplitude=4pt, mirror}, thick] ([yshift=-3pt]l1.south west) -- node[below=5pt, font=\scriptsize] {finite execution $\Exe$: not satisfied yet} ([yshift=-3pt]l5.south east);
+    \node[ForestGreen!70!black, font=\scriptsize, above=2pt] at (l6.north) {good event};
+  \end{tikzpicture}
+  \caption{Top: a safety property is violated by the bad event $e_4$, so every execution that starts with the prefix $\Exe' = (e_1, e_2, e_3, e_4)$ violates it. Bottom: a liveness property not yet satisfied by the finite execution $\Exe = (e_1, \ldots, e_5)$ can always be satisfied by extending it, e.g. with $\Del(p,q,m)$.}
+  \label{fig:safety-liveness}
+\end{figure}
+
+\paragraph{Classifying the properties of a fair-lossy link.} Let's apply the definitions to the three properties of \Cref{def:fair-lossy}.
+
+\begin{framedprob}{}
+  Among FL1, FL2 and FL3 there is at least one safety property. Which one?
+\end{framedprob}
+
+\textit{Solution:} FL3 (no creation) is a safety property. Suppose that in an execution $\Exe = (e_1, e_2, e_3, e_4, e_5, \ldots)$ the event $e_4$ is the delivery to $q$ of a message $m$ that was never sent by anyone. Then FL3 is violated already in the finite prefix $\Exe' = (e_1, e_2, e_3, e_4)$, and it stays violated in every extension of $\Exe'$: no future event can \curlyquotes{un-deliver} $m$.
+
+\begin{framedprob}{}
+  Among FL1, FL2 and FL3 there is at least one liveness property. Which one?
+\end{framedprob}
+
+\textit{Solution:} FL1 (fair-loss) is a liveness property. If $p$ has sent a message $m$ and $q$ has not delivered it at time $t$, there is always hope that it will be delivered at time $t + \Delta$. Formally, take any finite execution, e.g. $\Exe = (e_1, e_2, e_3, e_4, e_5)$: we can always extend it by letting $p$ send $m$ again and again and adding infinitely many deliveries, e.g. starting with $\Exe' = (e_1, e_2, e_3, e_4, e_5, \Del(p,q,m), \ldots)$, so that FL1 is satisfied.
+
+\begin{framedprob}{}
+  Is FL2 (finite duplication) a safety or a liveness property?
+\end{framedprob}
+
+\textit{Solution:} FL2 is a liveness property, even though it sounds like \curlyquotes{something bad cannot happen}. The bad thing here is an \textit{infinite} number of deliveries, which can never be observed in a finite execution. Take any finite execution in which $q$ has delivered $m$ many times:
+\[\Exe = (\Del(p,q,m), \Del(p,q,m), \ldots, \Del(p,q,m))\]
+We can always extend it as
+\[\Exe' = (\Del(p,q,m), \ldots, \Del(p,q,m), e_1, e_2, e_3, \ldots)\]
+where no $e_j$ is $\Del(p,q,m)$. In $\Exe'$ the message $m$ is delivered only finitely many times, so FL2 is satisfied. Hence, no finite execution violates FL2, which is exactly the definition of liveness.
+
+\begin{framedprob}{}
+  Consider the following variant of FL2:
+  \begin{itemize}
+    \item[] \textbf{(At-most-7 duplication)} For each message identifier $m$, process $q$ delivers $m$ at most seven times.
+  \end{itemize}
+  Is it a liveness property?
+\end{framedprob}
+
+\textit{Solution:} No, it is a safety property. Consider the finite execution
+\[\Exe = (\underbrace{\Del(p,q,m), \ldots, \Del(p,q,m)}_{8 \text{ times}})\]
+After the eighth delivery of $m$ the property is violated, and every extension of $\Exe$ still violates it, since the eight deliveries can't be undone.
+
+\begin{framedobs}{}
+  The two duplication properties look almost identical, but they are of different kinds. The difference is \textit{when} the bad thing becomes visible: \curlyquotes{more than 7 deliveries} is detected after a finite number of events, while \curlyquotes{infinitely many deliveries} is never detected in finite time. A bound that is fixed in advance gives a safety property, \curlyquotes{finitely many} gives a liveness property.
+\end{framedobs}
+
+\paragraph{Other properties.} The same classification applies to any abstraction. For instance, consider a resource $r$ (e.g.\ a file or a printer) that processes want to use exclusively:
+\begin{itemize}
+  \item \textbf{Mutual exclusion}: if a process $p$ is granted a resource $r$ at time $t$, then no other process $q$ is granted $r$ at $t$.
+  \item \textbf{No-deadlock}: if $r$ is not already granted, eventually someone gets a grant on resource $r$.
+  \item \textbf{No-starvation}: if a process $p$ requests a grant on resource $r$, it will eventually get it.
+\end{itemize}
+
+\begin{framedprob}{}
+  Classify mutual exclusion, no-deadlock and no-starvation as safety or liveness properties.
+\end{framedprob}
+
+\textit{Solution:} Mutual exclusion is a safety property: if at some time $t$ two processes hold $r$, the violation is visible in the finite prefix that ends at $t$, and it can't be repaired. No-deadlock and no-starvation are liveness properties: they both contain \curlyquotes{eventually}, and at any finite time the grant may still arrive later. We also observe that no-starvation is stronger than no-deadlock: no-deadlock only requires that \textit{someone} gets the resource, while no-starvation requires that \textit{every} process that asks for it gets it.
+
+\paragraph{Badly written properties.} A good specification keeps safety and liveness separate, since they are proved with different techniques: safety is usually proved with an invariant (\curlyquotes{in every reachable configuration, nothing bad has happened}), while liveness requires showing that progress is eventually made.
+
+\begin{framedprob}{}
+  What is wrong with the following property?
+  \begin{itemize}
+    \item[] If process $p$ sends a message $m$ to $q$, then $q$ will eventually deliver it and this delivery is unique.
+  \end{itemize}
+\end{framedprob}
+
+\textit{Solution:} The property mixes two different aspects:
+\begin{itemize}
+  \item a liveness aspect: $q$ will eventually deliver $m$;
+  \item a safety aspect: the delivery is unique.
+\end{itemize}
+It should be decomposed into two properties:
+\begin{enumerate}
+  \item If $p$ sends a message $m$ to $q$, then $q$ eventually delivers it. \hfill (liveness)
+  \item If $p$ sends a message $m$ to $q$, then $m$ is delivered at most once. \hfill (safety)
+\end{enumerate}
+
+\begin{framedobs}{}
+  This is not a coincidence: it can be proved (Alpern and Schneider, 1985) that \textit{every} property of executions can be written as the conjunction of a safety property and a liveness property. Hence, the decomposition we did above can always be done.
 \end{framedobs}
