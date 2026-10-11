@@ -26,6 +26,20 @@
 
 
 
+% Process box with buffers, used in the execution figure:
+% \dsproc{x}{y}{name}{state}{InBuf content}{OutBuf content}
+\newcommand{\dsproc}[6]{%
+  \draw[RoyalBlue, fill=gray!12] (#1,#2) rectangle ++(3.2,1.1);
+  \node[RoyalBlue, font=\small] at (#1+1.6,#2+0.78) {#3};
+  \node[font=\scriptsize] at (#1+1.6,#2+0.3) {state: $#4$};
+  \draw[RoyalBlue!60] (#1+0.5,#2) rectangle ++(0.75,-0.85);
+  \draw[RoyalBlue!60] (#1+1.95,#2) rectangle ++(0.75,-0.85);
+  \node[font=\tiny, anchor=north] at (#1+0.875,#2-0.85) {$\InBuf$};
+  \node[font=\tiny, anchor=north] at (#1+2.325,#2-0.85) {$\OutBuf$};
+  \ifstrempty{#5}{}{\node[mbox] at (#1+0.875,#2-0.42) {$#5$};}
+  \ifstrempty{#6}{}{\node[mbox] at (#1+2.325,#2-0.42) {$#6$};}
+}
+
 \section{What is a distributed system?}
 
 \begin{frameddefn}{Distributed system}
@@ -139,11 +153,51 @@ To compare the timing models formally, we describe what a run of the whole syste
   A configuration is \textit{initial} if $q_j \in Q_{in}$ for every process $p_j$ and all the buffers are empty.
 \end{frameddefn}
 
-The system moves from a configuration to the next one through a single \textbf{step}, which can be of the two kinds already described:
+The system moves from a configuration to the next one through a single \textbf{step} (or \textit{event}), which can be of the two kinds already described:
 \begin{itemize}
-  \item a \textit{computation step} $\mathit{comp}(j)$, in which process $p_j$ applies its transition function $P_j$, empties $\InBuf_j$ and adds the new messages to $\OutBuf_j$;
-  \item a \textit{delivery step} $\mathit{del}(m)$, in which a message $m = \abk{p_i, p_j, \text{payload}}$ is moved from $\OutBuf_i$ to $\InBuf_j$.
+  \item a \textit{computation step} $\Exec(j)$, in which process $p_j$ applies its transition function $P_j$, empties $\InBuf_j$ and adds the new messages to $\OutBuf_j$;
+  \item a \textit{delivery step} $\Del(m,i,j)$, in which the message $m$ sent by $p_i$ to $p_j$ is moved from $\OutBuf_i$ to $\InBuf_j$.
 \end{itemize}
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[
+      pbox/.style={draw=RoyalBlue, fill=gray!12, minimum width=3.2cm, minimum height=1.1cm},
+      mbox/.style={draw, fill=black!85, text=white, font=\scriptsize, inner sep=1.5pt, minimum width=0.45cm},
+    ]
+    % C0
+    \node[font=\bfseries] at (-1.2,0.4) {$C_0$};
+    \dsproc{0}{0}{Process 1}{q}{m}{}
+    \dsproc{6}{0}{Process 2}{q_2}{}{}
+    % C1
+    \node[font=\bfseries] at (-1.2,-3.0) {$C_1$};
+    \dsproc{0}{-3.4}{Process 1}{q'}{}{m'}
+    \dsproc{6}{-3.4}{Process 2}{q_2}{}{}
+    % C2
+    \node[font=\bfseries] at (-1.2,-6.4) {$C_2$};
+    \dsproc{0}{-6.8}{Process 1}{q'}{}{}
+    \dsproc{6}{-6.8}{Process 2}{q_2}{m'}{}
+    % steps
+    \draw[msg, BrickRed] (-1.2,0.0) -- node[left, font=\small, align=right] {$\Exec(1)$\\[1pt] {\scriptsize $p_1$ consumes $m$}\\[-1pt] {\scriptsize and sends $m'$}} (-1.2,-2.6);
+    \draw[msg, BrickRed] (-1.2,-3.4) -- node[left, font=\small, align=right] {$\Del(m',1,2)$\\[1pt] {\scriptsize the network moves}\\[-1pt] {\scriptsize $m'$ to $p_2$}} (-1.2,-6.0);
+  \end{tikzpicture}
+  \caption{An execution made of two steps. In $C_0$, process $p_1$ has a message $m$ in its input buffer. The computation step $\Exec(1)$ consumes $m$, changes the state of $p_1$ from $q$ to $q'$ and puts the new message $m'$, addressed to $p_2$, in $\OutBuf_1$. Then, the delivery step $\Del(m',1,2)$ moves $m'$ from $\OutBuf_1$ to $\InBuf_2$. The state of $p_2$ doesn't change: $p_2$ will read $m'$ only at its next computation step.}
+  \label{fig:execution-steps}
+\end{figure}
+
+\begin{framedex}{The steps of \Cref{fig:execution-steps}}
+  In the computation step $\Exec(1)$, the transition function of $p_1$ is applied to its state and to the content of its input buffer:
+  \begin{align*}
+    P_1(q, \{m\}) &= (q', \{\abk{1,2,m'}\}) \\
+    \OutBuf_1 &\leftarrow \OutBuf_1 \cup \{\abk{1,2,m'}\} \\
+    \InBuf_1 &\leftarrow \varnothing
+  \end{align*}
+  In the delivery step $\Del(m',1,2)$ no process executes anything: the network moves the message from the output buffer of $p_1$ to the input buffer of $p_2$:
+  \begin{align*}
+    \OutBuf_1 &\leftarrow \OutBuf_1 \setminus \{\abk{1,2,m'}\} \\
+    \InBuf_2 &\leftarrow \InBuf_2 \cup \{\abk{1,2,m'}\}
+  \end{align*}
+\end{framedex}
 
 \begin{frameddefn}{Execution}
   An execution is an (infinite) alternating sequence of configurations and steps
