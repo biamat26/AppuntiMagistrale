@@ -24,9 +24,9 @@
   \draw[msg] (c3) -- node[lbl, right] {$m_3$} (a3);
 }
 
-\section{Basic notions}
 
-\subsection{What is a distributed system?}
+
+\section{What is a distributed system?}
 
 \begin{frameddefn}{Distributed system}
   A distributed system is a collection of autonomous processes $p_1, \ldots, p_n$, usually running on different machines, that cooperate to solve a common problem and that communicate \underline{only} by exchanging messages over a network.
@@ -51,11 +51,12 @@ These advantages come at a price. Distributed systems are intrinsically hard bec
 
 A famous informal definition by Lamport captures the last point well: \emph{a distributed system is one in which a machine you have never heard of can crash and stop your own computer from working}.
 
-\subsection{The system model}
+\section{The system model}
 
 To reason formally about algorithms we need a \textbf{model}, i.e. a precise list of assumptions on what processes and channels can and cannot do. The same problem can be easy in one model and impossible in another, so the model is always the first thing to check when reading a result.
 
-\paragraph{Processes.} The system is made of $n$ processes $\Pi = \{p_1, \ldots, p_n\}$. Each process executes a sequential program: it performs local computations, sends messages and receives messages, one step at a time.
+\subsection{Processes}
+The system is made of $n$ processes $\Pi = \{p_1, \ldots, p_n\}$. Each process executes a sequential program: it performs local computations, sends messages and receives messages, one step at a time.
 
 \begin{figure}[H]
   \centering
@@ -97,7 +98,8 @@ In words: the transition function takes the current state $q$ and the received m
 
 The \textbf{global state} (or \textit{configuration}) of the system is the collection of the states of all the processes together with the contents of all their buffers. We'll come back to global states in the next section, where they will be central.
 
-\paragraph{Channels.} Unless stated otherwise, we assume that the network is \textit{fully connected} (every pair of processes can communicate directly) and that channels are \textbf{reliable}:
+\subsection{Channels}
+Unless stated otherwise, we assume that the network is \textit{fully connected} (every pair of processes can communicate directly) and that channels are \textbf{reliable}:
 \begin{itemize}
   \item every message sent to a correct process is eventually received, i.e. it will be received after a finite (but unbounded) amount of time;
   \item every message is received at most once (no duplication);
@@ -105,8 +107,14 @@ The \textbf{global state} (or \textit{configuration}) of the system is the colle
 \end{itemize}
 Reliability says nothing about the order of delivery: messages can be delivered in a different order from the one in which they were sent. When we also require messages between the same pair of processes to be delivered in sending order, we speak of \textbf{FIFO channels}.
 
-\paragraph{Timing.} The most important assumption concerns time.
+\subsection{Timing} 
+The most important assumption concerns time.
 
+\subsection{Execution}
+
+
+
+\section{Synchronous and asynchronous systems}
 \begin{frameddefn}{Synchronous and asynchronous systems}
   A distributed system is \textbf{synchronous} if there are known upper bounds on the time needed by a process to execute a step, on the time needed by a message to be delivered and on the drift of the local clocks. A system is \textbf{asynchronous} if no such bounds exist.
 \end{frameddefn}
