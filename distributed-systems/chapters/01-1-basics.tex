@@ -55,34 +55,51 @@ A famous informal definition by Lamport captures the last point well: \emph{a di
 
 To reason formally about algorithms we need a \textbf{model}, i.e. a precise list of assumptions on what processes and channels can and cannot do. The same problem can be easy in one model and impossible in another, so the model is always the first thing to check when reading a result.
 
-\paragraph{Processes.} The system is made of $n$ processes $\Pi = \{p_1, \ldots, p_n\}$. Each process executes a sequential program: it performs local computations, sends messages and receives messages, one action at a time.
-
-\begin{frameddefn}{Processes}
-  A process is a (possibily infinite) state machine that executes a sequential program. It has a local state, which includes its memory and its local clock, and it can perform three kinds of actions.
-\end{frameddefn}
+\paragraph{Processes.} The system is made of $n$ processes $\Pi = \{p_1, \ldots, p_n\}$. Each process executes a sequential program: it performs local computations, sends messages and receives messages, one step at a time.
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.7\textwidth]{process-model.png}
-  \caption{The state of a process is its internal memory together with the content of its InBuffer and OutBuffer.}
+  \caption{A process interacts with the upper layer (the application, which gives inputs and reads outputs) and with the link layer, through an InBuffer of received messages and an OutBuffer of messages to be sent. The state of a process is its internal memory together with the content of its InBuffer and OutBuffer.}
   \label{fig:process-model}
 \end{figure}
 
-So, a process is a possibly infinite-state I/O automation: 
-\begin{itemize}
-  \item Internal sates - set $Q$;
-  \item Initial states - set $Q_{in} \subseteq Q$;
-  \item Messages - set of all possible messages $M$ in the form <sender, receiver, payload>;
-  \item $InBuf_j$ - multiset of received messages, consumed by the next local step;
-  \item $OutBuf_j$ - multiset of "inflight" messages (messages sent but not yet received);
-\end{itemize}
+\begin{frameddefn}{Process}
+  A process $p_j$ is a (possibly infinite-state) input/output automaton made of:
+  \begin{itemize}
+    \item a set of \textit{internal states} $Q$, with a subset of \textit{initial states} $Q_{in} \subseteq Q$;
+    \item the set $M$ of all possible \textit{messages}, each of the form $\abk{\text{sender}, \text{receiver}, \text{payload}}$;
+    \item an \textit{input buffer} $\InBuf_j$, i.e. the multiset of messages received by $p_j$ and not yet processed;
+    \item an \textit{output buffer} $\OutBuf_j$, i.e. the multiset of messages sent by $p_j$ that are still in flight (sent but not yet received);
+    \item a \textit{transition function} $P_j$, which describes a single step of the process.
+  \end{itemize}
+\end{frameddefn}
 
+The buffers are \textit{multisets} and not sets because the same message can be sent more than once, and they are not queues because, in general, the network doesn't preserve the order of messages.
 
+In a single step, process $p_j$ reads its current state and all the messages in its input buffer, moves to a new state and produces a (possibly empty) set of messages to send. Formally, a step of $p_j$ is described as:
+\begin{align*}
+  P_j(q \in Q \cup Q_{in},\, \InBuf_j) &= (q' \in Q,\, \SendMsg \subseteq M) \\
+  \OutBuf_j &\leftarrow \OutBuf_j \cup \SendMsg \\
+  \InBuf_j &\leftarrow \varnothing
+\end{align*}
 
+In words: the transition function takes the current state $q$ and the received messages, and returns the next state $q'$ together with the set $\SendMsg$ of new messages. The new messages are added to the output buffer, while the input buffer is emptied, since all its messages have been consumed by the step.
+
+\begin{framedobs}{}
+  The process never moves messages from its output buffer to the input buffer of another process: this is done by the \textit{network}. Hence, an execution of the system alternates two kinds of steps:
+  \begin{itemize}
+    \item \textbf{computation steps}, in which a process $p_j$ applies $P_j$ as above;
+    \item \textbf{delivery steps}, in which the network takes a message $m = \abk{p_i, p_j, \text{payload}}$ from $\OutBuf_i$ and puts it in $\InBuf_j$.
+  \end{itemize}
+  The assumptions on channels and timing that we discuss below are exactly assumptions on \textit{when} and \textit{in which order} delivery steps can happen.
+\end{framedobs}
+
+The \textbf{global state} (or \textit{configuration}) of the system is the collection of the states of all the processes together with the contents of all their buffers. We'll come back to global states in the next section, where they will be central.
 
 \paragraph{Channels.} Unless stated otherwise, we assume that the network is \textit{fully connected} (every pair of processes can communicate directly) and that channels are \textbf{reliable}:
 \begin{itemize}
-  \item every message sent to a correct process is eventually received (Here, \emph{eventually} imply means it will be received sooner or later.);
+  \item every message sent to a correct process is eventually received, i.e. it will be received after a finite (but unbounded) amount of time;
   \item every message is received at most once (no duplication);
   \item every received message was actually sent by someone (no creation).
 \end{itemize}
