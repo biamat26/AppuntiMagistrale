@@ -24,8 +24,6 @@
   \draw[msg] (c3) -- node[lbl, right] {$m_3$} (a3);
 }
 
-\chapter{Models, Abstractions and Basic concepts}
-
 \section{Basic notions}
 
 \subsection{What is a distributed system?}
@@ -253,4 +251,3 @@ Two events are concurrent when neither of them can have influenced the other. Th
 \begin{framedobs}{}
   Concurrency is \underline{not} transitive. In \Cref{fig:running-example} we have $e_1^1 \cc e_3^1$ and $e_3^1 \cc e_1^2$, but $e_1^1 \to e_1^2$. Hence, concurrency is not an equivalence relation and it can't be used to split the events into \curlyquotes{simultaneous} groups.
 \end{framedobs}
-
