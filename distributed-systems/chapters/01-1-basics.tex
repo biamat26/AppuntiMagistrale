@@ -49,7 +49,7 @@ These advantages come at a price. Distributed systems are intrinsically hard bec
   \item \textbf{Independent failures}: a machine or a link can fail while the rest of the system keeps working, and the other processes may not be able to tell a failed process from a slow one.
 \end{enumerate}
 
-A famous informal definition by Lamport captures the last point well: a distributed system is one in which a machine you have never heard of can crash and stop your own computer from working.
+A famous informal definition by Lamport captures the last point well: \emph{a distributed system is one in which a machine you have never heard of can crash and stop your own computer from working}.
 
 \subsection{The system model}
 
@@ -57,9 +57,32 @@ To reason formally about algorithms we need a \textbf{model}, i.e. a precise lis
 
 \paragraph{Processes.} The system is made of $n$ processes $\Pi = \{p_1, \ldots, p_n\}$. Each process executes a sequential program: it performs local computations, sends messages and receives messages, one action at a time.
 
+\begin{frameddefn}{Processes}
+  A process is a (possibily infinite) state machine that executes a sequential program. It has a local state, which includes its memory and its local clock, and it can perform three kinds of actions.
+\end{frameddefn}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.7\textwidth]{process-model.png}
+  \caption{The state of a process is its internal memory together with the content of its InBuffer and OutBuffer.}
+  \label{fig:process-model}
+\end{figure}
+
+So, a process is a possibly infinite-state I/O automation: 
+\begin{itemize}
+  \item Internal sates - set $Q$;
+  \item Initial states - set $Q_{in} \subseteq Q$;
+  \item Messages - set of all possible messages $M$ in the form <sender, receiver, payload>;
+  \item $InBuf_j$ - multiset of received messages, consumed by the next local step;
+  \item $OutBuf_j$ - multiset of "inflight" messages (messages sent but not yet received);
+\end{itemize}
+
+
+
+
 \paragraph{Channels.} Unless stated otherwise, we assume that the network is \textit{fully connected} (every pair of processes can communicate directly) and that channels are \textbf{reliable}:
 \begin{itemize}
-  \item every message sent to a correct process is eventually received;
+  \item every message sent to a correct process is eventually received (Here, \emph{eventually} imply means it will be received sooner or later.);
   \item every message is received at most once (no duplication);
   \item every received message was actually sent by someone (no creation).
 \end{itemize}
