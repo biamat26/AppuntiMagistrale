@@ -107,25 +107,148 @@ Unless stated otherwise, we assume that the network is \textit{fully connected} 
 \end{itemize}
 Reliability says nothing about the order of delivery: messages can be delivered in a different order from the one in which they were sent. When we also require messages between the same pair of processes to be delivered in sending order, we speak of \textbf{FIFO channels}.
 
-\subsection{Timing} 
-The most important assumption concerns time.
+\subsection{Timing}
 
-\subsection{Execution}
+The process model tells us \textit{what} a process does in a step, but nothing about \textit{when} steps happen. Timing assumptions fill this gap: they describe how fast processes and the network are. There are three quantities involved:
+\begin{itemize}
+  \item \textbf{Process speed}: the time between two consecutive steps of the same process.
+  \item \textbf{Message delay}: the time between the moment a message is put in the $\OutBuf$ of its sender and the moment it is delivered in the $\InBuf$ of its receiver.
+  \item \textbf{Clock drift}: the rate at which the local clock of a process deviates from real time.
+\end{itemize}
 
+Depending on whether these quantities are bounded, and on whether the processes know the bounds, we obtain three timing models.
 
+\begin{frameddefn}[label={def:timing-models}]{Timing models}
+  A distributed system is:
+  \begin{itemize}
+    \item \textbf{synchronous} if there are \textit{known} upper bounds on process speed, on message delay and on clock drift;
+    \item \textbf{asynchronous} if there are no bounds at all: steps and messages can take an arbitrary (but finite) amount of time;
+    \item \textbf{partially synchronous} if the bounds exist but are \textit{unknown} to the processes, or if they are known but hold only after some unknown point in time, called \textit{Global Stabilization Time} (GST).
+  \end{itemize}
+\end{frameddefn}
+
+The synchronous model is the most convenient for the algorithm designer, since processes can reason about time, but it is also the least realistic. The asynchronous model is the opposite: it assumes nothing, so an algorithm that works in it works in any real network, but many problems become much harder (or even impossible) to solve. The partially synchronous model is the compromise used by most practical systems.
+
+\subsection{Executions}
+
+To compare the timing models formally, we describe what a run of the whole system looks like using the process model introduced above.
+
+\begin{frameddefn}{Configuration}
+  A configuration of the system is a vector containing the state of every process together with the content of all the buffers:
+  \[C = \rbk{q_1, \ldots, q_n,\ \InBuf_1, \ldots, \InBuf_n,\ \OutBuf_1, \ldots, \OutBuf_n}\]
+  A configuration is \textit{initial} if $q_j \in Q_{in}$ for every process $p_j$ and all the buffers are empty.
+\end{frameddefn}
+
+The system moves from a configuration to the next one through a single \textbf{step}, which can be of the two kinds already described:
+\begin{itemize}
+  \item a \textit{computation step} $\mathit{comp}(j)$, in which process $p_j$ applies its transition function $P_j$, empties $\InBuf_j$ and adds the new messages to $\OutBuf_j$;
+  \item a \textit{delivery step} $\mathit{del}(m)$, in which a message $m = \abk{p_i, p_j, \text{payload}}$ is moved from $\OutBuf_i$ to $\InBuf_j$.
+\end{itemize}
+
+\begin{frameddefn}{Execution}
+  An execution is an (infinite) alternating sequence of configurations and steps
+  \[C_0,\ \phi_1,\ C_1,\ \phi_2,\ C_2,\ \ldots\]
+  where $C_0$ is an initial configuration and each $C_k$ is the configuration obtained by applying the step $\phi_k$ to $C_{k-1}$.
+\end{frameddefn}
+
+We observe that steps are \textit{atomic} and happen one at a time: even if in reality two processes act at the same instant, we can always describe the execution as an interleaving of their steps, since a process cannot observe what another one is doing in the same instant. Not every sequence of steps is acceptable, though: the timing model decides which executions are \textbf{admissible}.
+
+\paragraph{Asynchronous executions.} In the asynchronous model the only requirement is that nothing is postponed forever.
+
+\begin{frameddefn}{Asynchronous execution}
+  An execution is an admissible asynchronous execution if:
+  \begin{enumerate}
+    \item every (correct) process performs infinitely many computation steps;
+    \item every message that is sent is eventually delivered.
+  \end{enumerate}
+\end{frameddefn}
+
+These two conditions are \textit{fairness} conditions: they forbid a process from being ignored forever and a message from staying in an output buffer forever, but they put no limit on how long this can take. Apart from this, the order of the steps is completely arbitrary. It's useful to think of it as chosen by an \textbf{adversary} (or \textit{scheduler}) that tries to make the algorithm fail: it can make a process very slow, deliver messages in any order and delay a message for as long as it wants. An algorithm is correct in the asynchronous model only if it is correct for \textit{every} admissible execution, i.e. against every possible adversary.
+
+\paragraph{Synchronous executions.} In the synchronous model, instead, the processes proceed together in \textbf{rounds}.
+
+\begin{frameddefn}{Synchronous execution}
+  An execution is an admissible synchronous execution if it is divided into rounds $1, 2, 3, \ldots$ such that, in each round:
+  \begin{enumerate}
+    \item every process performs exactly one computation step;
+    \item every message sent during the round is delivered before the next round starts.
+  \end{enumerate}
+\end{frameddefn}
+
+In other words, in each round every process reads all the messages sent to it in the previous round, updates its state and sends its new messages, which will be read in the next round. All the processes move in \textit{lockstep}, like musicians following the same metronome.
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}{0.48\textwidth}
+    \centering
+    \begin{tikzpicture}[xscale=0.95, yscale=0.9]
+      \foreach \x/\r in {0/1, 2/2, 4/3} {
+        \draw[dashed, gray!60] (\x+0.1,-0.5) -- (\x+0.1,2.5);
+        \node[font=\scriptsize, gray] at (\x+1.1,2.6) {round \r};
+      }
+      \draw[dashed, gray!60] (6.1,-0.5) -- (6.1,2.5);
+      \proc{2}{p_1}{6.3}
+      \proc{1}{p_2}{6.3}
+      \proc{0}{p_3}{6.3}
+      \foreach \x in {0.4, 2.4, 4.4} {
+        \node[ev] at (\x,2) {}; \node[ev] at (\x,1) {}; \node[ev] at (\x,0) {};
+      }
+      \draw[msg] (0.4,2) -- (1.9,1);
+      \draw[msg] (0.4,0) -- (1.9,1);
+      \draw[msg] (2.4,1) -- (3.9,2);
+      \draw[msg] (2.4,1) -- (3.9,0);
+      \draw[msg] (4.4,0) -- (5.9,2);
+    \end{tikzpicture}
+    \caption{Synchronous: one step per process per round, and every message arrives within its round.}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.48\textwidth}
+    \centering
+    \begin{tikzpicture}[xscale=0.95, yscale=0.9]
+      \proc{2}{p_1}{6.3}
+      \proc{1}{p_2}{6.3}
+      \proc{0}{p_3}{6.3}
+      \node[ev] (x1) at (0.4,2) {};
+      \node[ev] (x2) at (1.2,2) {};
+      \node[ev] (x3) at (5.6,2) {};
+      \node[ev] (y1) at (2.0,1) {};
+      \node[ev] (y2) at (4.6,1) {};
+      \node[ev] (z1) at (0.9,0) {};
+      \node[ev] (z2) at (3.0,0) {};
+      \draw[msg] (x1) -- (y2);
+      \draw[msg] (x2) -- (y1);
+      \draw[msg] (z1) -- (x3);
+      \draw[msg] (y1) -- (z2);
+    \end{tikzpicture}
+    \caption{Asynchronous: steps happen at arbitrary times and the message sent first by $p_1$ is overtaken by the second one.}
+  \end{subfigure}
+  \caption{A synchronous and an asynchronous execution of three processes.}
+  \label{fig:sync-async}
+\end{figure}
+
+\begin{framedobs}{}
+  If the processes don't fail and the algorithm is deterministic, a synchronous execution is completely determined by the initial configuration: the order of the steps inside a round doesn't matter, since every message is read only in the next round. In the asynchronous model, instead, the same initial configuration gives rise to infinitely many different executions, one for each choice of the adversary. This is why proving correctness is so much harder in the asynchronous model.
+\end{framedobs}
+
+\begin{framedobs}{}
+  Every admissible synchronous execution is also an admissible asynchronous execution: in each round every process takes a step and every message is delivered, so both fairness conditions hold. Hence, an algorithm that is correct for every asynchronous execution is also correct for every synchronous one.
+\end{framedobs}
+
+The two definitions of \curlyquotes{synchronous} we have seen (known bounds and execution in rounds) are closely related. If the bounds on process speed and message delay are known, the processes can \textit{simulate} rounds: each round lasts a fixed amount of time, long enough for every process to take a step and for every message to arrive, and a process simply waits for the end of the round before reading its input buffer. This also gives a natural way to measure time:
+\begin{itemize}
+  \item in the synchronous model, the \textbf{time complexity} of an algorithm is the number of rounds it needs;
+  \item in the asynchronous model, we normalize the maximum message delay of the execution to $1$ time unit and measure time in these units.
+\end{itemize}
 
 \section{Synchronous and asynchronous systems}
-\begin{frameddefn}{Synchronous and asynchronous systems}
-  A distributed system is \textbf{synchronous} if there are known upper bounds on the time needed by a process to execute a step, on the time needed by a message to be delivered and on the drift of the local clocks. A system is \textbf{asynchronous} if no such bounds exist.
-\end{frameddefn}
 
 In a synchronous system a process can use timeouts: if a message doesn't arrive within the bound, its sender has surely failed. In an asynchronous system this is impossible, since a slow process is indistinguishable from a crashed one.
 
 \begin{framedobs}{}
-  Every algorithm that is correct in the asynchronous model is also correct in the synchronous one, since every synchronous execution is in particular a legal asynchronous execution. The opposite is false: for instance, failure detection through timeouts only works in the synchronous model.
+  We have seen that every algorithm that is correct in the asynchronous model is also correct in the synchronous one. The opposite is false: for instance, failure detection through timeouts only works in the synchronous model.
 \end{framedobs}
 
-Real systems are somewhere in between: most of the time messages are fast, but there are periods (congestion, garbage collection, network problems) in which they are arbitrarily slow. This is captured by the \textbf{partially synchronous} model, in which the bounds exist but are unknown, or hold only after some unknown point in time. Many practical protocols, such as Paxos and Raft, are designed to be always safe in the asynchronous model while relying on partial synchrony only to make progress.
+Real systems are somewhere in between: most of the time messages are fast, but there are periods (congestion, garbage collection, network problems) in which they are arbitrarily slow. This is exactly what the \textbf{partially synchronous} model of \Cref{def:timing-models} captures. Many practical protocols, such as Paxos and Raft, are designed to be always safe in the asynchronous model while relying on partial synchrony only to make progress.
 
 \begin{framedobs}{FLP impossibility}
   Fischer, Lynch and Paterson (1985) proved that, in an asynchronous system, there is no deterministic algorithm that solves consensus if even a single process may crash. This is the main reason why asynchrony is such a strong assumption, and why practical protocols either use randomization or rely on partial synchrony.
