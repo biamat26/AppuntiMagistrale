@@ -1,0 +1,107 @@
+\chapter{Statistical Exploration}
+\label{ch:stats}
+
+% ============================================================
+%  What to measure, what to expect, how to interpret it
+% ============================================================
+
+\section{The experiment}
+
+The idea is to treat $f(k) = kG$ as a ``black box'' and to look at its outputs with the tools of descriptive statistics, as we would do with a hash function or a random number generator:
+\begin{enumerate}
+  \item choose a base point $G$ (also try different ones, e.g. $(1,5)$ of order 9 and $(6,6)$ of order 18);
+  \item for many inputs $k$ (e.g. $k = 1, \ldots, K$, or $k$ drawn at random), compute $Q_k = kG = (x_k, y_k)$;
+  \item collect the data set $\set{(k, x_k, y_k)}$ and compute the statistics below;
+  \item compare the results with what an ideal random function would give.
+\end{enumerate}
+
+\begin{framedobs}{The big caveat of the toy curve}
+  Since $kG = (k \bmod n) G$, taking $K \gg n$ inputs does \textbf{not} give new information: the outputs are just the same $n$ points repeated periodically. With $G = (1,5)$ we only ever see $\set{\mathcal{O}, (1,5), (2,10), (5,9), (12,1), (12,16), (5,8), (2,7), (1,12)}$. On a real curve $n \approx 2^{256}$ and the period is never observed.
+\end{framedobs}
+
+\section{Properties to measure}
+
+\subsection{Distribution and frequency of $x$ and $y$}
+
+Plot histograms of $x_k$ and $y_k$ and the frequency of each value $0, \ldots, 16$. As a reference, the frequencies of an ideal uniform distribution would all be equal, and a \textbf{chi-square test} measures the distance from it:
+\[
+  \chi^2 = \sum_{v=0}^{16} \frac{(O_v - E_v)^2}{E_v}, \qquad E_v = \frac{\text{number of samples}}{17}.
+\]
+\begin{lstlisting}[numbers=none]
+\chi^2 = \sum_{v=0}^{16} \frac{(O_v - E_v)^2}{E_v}\end{lstlisting}
+
+Expected results:
+\begin{itemize}
+  \item \textbf{$x$ is not uniform on $\set{0, \ldots, 16}$}: only the $x$ for which $x^3 + 7$ is a square can appear (8 values out of 17 on the full curve, only 4 with $G = (1,5)$), and each of them appears exactly \textbf{twice} per period, because $kG$ and $(n-k)G = -kG$ share the same $x$.
+  \item \textbf{$y$ on the full curve is perfectly uniform}: with a generator of order 18 every $y \in \set{0, \ldots, 16}$ appears exactly once. The reason is that $x \mapsto x^3$ is a bijection modulo 17 (since $\gcd(3, 16) = 1$), so for every $y$ there is exactly one $x$ with $x^3 = y^2 - 7$. This is a coincidence of $p = 17$: for \texttt{secp256k1} $p \equiv 1 \pmod 3$ and it is no longer true.
+  \item The distribution is uniform \textbf{on the points of the subgroup} $\abk{G}$ (each point exactly once per period), not on the coordinate values.
+\end{itemize}
+
+\subsection{Distribution of bits}
+
+Write $x$ and $y$ in binary (5 bits, since $16 = 10000_2$) and compute, for each bit position, the fraction of outputs where it is 1. An ideal random function gives $1/2$ everywhere.
+
+\begin{itemize}
+  \item The most significant bit is almost always 0: it is 1 only for the value 16. This is a \textbf{range effect}, not a weakness: values are in $[0, 17)$, not in $[0, 32)$. The same happens for \texttt{secp256k1}, but there $p$ is so close to $2^{256}$ that the bias is invisible ($\approx 2^{-224}$).
+  \item With $G = (1,5)$ the other bits are clearly biased too (only 4 distinct $x$ values); with a generator of the whole curve they are close to $1/2$.
+\end{itemize}
+
+\subsection{Correlation between input and output}
+
+Compute the Pearson correlation coefficient between $k$ and $x_k$, and between $k$ and $y_k$, over one period $k = 1, \ldots, n-1$:
+\[
+  r = \frac{\sum_i (k_i - \bar k)(x_i - \bar x)}{\sqrt{\sum_i (k_i - \bar k)^2}\,\sqrt{\sum_i (x_i - \bar x)^2}} .
+\]
+\begin{lstlisting}[numbers=none]
+r = \frac{\sum_i (k_i - \bar k)(x_i - \bar x)}{\sqrt{\sum_i (k_i - \bar k)^2}\,\sqrt{\sum_i (x_i - \bar x)^2}}\end{lstlisting}
+
+Also make a scatter plot of $k$ vs $x_k$.
+\begin{itemize}
+  \item $r(k, x) = 0$ exactly, but for a structural reason: $x_k = x_{n-k}$, so the graph is symmetric around $k = n/2$ and the linear correlation cancels out.
+  \item $r(k, y)$ is small but not exactly zero (on one period with $G = (1,5)$ it is around $0.3$, with only 8 samples).
+  \item \textbf{Zero correlation does not mean independence}: the relation $k \mapsto kG$ is completely deterministic and highly structured, just not \textit{linear}. Pearson's $r$ only detects linear dependence.
+\end{itemize}
+
+\subsection{Avalanche-like behaviour}
+
+Flip one bit of $k$ ($k' = k \oplus 2^i$) and count how many bits of the output $(x \| y)$ change (Hamming distance). For an ideal hash function, on average \textbf{half} of the output bits change, and every output bit flips with probability $1/2$ (\textit{strict avalanche criterion}).
+
+\begin{itemize}
+  \item On the toy curve the average Hamming distance over the 10 output bits is about 4.3--4.4, not far from the ideal 5: small changes of $k$ produce ``unpredictable-looking'' changes of $Q$.
+  \item But this is not a real avalanche property: flipping bit $i$ always means adding or subtracting $2^i G$, a fixed point. The change is perfectly predictable \textit{at the level of the group}: $f(k \oplus 2^i) = f(k) \pm 2^i G$.
+\end{itemize}
+
+\subsection{Algebraic structure (the test a hash function would fail)}
+
+Check numerically that, for all $a, b$:
+\[
+  (a + b)G = aG + bG .
+\]
+This holds always (it is the homomorphism property). For a hash function, a relation like $H(a + b) = H(a) \star H(b)$ for some simple operation $\star$ would be a catastrophic break.
+
+\section{Discussion: one-way function vs hash function}
+
+\begin{center}
+  \small
+  \begin{tabularx}{\textwidth}{l X X}
+    \toprule
+    Property & Meaningful for $k \mapsto kG$? & Specific to hash functions? \\
+    \midrule
+    Uniform distribution of outputs & Yes, but \textit{over the points of $\abk{G}$} when $k$ is uniform; it is automatic, since $f$ is a bijection & Yes: a hash must look uniform on $\set{0,1}^\ell$ for any input distribution \\
+    Uniform coordinates / bits & Only partially: $x$ has structural biases (only half of the values, pairs $\pm Q$); not a security requirement & Yes: every output bit should be unbiased \\
+    Frequencies, no repeated values & No collisions at all within one period (injective) & Collisions must exist (compression) but be hard to find \\
+    Low input/output correlation & Necessary (otherwise $k$ leaks), but not sufficient & Yes \\
+    Avalanche effect & Not required; present only ``visually'' & Required (strict avalanche criterion) \\
+    No algebraic structure & \textbf{No}: the structure is the whole point (signatures, ECDH) & \textbf{Yes}: essential \\
+    Hardness of inversion & \textbf{The} essential property (ECDLP), and it is not measurable with statistics & Essential (preimage resistance) \\
+    \bottomrule
+  \end{tabularx}
+\end{center}
+
+\begin{framedobs}{Main take-aways}
+  \begin{enumerate}
+    \item The security of $k \mapsto kG$ does \textbf{not} come from its statistical properties but from the computational hardness of the ECDLP on a group of huge prime order. On the toy curve all statistics can look ``random enough'' while the function is trivially invertible.
+    \item Good-looking statistics are a \textit{necessary} sanity check, never a proof of one-wayness: passing a $\chi^2$ test or having $r \approx 0$ says nothing about how hard it is to invert the function.
+    \item Uniformity, absence of correlation, avalanche effect and absence of algebraic relations are the properties \textit{expected from hash functions} (random-oracle-like behaviour). For EC scalar multiplication, the algebraic structure is a \textit{feature}: it is what makes public-key cryptography work.
+  \end{enumerate}
+\end{framedobs}
