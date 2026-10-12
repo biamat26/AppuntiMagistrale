@@ -51,6 +51,12 @@
 }
 \RequirePackage{algorithm}
 \RequirePackage{algpseudocode}
+% Event-based pseudocode (as in Cachin, Guerraoui, Rodrigues)
+\algblockdefx[Upon]{Upon}{EndUpon}[1]{\textbf{upon event} #1 \textbf{do}}{}
+\algtext*{EndUpon}
+\algblockdefx[UponCond]{UponCond}{EndUponCond}[1]{\textbf{upon} #1 \textbf{do}}{}
+\algtext*{EndUponCond}
+\algnewcommand{\Trigger}{\textbf{trigger}\ }
 
 % ---------- Framed boxes (style inspired by the Nyx notes) ----------
 \RequirePackage[most]{tcolorbox}
