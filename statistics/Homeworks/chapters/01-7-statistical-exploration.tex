@@ -1,11 +1,11 @@
-\chapter{Statistical Exploration}
-\label{ch:stats}
+\section{Statistical Exploration}
+\label{sec:stats}
 
 % ============================================================
 %  What to measure, what to expect, how to interpret it
 % ============================================================
 
-\section{The experiment}
+\subsection{The experiment}
 
 The idea is to treat $f(k) = kG$ as a ``black box'' and to look at its outputs with the tools of descriptive statistics, as we would do with a hash function or a random number generator:
 \begin{enumerate}
@@ -19,9 +19,9 @@ The idea is to treat $f(k) = kG$ as a ``black box'' and to look at its outputs w
   Since $kG = (k \bmod n) G$, taking $K \gg n$ inputs does \textbf{not} give new information: the outputs are just the same $n$ points repeated periodically. With $G = (1,5)$ we only ever see $\set{\mathcal{O}, (1,5), (2,10), (5,9), (12,1), (12,16), (5,8), (2,7), (1,12)}$. On a real curve $n \approx 2^{256}$ and the period is never observed.
 \end{framedobs}
 
-\section{Properties to measure}
+\subsection{Properties to measure}
 
-\subsection{Distribution and frequency of $x$ and $y$}
+\subsubsection{Distribution and frequency of $x$ and $y$}
 
 Plot histograms of $x_k$ and $y_k$ and the frequency of each value $0, \ldots, 16$. As a reference, the frequencies of an ideal uniform distribution would all be equal, and a \textbf{chi-square test} measures the distance from it:
 \[
@@ -37,7 +37,7 @@ Expected results:
   \item The distribution is uniform \textbf{on the points of the subgroup} $\abk{G}$ (each point exactly once per period), not on the coordinate values.
 \end{itemize}
 
-\subsection{Distribution of bits}
+\subsubsection{Distribution of bits}
 
 Write $x$ and $y$ in binary (5 bits, since $16 = 10000_2$) and compute, for each bit position, the fraction of outputs where it is 1. An ideal random function gives $1/2$ everywhere.
 
@@ -46,7 +46,7 @@ Write $x$ and $y$ in binary (5 bits, since $16 = 10000_2$) and compute, for each
   \item With $G = (1,5)$ the other bits are clearly biased too (only 4 distinct $x$ values); with a generator of the whole curve they are close to $1/2$.
 \end{itemize}
 
-\subsection{Correlation between input and output}
+\subsubsection{Correlation between input and output}
 
 Compute the Pearson correlation coefficient between $k$ and $x_k$, and between $k$ and $y_k$, over one period $k = 1, \ldots, n-1$:
 \[
@@ -62,7 +62,7 @@ Also make a scatter plot of $k$ vs $x_k$.
   \item \textbf{Zero correlation does not mean independence}: the relation $k \mapsto kG$ is completely deterministic and highly structured, just not \textit{linear}. Pearson's $r$ only detects linear dependence.
 \end{itemize}
 
-\subsection{Avalanche-like behaviour}
+\subsubsection{Avalanche-like behaviour}
 
 Flip one bit of $k$ ($k' = k \oplus 2^i$) and count how many bits of the output $(x \| y)$ change (Hamming distance). For an ideal hash function, on average \textbf{half} of the output bits change, and every output bit flips with probability $1/2$ (\textit{strict avalanche criterion}).
 
@@ -71,7 +71,7 @@ Flip one bit of $k$ ($k' = k \oplus 2^i$) and count how many bits of the output 
   \item But this is not a real avalanche property: flipping bit $i$ always means adding or subtracting $2^i G$, a fixed point. The change is perfectly predictable \textit{at the level of the group}: $f(k \oplus 2^i) = f(k) \pm 2^i G$.
 \end{itemize}
 
-\subsection{Algebraic structure (the test a hash function would fail)}
+\subsubsection{Algebraic structure (the test a hash function would fail)}
 
 Check numerically that, for all $a, b$:
 \[
@@ -79,7 +79,7 @@ Check numerically that, for all $a, b$:
 \]
 This holds always (it is the homomorphism property). For a hash function, a relation like $H(a + b) = H(a) \star H(b)$ for some simple operation $\star$ would be a catastrophic break.
 
-\section{Discussion: one-way function vs hash function}
+\subsection{Discussion: one-way function vs hash function}
 
 \begin{center}
   \small

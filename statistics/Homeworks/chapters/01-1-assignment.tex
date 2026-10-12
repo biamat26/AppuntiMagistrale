@@ -1,10 +1,10 @@
-\chapter{The Assignment}
+\section{The Assignment}
 
 % ============================================================
 %  What the homework asks and how we are going to solve it
 % ============================================================
 
-\section{What is asked}
+\subsection{What is asked}
 
 The homework asks us to build a small \textbf{JavaScript/HTML/CSS} program that shows how, in Ethereum, a \textit{private key} is turned into a \textit{public key}. The mechanism is \textbf{elliptic-curve scalar multiplication}:
 \[
@@ -28,7 +28,7 @@ Note that the toy curve has the same equation as \texttt{secp256k1} ($y^2 = x^3 
   This is why it ``looks like'' a hash function. However, it has an algebraic structure (it is a group homomorphism) that a hash function must \underline{not} have: this difference is the core of the statistical part of the homework.
 \end{framedobs}
 
-\section{Deliverables, step by step}
+\subsection{Deliverables, step by step}
 
 \begin{enumerate}
   \item \textbf{Define the toy curve and the base point}: $p = 17$, $a = 0$, $b = 7$, $G = (1,5)$. Check that $G$ is really on the curve: $5^2 = 25 \equiv 8$ and $1^3 + 7 = 8$. \checkmark
@@ -42,10 +42,10 @@ Note that the toy curve has the same equation as \texttt{secp256k1} ($y^2 = x^3 
   \item \textbf{Publish} the result on the GitHub Pages site (\texttt{hw1/} folder of the \textit{Statistics Homework} site).
 \end{enumerate}
 
-\section{Roadmap of these notes}
+\subsection{Roadmap of these notes}
 
 \begin{itemize}
-  \item \Cref{ch:background} gives the theory: modular arithmetic, elliptic curves over finite fields, the group law, scalar multiplication, ECDLP and how Ethereum uses all of this.
-  \item \Cref{ch:worked} solves the toy example completely by hand, step by step.
-  \item \Cref{ch:stats} explains what to measure in the statistical part, what we expect to see, and how to interpret it.
+  \item \Cref{sec:modarith} gives the theory: modular arithmetic, elliptic curves over finite fields, the group law, scalar multiplication, ECDLP and how Ethereum uses all of this.
+  \item \Cref{sec:worked} solves the toy example completely by hand, step by step.
+  \item \Cref{sec:stats} explains what to measure in the statistical part, what we expect to see, and how to interpret it.
 \end{itemize}

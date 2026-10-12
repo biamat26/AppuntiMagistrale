@@ -107,7 +107,7 @@ Intuitively: for each $x$ the value $x^3 + ax + b$ is a square about half the ti
 \end{framedthm}
 
 \begin{framedobs}{Consequence: the private key lives ``modulo $n$''}
-  If $G$ has order $n$, then $kG = (k \bmod n)\, G$. Hence only $n$ different public keys exist, and private keys are taken in $\set{1, \ldots, n-1}$. In real cryptography $n$ must be a \textbf{huge prime}; on our toy curve $n = 9$, which will heavily affect the statistics (\cref{ch:stats}).
+  If $G$ has order $n$, then $kG = (k \bmod n)\, G$. Hence only $n$ different public keys exist, and private keys are taken in $\set{1, \ldots, n-1}$. In real cryptography $n$ must be a \textbf{huge prime}; on our toy curve $n = 9$, which will heavily affect the statistics (\cref{sec:stats}).
 \end{framedobs}
 
 \subsection{The toy curve $y^2 = x^3 + 7$ over $\mathbb{F}_{17}$}
