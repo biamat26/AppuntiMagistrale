@@ -1,0 +1,216 @@
+% ============================================================
+%  Clock synchronisation in synchronous systems: physical clocks
+% ============================================================
+
+\section{Clock synchronisation in synchronous systems}
+
+\subsection{Why time matters}
+
+Many applications require an ordering among events, and synchronization, to work correctly. Think for instance of air traffic control, network monitoring, measurement and control systems, or a stock market, where buy and sell orders coming from different places must be processed in the order in which they were issued.
+
+In the previous chapter we saw that, in an asynchronous system, this is a serious problem: by \Cref{thm:no-reconstruction}, processes can't reconstruct the exact execution, since different executions (\Cref{fig:local-executions}) are indistinguishable. If every process had access to a precise clock, we could simply label each event with the time at which it happened and sort the events.
+
+Time is important for two reasons. First of all, it is a quantity we are interested in measuring by itself. Moreover, a lot of algorithms depend on time:
+\begin{itemize}
+  \item \textbf{data consistency}: e.g.\ deciding which of two updates of the same data item is the most recent one;
+  \item \textbf{authentication}: e.g.\ credentials and certificates have an expiration time, and a server must decide whether a ticket is still valid;
+  \item \textbf{double processing avoidance}: e.g.\ \texttt{make} recompiles a file only if the source is more recent than the compiled object, by comparing their timestamps. If the two files are on machines with different clocks, \texttt{make} can skip a file that should be recompiled;
+  \item \textbf{sensor networks with TDMA} (Time Division Multiple Access): each node can transmit only in its own time slot, so all nodes must agree on when each slot starts.
+\end{itemize}
+
+\paragraph{Timestamping.} The general idea is that each process attaches a label, called \textbf{timestamp}, to each event. In this way it should be possible to build a global history of the system, by ordering all the events according to their timestamps. The \curlyquotes{naïve} solution is that each process timestamps its events by means of its \textbf{physical clock}. As we are going to see, this is much harder than it seems.
+
+\subsection{Physical clocks}
+
+\paragraph{Physical computer clocks.} The local clock of a computer is obtained by the operating system by reading a local \textbf{hardware clock}. A hardware clock consists of an oscillator (typically a quartz crystal) and a counting register, which is incremented at every tick of the oscillator.
+
+\begin{frameddefn}{Hardware clock}
+  Let $h_i(\tau)$ be the rate of the oscillator of process $p_i$ at real time $\tau$, i.e.\ how fast its counting register is incremented. The value of the hardware clock of $p_i$ at real time $t$ is
+  \[H_i(t) = \int_0^t h_i(\tau)\, d\tau\]
+\end{frameddefn}
+
+In other words, the hardware clock accumulates all the ticks produced by the oscillator from time $0$ to time $t$. For a perfect oscillator $h_i(\tau) = 1$ for every $\tau$, hence $H_i(t) = t$. A real oscillator, instead, runs slightly faster or slower than $1$, and its rate even changes over time (e.g.\ with temperature), so $H_i(t)$ slowly moves away from $t$. We observe that $\frac{dH_i(t)}{dt} = h_i(t)$: the rate of the oscillator is exactly the quantity that we'll use to define the drift rate.
+
+\begin{frameddefn}{Software clock}
+  At real time $t$, the operating system of process $p_i$ reads the hardware clock $H_i(t)$ and produces the local (software) clock
+  \[C_i(t) = \alpha H_i(t) + \beta\]
+  where $\alpha$ and $\beta$ are parameters chosen by the operating system.
+\end{frameddefn}
+
+The parameter $\alpha$ scales the ticks into time units (e.g.\ seconds), while $\beta$ is an offset: for instance, the time at which the counter was started.
+
+\paragraph{Parameters affecting accuracy.} Hardware clocks are not perfect: no two oscillators run exactly at the same frequency, and the frequency changes with temperature and age. Hence, different local clocks may have different values.
+
+\begin{frameddefn}{Skew and drift rate}
+  The \textbf{skew} between the clocks of processes $p_i$ and $p_j$ at time $t$ is the difference between their values:
+  \[\mathit{Skew}_{i,j}(t) = \abs{C_i(t) - C_j(t)}\]
+  The \textbf{drift rate} of a clock is the gradual misalignment, with respect to a perfect clock, caused by the slight inaccuracies of the time-keeping mechanism. It is measured as the change in the offset between the clock and a perfect clock per unit of real time.
+\end{frameddefn}
+
+In other words, the skew is a \textit{distance} at a given moment, while the drift rate is a \textit{speed}: it tells how quickly the skew grows. For example, a drift rate of $2\ \mu s/s$ means that the clock increases its value by $1\ s + 2\ \mu s$ for each real second. Some typical values:
+\begin{itemize}
+  \item ordinary quartz clocks deviate by about $1$ second in $11$--$12$ days, i.e.\ a drift rate of about $10^{-6}\ s/s$;
+  \item high-precision quartz clocks have a drift rate of $10^{-7}$--$10^{-8}\ s/s$.
+\end{itemize}
+
+\begin{framedobs}{}
+  On the slides the drift rate of ordinary quartz clocks is written as $10^{-5}\ s/s$, but this doesn't match \curlyquotes{1 second in 11--12 days}: in one day there are $86\,400$ seconds, so $10^{-5}\ s/s$ gives almost $1$ second \textit{per day}, while $1$ second in $11.5$ days is $1 / (11.5 \cdot 86\,400) \approx 10^{-6}\ s/s$. The standard value (e.g.\ in Coulouris et al.) is $10^{-6}$.
+\end{framedobs}
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[scale=1.0]
+    \draw[-{Latex}] (0,0) -- (5.2,0) node[below left, font=\small] {real time $t$};
+    \draw[-{Latex}] (0,0) -- (0,4.6) node[left, font=\small, align=right] {hardware\\time $H$};
+    \draw[thick, ForestGreen!70!black] (0,0) -- (4.3,4.3) node[right, font=\small, align=left] {perfect clock\\[-2pt]{\scriptsize $\frac{dH(t)}{dt} = 1$}};
+    \draw[thick, BrickRed] (0,0) -- (2.8,4.4) node[left, font=\small, align=right] {fast clock\\[-2pt]{\scriptsize $\frac{dH(t)}{dt} > 1$}};
+    \draw[thick, RoyalBlue] (0,0) -- (5.0,2.8) node[right, font=\small, align=left] {slow clock\\[-2pt]{\scriptsize $\frac{dH(t)}{dt} < 1$}};
+  \end{tikzpicture}
+  \caption{A perfect clock advances by exactly one second per real second. A fast clock runs ahead of real time, a slow clock falls behind.}
+  \label{fig:drift}
+\end{figure}
+
+\begin{frameddefn}{Correct clock}
+  A hardware clock $H$ is \textbf{correct} if its drift rate is within a limited bound $\rho > 0$ (e.g.\ $10^{-6}\ s/s$), i.e.
+  \[1 - \rho \leq \frac{dH(t)}{dt} \leq 1 + \rho\]
+\end{frameddefn}
+
+Integrating, for every $t' > t$ we get
+\[(1 - \rho)(t' - t) \leq H(t') - H(t) \leq (1 + \rho)(t' - t)\]
+This means that with a correct hardware clock we can measure a time interval $[t, t']$ introducing only a limited error: the measured length differs from the real one by at most $\rho (t' - t)$.
+
+\subsection{Bounding the skew}
+
+Even if two clocks are correct, their skew grows over time. Suppose that two correct clocks are perfectly synchronized at time $0$. In the worst case, clock $1$ runs as fast as possible and clock $2$ as slow as possible:
+\[C_1(t) = (1 + \rho)\, t \qquad C_2(t) = (1 - \rho)\, t\]
+Hence, the skew at time $t$ is
+\[\abs{C_1(t) - C_2(t)} = 2\rho\, t\]
+which grows linearly without limit. If we want to keep the skew below a bound $\Delta$, the clocks must be re-synchronized before the skew reaches $\Delta$, i.e.\ at time
+\[t = \frac{\Delta}{2\rho}\]
+Indeed, at that time:
+\[C_1(t) = (1+\rho)\frac{\Delta}{2\rho} = \frac{\Delta}{2\rho} + \frac{\Delta}{2} \qquad C_2(t) = (1-\rho)\frac{\Delta}{2\rho} = \frac{\Delta}{2\rho} - \frac{\Delta}{2} \qquad \abs{C_1(t) - C_2(t)} = \Delta\]
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[scale=1.0]
+    \draw[-{Latex}] (0,0) -- (9.4,0) node[right, font=\small] {real time};
+    \draw[-{Latex}] (0,0) -- (0,4.4) node[above, font=\small] {clock value};
+    % first period
+    \draw[gray, dashed] (0,0) -- (9,4.05);
+    \draw[thick, BrickRed] (0,0) -- (4,2.25);
+    \draw[thick, RoyalBlue] (0,0) -- (4,1.35);
+    \draw[{Latex}-{Latex}] (4,1.35) -- node[right, font=\scriptsize] {$\Delta$} (4,2.25);
+    \draw[dotted] (4,0) -- (4,1.35);
+    \node[below, font=\scriptsize] at (4,0) {$\frac{\Delta}{2\rho}$};
+    \node[font=\scriptsize, BrickRed] at (2.4,1.75) {clock 1};
+    \node[font=\scriptsize, RoyalBlue] at (2.9,0.7) {clock 2};
+    % correction
+    \fill[ForestGreen!70!black] (4,1.8) circle (1.6pt);
+    \node[font=\scriptsize, ForestGreen!60!black, align=center] at (3.0,3.2) {correction:\\perfect sync};
+    \draw[ForestGreen!60!black, -{Latex}] (3.2,2.85) -- (3.95,1.88);
+    % second period
+    \draw[thick, BrickRed] (4,1.8) -- (8,4.05);
+    \draw[thick, RoyalBlue] (4,1.8) -- (8,3.15);
+    \draw[{Latex}-{Latex}] (8,3.15) -- node[right, font=\scriptsize] {$\Delta$} (8,4.05);
+    \draw[dotted] (8,0) -- (8,3.15);
+    \node[below, font=\scriptsize] at (8,0) {$2 \cdot \frac{\Delta}{2\rho}$};
+  \end{tikzpicture}
+  \caption{Two clocks perfectly synchronized at time $0$ diverge with relative speed $2\rho$. After $\Delta / 2\rho$ their skew reaches $\Delta$, so they must be corrected (re-synchronized) at least that often.}
+  \label{fig:skew-bound}
+\end{figure}
+
+\begin{framedex}{}
+  With ordinary quartz clocks ($\rho = 10^{-6}$) and a required skew of at most $\Delta = 1$ ms, the clocks must be re-synchronized at least every
+  \[\frac{\Delta}{2\rho} = \frac{10^{-3}}{2 \cdot 10^{-6}} = 500 \text{ seconds,}\]
+  i.e.\ roughly every $8$ minutes.
+\end{framedex}
+
+\subsection{Monotonicity}\label{sec:monotonicity}
+
+When we correct a clock, we must be careful: software clocks have to be \textbf{monotone}.
+
+\begin{frameddefn}{Monotonicity}
+  A software clock $C$ is monotone if it never goes back:
+  \[t' > t \implies C(t') > C(t)\]
+\end{frameddefn}
+
+Monotonicity can be guaranteed by choosing suitable values for $\alpha$ and $\beta$ in $C_i(t) = \alpha H_i(t) + \beta$. Note that $\alpha$ and $\beta$ can be functions of time: the operating system can change them while the system is running.
+
+\paragraph{What does slowing down a clock mean?} Correcting a clock that is \textit{behind} is easy: we can just move it forward. Correcting a clock that is \textit{ahead} is a problem: it is not possible to impose a value in the past. This action would violate the time monotonicity, and it could also violate the cause/effect ordering of the events produced by a process: an event that happens after the correction could get a smaller timestamp than an event that happened before it. For example, a file written after the correction could look older than a file written before it, confusing tools like \texttt{make}.
+
+Consequently, instead of moving the clock back, we \textbf{slow it down}, by hiding some of the interrupts of the hardware clock: the software clock skips some of the ticks, so that it still advances, but more slowly than real time, until the real time catches up. In terms of the formula, this corresponds to temporarily decreasing $\alpha$ (and adjusting $\beta$ so that $C$ stays continuous).
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[scale=1.0]
+    \draw[-{Latex}] (0,0) -- (8.4,0) node[below left, font=\small] {real time};
+    \draw[-{Latex}] (0,0) -- (0,4.4) node[above, font=\small] {clock value};
+    \draw[gray, dashed] (0,0) -- (8,4) node[right, font=\scriptsize, text=gray] {real time};
+    \draw[thick, RoyalBlue] (0,0.8) -- (3,2.3);
+    \draw[thick, RoyalBlue] (3,2.3) -- (6,3.0);
+    \draw[thick, RoyalBlue] (6,3.0) -- (8,4.0);
+    \draw[thick, BrickRed, dashed] (3,2.3) -- (3,1.5);
+    \node[BrickRed, font=\scriptsize, align=left, anchor=west] at (3.1,1.1) {forbidden: jump back\\(violates monotonicity)};
+    \fill (3,2.3) circle (1.5pt);
+    \node[font=\scriptsize, RoyalBlue, align=center] at (4.2,3.2) {slowed down\\(hidden interrupts)};
+    \node[font=\scriptsize, RoyalBlue] at (1.1,1.75) {clock ahead};
+  \end{tikzpicture}
+  \caption{A clock that is ahead of real time is not moved back (red), but slowed down until the real time catches up with it (blue).}
+  \label{fig:slow-down}
+\end{figure}
+
+\subsection{UTC, internal and external clock synchronization}
+
+\paragraph{Universal Time Coordinated (UTC).} UTC is an international standard: the base of any international time measure. It is based on the International Atomic Time (TAI), where $1$ second is the time a caesium-133 atom needs for $9\,192\,631\,770$ state transitions. Physical clocks based on atomic oscillators are the most accurate clocks, with a drift rate of about $10^{-13}$. UTC is kept aligned with the rotation of the Earth by occasionally inserting \textit{leap seconds}.
+
+UTC signals come from shortwave radio broadcasting stations or from satellites (GPS), with an accuracy of about:
+\begin{itemize}
+  \item $1$ ms for broadcasting stations;
+  \item $1\ \mu s$ for GPS.
+\end{itemize}
+UTC signal receivers can be connected to computers and used to synchronize local clocks with the real time. Of course, not every computer has such a receiver: most of them have to synchronize with other computers through the network.
+
+\paragraph{Internal and external synchronization.} There are two different goals that a synchronization algorithm can have.
+
+\begin{frameddefn}{External synchronization}
+  Let $D > 0$ be a synchronization bound and let $S$ be a source of UTC. The clocks $C_i$ (for $i = 1, \ldots, N$) are \textbf{externally synchronized} with $S$ in a time interval $I$ if
+  \[\abs{S(t) - C_i(t)} < D \qquad \forall i \in \{1, \ldots, N\},\ \forall t \in I\]
+  In this case, we say that the clocks $C_i$ are \textbf{accurate} within the bound $D$.
+\end{frameddefn}
+
+\begin{frameddefn}{Internal synchronization}
+  Let $D > 0$ be a synchronization bound. The clocks $C_i$ (for $i = 1, \ldots, N$) are \textbf{internally synchronized} in a time interval $I$ if
+  \[\abs{C_i(t) - C_j(t)} < D \qquad \forall i, j \in \{1, \ldots, N\},\ \forall t \in I\]
+  In this case, we say that the clocks $C_i$ \textbf{agree} within the bound $D$.
+\end{frameddefn}
+
+With external synchronization processes synchronize with an authoritative external source, while with internal synchronization they only synchronize among themselves. The two notions are related as follows.
+
+\begin{framedobs}{}
+  Clocks that are internally synchronized are not necessarily externally synchronized: even though they agree with each other, they may drift collectively away from the external time source.
+\end{framedobs}
+
+\begin{framedprop}{}
+  A set of processes externally synchronized within the bound $D$ is also internally synchronized within the bound $2D$.
+\end{framedprop}
+
+\begin{proof}
+  Fix $t \in I$ and two processes $p_i, p_j$. By the triangle inequality and by external synchronization:
+  \[\abs{C_i(t) - C_j(t)} \leq \abs{C_i(t) - S(t)} + \abs{S(t) - C_j(t)} < D + D = 2D \qedhere\]
+\end{proof}
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[scale=1.0]
+    \draw[-{Latex}] (-0.2,0) -- (10,0) node[right, font=\small] {clock value at time $t$};
+    \fill[ForestGreen!12] (2.5,-0.4) rectangle (7.5,0.4);
+    \draw[thick, ForestGreen!70!black] (5,-0.5) -- (5,0.5) node[above, font=\small] {$S(t)$};
+    \draw[{Latex}-{Latex}] (2.5,-0.75) -- node[below, font=\scriptsize] {$D$} (5,-0.75);
+    \draw[{Latex}-{Latex}] (5,-0.75) -- node[below, font=\scriptsize] {$D$} (7.5,-0.75);
+    \fill[RoyalBlue] (2.8,0) circle (2.2pt) node[above=2pt, font=\scriptsize] {$C_i(t)$};
+    \fill[RoyalBlue] (7.2,0) circle (2.2pt) node[above=2pt, font=\scriptsize] {$C_j(t)$};
+    \draw[{Latex}-{Latex}, BrickRed] (2.8,1.35) -- node[above, font=\scriptsize] {almost $2D$} (7.2,1.35);
+  \end{tikzpicture}
+  \caption{If every clock is within $D$ from $S(t)$, two clocks on opposite sides of $S(t)$ can be almost $2D$ apart.}
+  \label{fig:ext-int}
+\end{figure}

@@ -306,7 +306,7 @@ Hence, different executions can give the same local executions. When this happen
 
 The example generalizes. Consider two consecutive events of an execution that affect different processes and such that the second one is not the delivery of a message produced by the first one. Swapping them doesn't change any local execution, and the resulting execution is still fair. Repeating such swaps, we can build many executions which are all indistinguishable from the original one, even though they go through different configurations. This leads to a fundamental result.
 
-\begin{framedthm}{}
+\begin{framedthm}[label={thm:no-reconstruction}]{}
   In an asynchronous system it is impossible to reconstruct the exact execution.
 \end{framedthm}
 
