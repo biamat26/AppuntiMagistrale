@@ -1,0 +1,70 @@
+% ============================================================
+%  One-way functions and Impagliazzo's worlds
+% ============================================================
+
+\section{One-way functions}
+
+\subsection{The computational model}
+
+From now on, ``efficient'' means \textbf{polynomial time} in the input length $n$: at most $n^c$ steps for some constant $c$, written $\poly(n)$. We are generous with the adversary: it can use $\poly(n)$ time and $\poly(n)$ \textbf{random bits}. In other words, the adversary is a \textbf{probabilistic polynomial-time} (PPT) algorithm. Its success probabilities are measured against \textbf{negligible functions} (\Cref{def:negl}): functions that go to zero faster than the inverse of any polynomial.
+
+\subsection{The definition}
+
+The hard problem underlying all of symmetric cryptography is the existence of functions that are \textbf{easy to compute but hard to invert}. Multiplying two large primes is immediate, while recovering the two primes from their product (factoring) is, as far as we know, extremely hard. It is like breaking an egg: easy in one direction, impossible in the other.
+
+\begin{frameddefn}[label={def:owf}]{One-way function}
+  A function $f : \{0,1\}^n \to \{0,1\}^m$ is a \textbf{one-way function} (OWF) if:
+  \begin{enumerate}
+    \item $f$ is computable in $\poly(n)$ time;
+    \item for every PPT algorithm $\Adv$ there is a negligible function $\negl$ such that
+    \[
+      \Pr\big[f(x') = y \;:\; x \sample \{0,1\}^n,\ y = f(x),\ x' \leftarrow \Adv(y)\big] \leq \negl(n)
+    \]
+    where the probability is over the choice of $x$ and the random bits of $\Adv$.
+  \end{enumerate}
+\end{frameddefn}
+
+How to read the definition:
+\begin{itemize}
+  \item \textbf{$x$ is chosen at random} $\to$ hardness is required \textbf{on average}, not only on a few particularly hard inputs. This is what cryptography needs, because keys are random.
+  \item \textbf{Any preimage is enough} $\to$ the adversary wins if it finds \textit{some} $x'$ with $f(x') = y$, not necessarily the original $x$.
+  \item \textbf{Negligible, not zero} $\to$ the adversary can always guess a random $x'$, so the success probability can never be exactly zero.
+\end{itemize}
+
+Nobody knows whether one-way functions exist: proving it would imply $\mathsf{P} \neq \mathsf{NP}$ (see below). There are, however, well-studied \textbf{candidates}:
+\begin{itemize}
+  \item \textbf{Multiplication} $\to$ $f(p, q) = p \cdot q$ for random primes $p, q$; inverting it means factoring.
+  \item \textbf{Modular exponentiation} $\to$ $f(x) = g^x \bmod p$; inverting it means computing the discrete logarithm.
+  \item \textbf{Subset sum} $\to$ $f(a_1, \ldots, a_k, S) = (a_1, \ldots, a_k, \sum_{i \in S} a_i)$; inverting it means finding a subset with a given sum.
+\end{itemize}
+
+\subsection{Why $\mathsf{P} \neq \mathsf{NP}$ is not enough}
+
+One could ask: why not simply assume $\mathsf{P} \neq \mathsf{NP}$? Because it is too \textit{weak} for cryptography.
+\begin{itemize}
+  \item \textbf{OWFs imply $\mathsf{P} \neq \mathsf{NP}$.} Inverting $f$ is an $\mathsf{NP}$ search problem: given a candidate $x'$, checking that $f(x') = y$ is easy. If $\mathsf{P} = \mathsf{NP}$, every efficiently computable $f$ could be inverted, so no OWF would exist.
+  \item \textbf{The converse is not known.} $\mathsf{P} \neq \mathsf{NP}$ only says that some problems are hard \textbf{in the worst case}, that is, on some inputs. Cryptography needs problems that are hard \textbf{on random inputs}, and with a way to generate hard instances together with their solutions. $\mathsf{P} \neq \mathsf{NP}$ does not guarantee any of this.
+\end{itemize}
+
+\subsection{Impagliazzo's five worlds}
+
+In 1995 Russell Impagliazzo described five possible ``worlds'' we may be living in, depending on which complexity assumptions turn out to be true:
+
+\begin{table}[H]
+  \centering
+  \small
+  \begin{tabularx}{\textwidth}{@{}lX@{}}
+    \toprule
+    \textbf{World} & \textbf{What happens} \\
+    \midrule
+    Algorithmica & $\mathsf{P} = \mathsf{NP}$: every $\mathsf{NP}$ problem is easy, and no cryptography is possible \\
+    Heuristica & $\mathsf{P} \neq \mathsf{NP}$, but hard problems are easy \textit{on average} \\
+    Pessiland & there are problems that are hard on average, but no one-way functions: we pay the price of hardness without getting any cryptography \\
+    Minicrypt & one-way functions exist (so symmetric cryptography is possible), but public-key cryptography is not \\
+    Cryptomania & one-way functions \textit{and} public-key cryptography exist \\
+    \bottomrule
+  \end{tabularx}
+  \caption{Impagliazzo's five worlds.}
+\end{table}
+
+Impagliazzo does not say which world we live in. Pessiland is the worst one, and most researchers believe (and hope) that we live in Cryptomania, or at least in Minicrypt.

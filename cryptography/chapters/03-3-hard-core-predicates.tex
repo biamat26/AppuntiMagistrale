@@ -1,0 +1,129 @@
+% ============================================================
+%  From PRGs to OWFs, hard-core predicates, from OWFs to PRGs
+% ============================================================
+
+\section{Hard-core predicates}
+
+\Cref{thm:stretch} tells us that a PRG adding a single bit is enough. How do we build one? We will see that PRGs and one-way functions are \textbf{equivalent}: one exists if and only if the other does. Since nobody knows whether one-way functions exist, building a PRG is exactly as hard as building a OWF; in practice, real-world PRGs are \textit{heuristic} constructions, believed but not proved to be secure.
+
+\subsection{From PRGs to one-way functions}
+
+The easy direction first.
+
+\begin{framedthm}[label={thm:prg-owf}]{From PRGs to OWFs}
+  Let $G : \{0,1\}^n \to \{0,1\}^{2n}$ be a PRG. Then the function $f : \{0,1\}^{2n} \to \{0,1\}^{2n}$ defined by
+  \[
+    f(x_1 \concat x_2) = G(x_1) \qquad \text{with } x_1, x_2 \in \{0,1\}^n
+  \]
+  is a one-way function.
+\end{framedthm}
+
+\textbf{Intuition.} Whoever can invert $f$ can \textbf{recognize} the outputs of $G$: take the string, try to invert it, and recompute. On outputs of $G$ the inversion works with noticeable probability, while a uniform string is almost never an output of $G$ at all.
+
+\begin{proof}
+  $f$ is efficiently computable because $G$ is. Suppose, by contradiction, that a PPT adversary $\Adv$ inverts $f$ with a probability $\varepsilon(n)$ that is not negligible. Build the distinguisher $D$ that, on input $z \in \{0,1\}^{2n}$:
+  \begin{enumerate}
+    \item computes $x' \leftarrow \Adv(z)$;
+    \item outputs $1$ if $f(x') = z$, and $0$ otherwise.
+  \end{enumerate}
+  \begin{itemize}
+    \item \textbf{If $z \leftarrow G(\Uni{n})$}: since $f$ ignores the second half of its input, $z = G(x_1)$ with $x_1$ uniform is distributed exactly as $f(x)$ with $x$ uniform. So $D$ outputs $1$ exactly when $\Adv$ inverts, that is, with probability $\varepsilon(n)$.
+    \item \textbf{If $z \leftarrow \Uni{2n}$}: $D$ outputs $1$ only if $z$ is in the image of $G$. The image contains at most $2^n$ strings out of $2^{2n}$, so this happens with probability at most $2^{-n}$.
+  \end{itemize}
+  The advantage of $D$ is at least $\varepsilon(n) - 2^{-n}$, which is not negligible (for large $n$ it is at least $\frac{\varepsilon(n)}{2}$). This contradicts the fact that $G$ is a PRG.
+\end{proof}
+
+\subsection{Hard-core predicates}
+
+For the opposite direction we need a bit of the input that stays \textbf{secret} even when $f(x)$ is known.
+
+\begin{frameddefn}[label={def:hardcore}]{Hard-core predicate}
+  Let $f : \{0,1\}^n \to \{0,1\}^m$ be efficiently computable. A function $h : \{0,1\}^n \to \{0,1\}$ is a \textbf{hard-core predicate} for $f$ if for every PPT adversary $\Adv$:
+  \[
+    \Pr\big[\Adv(f(x)) = h(x) : x \sample \{0,1\}^n\big] \leq \frac{1}{2} + \negl(n)
+  \]
+\end{frameddefn}
+
+In words: seeing $f(x)$, no efficient adversary can guess the bit $h(x)$ noticeably better than tossing a coin. An equivalent formulation, which is often more convenient, is
+\[
+  \big(f(x),\ h(x)\big) \cind \big(f(x),\ \Uni{1}\big) \qquad \text{with } x \sample \{0,1\}^n
+\]
+that is, $h(x)$ looks like a fresh random bit even next to $f(x)$.
+
+Neither definition requires $f$ to be one-way, but intuitively a hard-core bit is what makes a function hard to invert. This raises three natural questions.
+
+\paragraph{Question 1: is there a universal hard-core predicate, hard-core for every OWF?} \textbf{No.}
+
+\begin{proof}
+  Suppose that an efficiently computable $h^*$ were hard-core for every OWF. Take any OWF $f$ and define
+  \[
+    \tilde f(x) = h^*(x) \concat f(x)
+  \]
+  \begin{itemize}
+    \item \textbf{$h^*$ is not hard-core for $\tilde f$}: the adversary that outputs the first bit of $\tilde f(x)$ guesses $h^*(x)$ with probability $1$.
+    \item \textbf{$\tilde f$ is still one-way.} Suppose a PPT $\tilde\Adv$ inverts $\tilde f$ with probability $\varepsilon(n)$. Build $\Adv$ for $f$: on input $y$, choose a random bit $b$ and output $\tilde\Adv(b \concat y)$. With probability $\frac{1}{2}$ the bit is right, $b = h^*(x)$, and then the input of $\tilde\Adv$ is distributed exactly as $\tilde f(x)$; so with probability $\varepsilon(n)$ it returns $x'$ with $\tilde f(x') = b \concat y$, which implies $f(x') = y$. Hence $\Adv$ inverts $f$ with probability at least $\frac{\varepsilon(n)}{2}$, so $\varepsilon$ must be negligible.
+  \end{itemize}
+  So $\tilde f$ is a OWF for which $h^*$ is not hard-core, a contradiction.
+\end{proof}
+
+\paragraph{Question 2: is every function with a hard-core predicate one-way?} \textbf{No.} Let $f$ delete the last bit, $f(x_1 \cdots x_n) = x_1 \cdots x_{n-1}$, and let $h(x) = x_n$ be the deleted bit. Since $x$ is uniform, $x_n$ is independent of $f(x)$, so $h$ is hard-core (no adversary can do better than $\frac{1}{2}$). But $f$ is trivially invertible: appending any bit to $y$ gives a valid preimage, so the adversary inverts with probability $1$.
+
+\paragraph{Question 3: does every OWF have a hard-core predicate?} \textbf{Yes, up to a small modification.} This is the Goldreich--Levin theorem.
+
+\begin{framedthm}[label={thm:gl}]{Goldreich--Levin}
+  Let $f : \{0,1\}^n \to \{0,1\}^m$ be a OWF, and define $g : \{0,1\}^{2n} \to \{0,1\}^{m+n}$ as
+  \[
+    g(x, r) = f(x) \concat r
+  \]
+  Then $g$ is a OWF, and it has the hard-core predicate
+  \[
+    h(x, r) = \langle x, r \rangle \bmod 2 = x_1 r_1 \oplus x_2 r_2 \oplus \cdots \oplus x_n r_n
+  \]
+\end{framedthm}
+
+The proof is long and was omitted in class. The intuition: $r$ is public and random, and $h(x,r)$ is the XOR of a \textbf{random subset} of the bits of $x$, the subset selected by $r$. Predicting this XOR for random subsets better than by chance would allow one to reconstruct $x$, and therefore to invert $f$. It is the same family of functions as in the Alice and Bob extraction example: the inner product with a random vector.
+
+\subsection{From one-way permutations to PRGs}
+
+Hard-core predicates are exactly what we need to build a PRG. The simplest case uses a \textbf{one-way permutation} (OWP): a OWF that is a bijection $f : \{0,1\}^n \to \{0,1\}^n$.
+
+\begin{framedprop}[label={prop:owp-prg}]{From OWPs to PRGs}
+  Let $f$ be a one-way permutation with hard-core predicate $h$. Then
+  \[
+    G(s) = f(s) \concat h(s)
+  \]
+  is a PRG with stretch $1$.
+\end{framedprop}
+
+\begin{proof}
+  $G$ is efficiently computable because $f$ and $h$ are. For $s$ uniform:
+  \begin{itemize}
+    \item $f(s)$ is \textbf{uniform} over $\{0,1\}^n$, because a permutation of a uniform string is uniform;
+    \item by the equivalent formulation of hard-core predicates, $h(s)$ looks like a fresh random bit even next to $f(s)$.
+  \end{itemize}
+  Therefore
+  \[
+    G(\Uni{n}) = \big(f(s),\, h(s)\big) \cind \big(f(s),\, \Uni{1}\big) = \big(\Uni{n},\, \Uni{1}\big) = \Uni{n+1} \qedhere
+  \]
+\end{proof}
+
+Combined with Goldreich--Levin: if $f$ is a OWP, then $g(x, r) = f(x) \concat r$ is also a permutation, so $G(x, r) = f(x) \concat r \concat \langle x, r \rangle$ is a PRG with stretch $1$.
+
+\subsection{From one-way functions to PRGs}
+
+The proposition can be extended to \textbf{every} one-way function, not only permutations. The construction is much harder (it combines many evaluations of $f$ with their hard-core bits), and its proof was omitted.
+
+\begin{framedthm}[label={thm:hill}]{Håstad, Impagliazzo, Levin, Luby}
+  If a one-way function exists, then a PRG with stretch $1$ exists.
+\end{framedthm}
+
+Together with \Cref{thm:prg-owf} and \Cref{thm:stretch} this gives the complete picture:
+\[
+  \begin{aligned}
+    \text{OWF} \;&\xrightarrow{\ \text{Goldreich--Levin, HILL}\ }\; \text{PRG with stretch } 1 \;\xrightarrow{\ \text{stretching}\ }\; \text{PRG with stretch } \poly(n) \\
+    \text{PRG} \;&\xrightarrow{\ \text{\Cref{thm:prg-owf}}\ }\; \text{OWF}
+  \end{aligned}
+\]
+\begin{framedcor}{}
+  One-way functions exist if and only if pseudorandom generators exist.
+\end{framedcor}
