@@ -1,0 +1,389 @@
+% ============================================================
+%  Randomness extraction and the Leftover Hash Lemma
+% ============================================================
+
+\section{Randomness extraction}
+
+\subsection{The problem: where do uniform keys come from?}
+
+Every scheme we have seen so far, the One-Time Pad, Shannon's theorem and the information-theoretic MACs, starts from the same assumption: \textbf{the key is perfectly uniform}. In the proof of \Cref{prop:otp}, the key step was $\Pr[K = m \oplus c] = 2^{-n}$, which holds only if every key has the same probability; with a biased key, perfect secrecy is lost.
+
+In the real world, though, randomness comes from physical sources:
+\begin{itemize}
+  \item electronic or thermal noise;
+  \item the timing of keyboard and mouse events, or of network packets;
+  \item hardware events.
+\end{itemize}
+These sources are \textbf{unpredictable}, but they are \textbf{not uniform}: some outcomes are more likely than others, and consecutive outputs may be correlated. We cannot use them directly as keys. So the question is:
+
+\begin{center}
+  \itshape Given a source that is random but not uniform, can we turn it into bits that are (almost) uniform?
+\end{center}
+
+This process is called \textbf{randomness extraction}, and a function that does it is called an \textbf{extractor}. It works like a water filter: a lot of ``dirty'' water goes in, less but clean water comes out.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[box/.style={draw, rounded corners=2pt, minimum height=8mm, inner sep=5pt}]
+    \node[align=center] (X) at (0,0) {$n$ ``dirty'' bits\\[-2pt]{\scriptsize (physical source $X$)}};
+    \node[box] (E) at (4,0) {$\Ext$};
+    \node[align=center] (Y) at (8,0) {$\ell$ clean bits\\[-2pt]{\scriptsize (almost uniform $\to$ key)}};
+    \draw[msg] (X) -- (E);
+    \draw[msg] (E) -- (Y);
+  \end{tikzpicture}
+  \caption{An extractor turns imperfect randomness into (almost) uniform bits.}
+\end{figure}
+
+\begin{framedobs}{An extractor does not create randomness}
+  The output cannot contain \textbf{more} randomness than the input: an extractor \textbf{concentrates} the randomness already present in the source, it does not multiply it. Expanding a few random bits into many bits that only \textit{look} random is possible only against computationally bounded adversaries, with \textit{pseudorandom generators}, which we will see in the computational part of the course.
+\end{framedobs}
+
+\subsection{A first, simple case: the biased coin}
+
+Let's start from the simplest possible weak source: a \textbf{biased coin} $B$, with $\Pr[B = 1] = p$ for some unknown $0 < p < 1$. We assume that the flips are \textbf{independent} and that the bias $p$ is \textbf{always the same}.
+
+\begin{framedalgo}{Von Neumann's extractor}
+  Flip the coin twice and look at the pair $b_1 b_2$ (one \textit{round}):
+  \begin{itemize}
+    \item $01$ $\to$ output $0$;
+    \item $10$ $\to$ output $1$;
+    \item $00$ or $11$ $\to$ output nothing: the round \textbf{fails}, throw the pair away and flip twice again.
+  \end{itemize}
+\end{framedalgo}
+
+The four possible outcomes of a round:
+
+\begin{table}[H]
+  \centering
+  \small
+  \begin{tabular}{llc}
+    \toprule
+    \textbf{Pair} & \textbf{What happens} & \textbf{Probability} \\
+    \midrule
+    $01$ & output $0$ & $(1-p)\,p$ \\
+    $10$ & output $1$ & $p\,(1-p)$ \\
+    $00$ & no output, flip again & $(1-p)^2$ \\
+    $11$ & no output, flip again & $p^2$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\paragraph{Why the output bit is uniform.} The two useful pairs have exactly the same probability:
+\[
+  \Pr[01] = (1-p)\,p = p\,(1-p) = \Pr[10]
+\]
+So, whenever a bit comes out, it is \textbf{exactly} uniform, whatever the bias $p$ is.
+
+\paragraph{Why the procedure terminates.} A round fails with probability $(1-p)^2 + p^2 = 1 - 2p(1-p)$, so $m$ rounds in a row all fail with probability
+\[
+  \big(1 - 2p(1-p)\big)^m \xrightarrow[m \to \infty]{} 0
+\]
+which goes to zero exponentially fast. On average we need $\frac{1}{2p(1-p)}$ rounds.
+
+The two facts play \textbf{different roles}: the symmetry $\Pr[01] = \Pr[10]$ makes the bit \textbf{uniform}, while the vanishing failure probability only guarantees that the procedure \textbf{stops}.
+
+\begin{framedex}{A very biased coin}
+  With $p = 0.9$: $\Pr[11] = 0.81$ and $\Pr[00] = 0.01$, so a round fails with probability $0.82$, and $50$ rounds in a row fail with probability $0.82^{50} \approx 0.00005$. On average we need $\frac{1}{0.18} \approx 5.6$ rounds. A lot of flips are wasted, but when a bit finally comes out, $0$ and $1$ are equally likely ($0.09$ each).
+\end{framedex}
+
+\paragraph{The limit of this approach.} Von Neumann's trick works only because of two strong assumptions: the flips are \textbf{independent}, and they have the \textbf{same bias}. Real sources satisfy neither: their outputs can be correlated, and their distribution can be arbitrary. We need a method that works for \textbf{any} source $X$, without knowing its distribution.
+
+\subsection{How much randomness does a source contain? Min-entropy}
+
+If we want to handle arbitrary sources, we first need to know \textbf{which sources we can hope to extract from}. Some sources clearly contain no randomness at all: if $X$ is constant, there is nothing to extract. So we need a \textbf{measure} of how random a source is.
+
+\paragraph{Which measure?} In cryptography the question that matters is: \textbf{how hard is it for an attacker to guess the value of $X$ at the first attempt?} The best strategy is to bet on the \textbf{most likely value}, which succeeds with probability $\max_x \Pr[X = x]$. The smaller this probability, the more random the source is for the attacker.
+
+A probability like $\frac{1}{256}$ is not very telling, so we compare it with tossing fair coins: guessing $1$ coin succeeds with probability $\frac{1}{2}$, guessing $8$ coins with probability $\frac{1}{2^8} = \frac{1}{256}$, guessing $k$ coins with probability $\frac{1}{2^k}$. Measuring the guessing probability in ``number of coins'' gives the \textbf{min-entropy}.
+
+\begin{frameddefn}[label={def:min-entropy}]{Min-entropy}
+  The min-entropy of a random variable $X$ is
+  \[
+    \Hmin(X) = -\log_2 \max_x \Pr[X = x]
+  \]
+  Equivalently, $\Hmin(X) \geq k$ if and only if every value of $X$ has probability at most $2^{-k}$.
+\end{frameddefn}
+
+So $\Hmin(X) = k$ means that \textbf{guessing $X$ at the first attempt is exactly as hard as guessing $k$ uniformly random bits} (the logarithm just converts the probability into a number of coins). Note that $X$ can be much longer than $k$ bits: a $1000$-bit string whose most likely value has probability $\frac{1}{256}$ is worth, for the attacker, only $8$ random bits. Min-entropy measures how much \textit{real} randomness the source contains, not how long it is.
+
+\begin{table}[H]
+  \centering
+  \small
+  \begin{tabular}{lcc}
+    \toprule
+    \textbf{Source $X$} & \textbf{Best guess succeeds with} & \textbf{Min-entropy} \\
+    \midrule
+    one fair coin & $\frac{1}{2}$ & $1$ bit \\
+    $8$ fair coins & $\frac{1}{256}$ & $8$ bits \\
+    uniform over $\{0,1\}^n$ & $2^{-n}$ & $n$ bits (the maximum) \\
+    uniform over a set $S$ & $\frac{1}{|S|}$ & $\log_2 |S|$ bits \\
+    a constant & $1$ & $0$ bits \\
+    a coin that gives $1$ with probability $0.9$ & $0.9$ & $\approx 0.15$ bits \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{framedex}{Passwords}
+  Suppose there are millions of possible passwords, but $1\%$ of the people use ``123456''. An attacker who tries ``123456'' succeeds once in a hundred times:
+  \[
+    \Hmin = -\log_2 \frac{1}{100} \approx 6.6 \text{ bits}
+  \]
+  Even though there are millions of possible passwords, against an attacker who guesses the password of a random person they are worth less than $7$ coins. It is the most likely value, not the number of values, that makes a source weak.
+\end{framedex}
+
+\paragraph{Why ``min'', and why not Shannon entropy?} Shannon entropy is the \textbf{average} of $\log_2 \frac{1}{\Pr[X = x]}$, while min-entropy takes the \textbf{minimum}, that is, it looks only at the worst case, the most likely value. In general $\Hmin(X) \leq H(X)$, and the difference can be huge. Take $X$ that, with probability $\frac{1}{2}$, is $0^n$, and otherwise is uniform over $\{0,1\}^n$:
+\begin{itemize}
+  \item Shannon entropy: $H(X) \approx \frac{n}{2}$, which looks like a lot of randomness;
+  \item min-entropy: $\Hmin(X) \approx 1$, because an attacker who always guesses $0^n$ is right half of the times.
+\end{itemize}
+Security is about the attacker's best move, so \textbf{min-entropy is the right measure}.
+
+\subsection{The natural goal, and why it is impossible}
+
+Now that we can measure randomness, we can state the goal precisely. We do not know which source we will get (thermal noise, keyboard timings, \ldots): we only know that it has at least $k$ bits of min-entropy. So:
+
+\begin{center}
+  \itshape Find a single function $\Ext$ such that, for \textbf{every} source $X$ with $\Hmin(X) \geq k$, the output $\Ext(X)$ is uniform.
+\end{center}
+
+Note that $X$ is a \textit{source}, a random process whose values we do not choose, and $\Ext$ is a \textit{function} applied to whatever value comes out. Unfortunately this goal is impossible, even in the most favourable case: extracting \textbf{a single bit} from a source with almost full min-entropy.
+
+\begin{framedprop}[label={prop:no-deterministic}]{}
+  For every function $\Ext : \{0,1\}^n \to \{0,1\}$ there is a source $X$ with $\Hmin(X) \geq n-1$ such that $\Ext(X)$ is \textbf{constant}.
+\end{framedprop}
+
+The proof uses the \textbf{pigeonhole principle}: if $N$ objects are distributed into $c$ boxes, at least one box contains at least $\frac{N}{c}$ objects (otherwise there would be fewer than $c \cdot \frac{N}{c} = N$ objects in total).
+
+\begin{proof}
+  \begin{enumerate}
+    \item $\Ext$ splits the $2^n$ inputs into two groups: those mapped to $0$ and those mapped to $1$.
+    \item By the pigeonhole principle ($2^n$ objects, $2$ boxes), one of the two groups contains at least $2^{n-1}$ inputs. Call $b$ the output of that group.
+    \item Let $X$ be uniform over that group. Every value has probability at most $\frac{1}{2^{n-1}}$, so
+    \[
+      \Hmin(X) = -\log_2 \max_x \Pr[X = x] \geq -\log_2 \frac{1}{2^{n-1}} = n - 1
+    \]
+    \item But every value of $X$ is mapped to $b$, so $\Ext(X) = b$ \textbf{always}. \qedhere
+  \end{enumerate}
+\end{proof}
+
+\begin{framedex}{The parity extractor with $n = 3$}
+  Take $\Ext(x_1 x_2 x_3) = x_1 \oplus x_2 \oplus x_3$ (the parity), which seems a good extractor since it mixes all the bits. The $8$ inputs split into two groups:
+  \begin{center}
+    \begin{tabular}{cc}
+      \toprule
+      \textbf{Output 0 (even number of 1s)} & \textbf{Output 1 (odd number of 1s)} \\
+      \midrule
+      $000,\ 011,\ 101,\ 110$ & $001,\ 010,\ 100,\ 111$ \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  Let $X$ be uniform over $\{000, 011, 101, 110\}$: every value has probability $\frac{1}{4}$, so $\Hmin(X) = 2 = n - 1$. Guessing $X$ is as hard as guessing $2$ coins, and yet $\Ext(X) = 0$ always: we extracted no randomness at all.
+\end{framedex}
+
+\begin{framedobs}{Moral}
+  The problem is not the source, which is very random, but the fact that the extractor is \textbf{fixed in advance}: once $\Ext$ is known, an adversarial source can always be built against it, by concentrating on inputs that $\Ext$ maps to the same output. To avoid this, we relax the goal to an output that is only \textbf{close} to uniform (\Cref{sec:sd}), and we let the extractor use a \textbf{random seed}, chosen independently of the source, so that the function is picked at random \textbf{after} the source is fixed (\Cref{sec:seeded}).
+\end{framedobs}
+
+Why should a source be ``built against'' the extractor? Two reasons. First, we want a \textbf{guarantee} for every source with enough min-entropy, because we do not know the exact distribution of ours; the proposition shows that a fixed extractor cannot give this guarantee. Second, the source may really be influenced by an adversary: a server that uses the arrival times of network packets as randomness receives packets from the attacker too, who can choose when to send them. The attacker does not control the source completely, so it remains unpredictable, but she can \textit{shape} its distribution.
+
+\subsection{Measuring ``close to uniform'': statistical distance}\label{sec:sd}
+
+The first lesson of \Cref{prop:no-deterministic} is that exact uniformity is too much to ask. To relax it to ``almost uniform'' we need a way to measure how far apart two distributions are.
+
+\begin{frameddefn}[label={def:sd}]{Statistical distance}
+  The statistical distance between two random variables $X$ and $X'$ over the same set is
+  \[
+    \SD(X; X') = \frac{1}{2} \sum_x \big|\Pr[X = x] - \Pr[X' = x]\big|
+  \]
+  We write $X \approx_\varepsilon X'$, read ``$\varepsilon$-close'', when $\SD(X; X') \leq \varepsilon$.
+\end{frameddefn}
+
+The meaning is what matters: the statistical distance is exactly the \textbf{best advantage of an unbounded adversary} in telling the two distributions apart,
+\[
+  \SD(X; X') = \max_{\Adv} \Big|\Pr[\Adv(x) = 1 : x \leftarrow X] - \Pr[\Adv(x) = 1 : x \leftarrow X']\Big|
+\]
+So ``$\varepsilon$-close to uniform'' means that no adversary, however powerful, can distinguish the output from truly uniform bits with advantage more than $\varepsilon$. It is the same ``quiz'' idea of the security definitions.
+
+Useful properties:
+\begin{itemize}
+  \item $0 \leq \SD \leq 1$;
+  \item triangle inequality: $\SD(X; Z) \leq \SD(X; Y) + \SD(Y; Z)$;
+  \item \textbf{processing cannot help}: $\SD(f(X); f(X')) \leq \SD(X; X')$ for every function $f$.
+\end{itemize}
+
+\subsection{Adding a seed: seeded extractors}\label{sec:seeded}
+
+The second lesson was that the extractor needs randomness that the source does not know. So we give it a short, \textbf{truly uniform seed} $S$, chosen \textbf{independently of the source}:
+\[
+  \Ext : \underbrace{\{0,1\}^d}_{\text{seed}} \times \underbrace{\{0,1\}^n}_{\text{source}} \to \underbrace{\{0,1\}^\ell}_{\text{output}}
+\]
+
+\paragraph{A trap to avoid.} If we only asked ``$\Ext(S, X)$ is close to uniform'', there would be a useless solution: $\Ext(S, X) = S$, which ignores the source and copies the seed. It is uniform, but it extracts nothing from $X$. To rule this out, we ask the output to look uniform \textbf{even to someone who sees the seed}. As a bonus, the seed can then be \textbf{public}.
+
+\begin{frameddefn}[label={def:extractor}]{Seeded extractor}
+  $\Ext : \{0,1\}^d \times \{0,1\}^n \to \{0,1\}^\ell$ is a \textbf{$(k, \varepsilon)$-extractor} if, for every source $X$ with $\Hmin(X) \geq k$:
+  \[
+    \big(S,\ \Ext(S, X)\big) \approx_\varepsilon \big(S,\ U_\ell\big)
+  \]
+  where $S$ is uniform over $\{0,1\}^d$ and independent of $X$, and $U_\ell$ is uniform over $\{0,1\}^\ell$.
+\end{frameddefn}
+
+In words: even knowing the seed, the output is indistinguishable from fresh uniform bits, except with advantage $\varepsilon$. (This notion is also called a \textit{strong} seeded extractor.)
+
+\begin{framedex}{Alice, Bob and Eve}
+  Alice and Bob want to use the One-Time Pad to exchange one bit (``attack'' or ``retreat''), so they need a \textbf{uniform 1-bit key}. Alice's computer generates it from the last $3$ bits of the arrival time of a network packet: a source $X$ of $3$ bits. Eve cannot read Alice's computer, but she can \textbf{send packets} to it and partly influence their arrival times.
+
+  \textbf{Scenario 1: fixed extractor.} Alice uses the parity, and Eve knows it (Kerckhoffs's principle). Eve times her packets so that the arrival times fall on $\{000, 011, 101, 110\}$, at random among them. The source still has $\Hmin(X) = 2$, so Alice notices nothing, but the key is always $0$. The next day Alice encrypts $c = m \oplus 0 = m$: the ciphertext is the message, and Eve reads it in clear.
+
+  \textbf{Scenario 2: seeded extractor.} Alice uses $h_s(x) = (s_1 x_1) \oplus (s_2 x_2) \oplus (s_3 x_3)$, the XOR of the bits selected by a seed $s$ chosen at random \textbf{after} Eve has prepared her packets. Against the same source:
+  \begin{center}
+    \small
+    \begin{tabular}{cccc}
+      \toprule
+      \textbf{Seed $s$} & \textbf{Bits used} & \textbf{Output on $000, 011, 101, 110$} & \textbf{Key} \\
+      \midrule
+      $100$ & $x_1$ & $0,0,1,1$ & uniform \\
+      $010$ & $x_2$ & $0,1,0,1$ & uniform \\
+      $001$ & $x_3$ & $0,1,1,0$ & uniform \\
+      $110$ & $x_1 \oplus x_2$ & $0,1,1,0$ & uniform \\
+      $101$ & $x_1 \oplus x_3$ & $0,1,0,1$ & uniform \\
+      $011$ & $x_2 \oplus x_3$ & $0,0,1,1$ & uniform \\
+      $111$ & parity & $0,0,0,0$ & constant \\
+      $000$ & none & $0,0,0,0$ & constant \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  With $6$ seeds out of $8$ the key is perfectly uniform: Eve's trap was built against \textit{one} function, and the function is drawn at random. With realistic sizes (hundreds of bits), the Leftover Hash Lemma below guarantees that the fraction of ``unlucky'' seeds becomes negligible.
+
+  The seed may even be public, but it must be chosen \textbf{independently of the source}: if Alice always used the same seed, known in advance, we would be back to Scenario 1.
+\end{framedex}
+
+\subsection{Random hash functions and collision probability}
+
+Do seeded extractors exist? A natural candidate comes from the MAC section: \textbf{pairwise independent hash functions}. The seed $s$ selects a function from the family, and
+\[
+  \Ext(s, x) = h_s(x)
+\]
+\textbf{Intuition.} A random function from a pairwise independent family \textbf{spreads its inputs evenly}: two different inputs land on the same output only with probability $2^{-\ell}$. A source with high min-entropy has many inputs, none too likely, so after hashing they get spread almost uniformly.
+
+To prove it, we need to bound the statistical distance of $(S, h_S(X))$ from uniform. Computing it directly is hard, because of the absolute values. There is a quantity that is much easier to compute for hash functions and that still controls the distance: the \textbf{collision probability}.
+
+\begin{frameddefn}{Collision probability}
+  Let $Y'$ be an independent copy of $Y$. The collision probability of $Y$ is
+  \[
+    \Col(Y) = \Pr[Y = Y'] = \sum_y \Pr[Y = y]^2
+  \]
+  that is, the probability that two independent samples of $Y$ are equal.
+\end{frameddefn}
+
+The uniform distribution over a set $\mathcal{Y}$ has the \textbf{fewest possible collisions}, $\Col(U) = \frac{1}{|\mathcal{Y}|}$, while a distribution concentrated on a few values collides often. So few collisions should mean close to uniform, and the next lemma makes this precise.
+
+\begin{framedlem}[label={lem:col-sd}]{From collisions to statistical distance}
+  If $\Col(Y) \leq \frac{1}{|\mathcal{Y}|}(1 + 4\varepsilon^2)$, then $\SD(Y; U) \leq \varepsilon$, where $U$ is uniform over $\mathcal{Y}$.
+\end{framedlem}
+
+\begin{proof}
+  For each value $y$, let $q_y = \Pr[Y = y] - \frac{1}{|\mathcal{Y}|}$ be how much $y$ deviates from uniform.
+  \begin{enumerate}
+    \item \textbf{Rewrite the distance with the deviations:} $\SD(Y; U) = \frac{1}{2}\sum_y |q_y|$.
+    \item \textbf{Cauchy--Schwarz.} Since $\sum_y |q_y| \cdot 1 \leq \sqrt{\sum_y q_y^2} \cdot \sqrt{\sum_y 1}$:
+    \[
+      \SD(Y; U) \leq \frac{1}{2}\sqrt{|\mathcal{Y}| \cdot \textstyle\sum_y q_y^2}
+    \]
+    \item \textbf{Compute the sum of squares.} Expanding the square and using $\sum_y \Pr[Y = y] = 1$:
+    \[
+      \sum_y q_y^2 = \sum_y \Pr[Y = y]^2 - \frac{2}{|\mathcal{Y}|}\sum_y \Pr[Y = y] + \frac{|\mathcal{Y}|}{|\mathcal{Y}|^2}
+      = \Col(Y) - \frac{1}{|\mathcal{Y}|} \leq \frac{4\varepsilon^2}{|\mathcal{Y}|}
+    \]
+    \item \textbf{Substitute:}
+    \[
+      \SD(Y; U) \leq \frac{1}{2}\sqrt{|\mathcal{Y}| \cdot \frac{4\varepsilon^2}{|\mathcal{Y}|}} = \varepsilon \qedhere
+    \]
+  \end{enumerate}
+\end{proof}
+
+So, to prove that hashing gives an extractor, it is enough to show that $(S, h_S(X))$ has few collisions.
+
+\subsection{The Leftover Hash Lemma}
+
+We now have all the pieces: random hashing as the candidate extractor, and the collision probability as the tool to analyse it.
+
+\begin{framedthm}[label={thm:lhl}]{Leftover Hash Lemma}
+  Let $\Hfam = \{h_s : \{0,1\}^n \to \{0,1\}^\ell\}_{s \in \{0,1\}^d}$ be a pairwise independent family. If
+  \[
+    k \geq \ell + 2\log_2\frac{1}{\varepsilon} - 2
+  \]
+  then $\Ext(s, x) = h_s(x)$ is a $(k, \varepsilon)$-extractor.
+\end{framedthm}
+
+\textbf{In words.} From a source with $k$ bits of min-entropy, hashing with a random public function gives about
+\[
+  \ell \approx k - 2\log_2\frac{1}{\varepsilon}
+\]
+bits that are $\varepsilon$-close to uniform. The $2\log_2\frac{1}{\varepsilon}$ bits we lose are the \textbf{price} of being $\varepsilon$-close instead of exactly uniform.
+
+\begin{proof}
+  Let $Y = (S, h_S(X))$, and let $Y' = (S', h_{S'}(X'))$ be an independent copy, where $S'$ and $X'$ are independent copies of $S$ and $X$. We bound $\Col(Y)$ and then apply \Cref{lem:col-sd}.
+  \begin{enumerate}
+    \item \textbf{Separate the seeds.} The two samples collide only if the seeds are equal \textbf{and} the outputs are equal:
+    \[
+      \Col(Y) = \Pr[S = S' \wedge h_S(X) = h_{S'}(X')] = \underbrace{\Pr[S = S']}_{=\,2^{-d}} \cdot \Pr[h_S(X) = h_S(X')]
+    \]
+    Once $S = S'$, the seed is still uniform and independent of $X$ and $X'$.
+    \item \textbf{Two ways for the outputs to collide.} Either the inputs themselves are equal, or they are different and the hash maps them to the same output:
+    \[
+      \Pr[h_S(X) = h_S(X')] \leq \Pr[X = X'] + \Pr[X \neq X' \wedge h_S(X) = h_S(X')]
+    \]
+    \item \textbf{Equal inputs: this is where min-entropy enters.}
+    \[
+      \Pr[X = X'] = \sum_x \Pr[X = x]^2 \leq \max_x \Pr[X = x] \cdot \sum_x \Pr[X = x] = 2^{-\Hmin(X)} \leq 2^{-k}
+    \]
+    \item \textbf{Different inputs: this is where pairwise independence enters.} For fixed $x \neq x'$, the pair $(h_S(x), h_S(x'))$ is uniform over $\{0,1\}^\ell \times \{0,1\}^\ell$, so
+    \[
+      \Pr_S[h_S(x) = h_S(x')] = \sum_{\tau} \Pr[h_S(x) = \tau \wedge h_S(x') = \tau] = 2^\ell \cdot 2^{-2\ell} = 2^{-\ell}
+    \]
+    Averaging over $X$ and $X'$, the second term is at most $2^{-\ell}$.
+    \item \textbf{Put the pieces together.}
+    \[
+      \Col(Y) \leq 2^{-d}\big(2^{-k} + 2^{-\ell}\big) = \frac{1}{2^{d+\ell}}\big(1 + 2^{\ell - k}\big)
+    \]
+    \item \textbf{Use the hypothesis on $k$.} From $k \geq \ell + 2\log_2\frac{1}{\varepsilon} - 2$ we get $\ell - k \leq 2 - 2\log_2\frac{1}{\varepsilon}$, so $2^{\ell - k} \leq 4\varepsilon^2$ and
+    \[
+      \Col(Y) \leq \frac{1 + 4\varepsilon^2}{2^{d+\ell}}
+    \]
+    \item \textbf{Conclude with the lemma.} $Y$ takes values in a set of size $2^{d+\ell}$, and the uniform distribution on that set is exactly $(S, U_\ell)$. By \Cref{lem:col-sd}, $\SD\big((S, h_S(X)); (S, U_\ell)\big) \leq \varepsilon$. \qedhere
+  \end{enumerate}
+\end{proof}
+
+\begin{framedobs}{}
+  \begin{itemize}
+    \item \textbf{The two hypotheses meet in the proof}: min-entropy controls the collisions of the \textit{source} (step 3), pairwise independence controls the collisions of the \textit{hash} (step 4).
+    \item \textbf{Only collisions are needed}: the proof uses pairwise independence only through $\Pr[h_S(x) = h_S(x')] \leq 2^{-\ell}$ for $x \neq x'$. Families with this weaker property are called \textit{universal}, and they are enough. The family of the Alice and Bob example is universal.
+    \item \textbf{The same tool twice}: the family $am + b \bmod p$ used for the MACs works here too.
+    \item \textbf{A numerical example}: from a source with $k = 256$ bits of min-entropy and a target $\varepsilon = 2^{-64}$, we extract $\ell = 256 - 128 + 2 = 130$ almost-uniform bits.
+    \item \textbf{The loss cannot be avoided}: losing about $2\log_2\frac{1}{\varepsilon}$ bits is optimal in general (a lower bound due to Radhakrishnan and Ta-Shma).
+    \item \textbf{Where it is used}: deriving keys from Diffie--Hellman shared secrets, which have high min-entropy but are not uniform; privacy amplification in quantum key distribution; extracting keys from physical noise.
+  \end{itemize}
+\end{framedobs}
+
+\subsection{The thread of the argument}
+
+\begin{table}[H]
+  \centering
+  \small
+  \begin{tabularx}{\textwidth}{@{}cXX@{}}
+    \toprule
+    \textbf{Step} & \textbf{Problem we face} & \textbf{What it leads to} \\
+    \midrule
+    1 & keys must be uniform, but real sources are not & extractors \\
+    2 & simplest weak source: a biased coin & Von Neumann's extractor (independent flips with the same bias only) \\
+    3 & we want any source: from which ones can we extract? & min-entropy, the attacker's best guessing probability \\
+    4 & one function that makes every high-min-entropy source uniform & impossible: every fixed function can be fooled \\
+    5 & exact uniformity is too much & statistical distance \\
+    6 & a fixed function can be fooled & a public random seed: seeded extractors \\
+    7 & which function should we use? & random hash functions from a pairwise independent family \\
+    8 & the statistical distance is hard to compute directly & collision probability \\
+    9 & put everything together & Leftover Hash Lemma: $\ell \approx k - 2\log_2\frac{1}{\varepsilon}$ \\
+    \bottomrule
+  \end{tabularx}
+\end{table}

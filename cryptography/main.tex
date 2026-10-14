@@ -1,0 +1,38 @@
+\documentclass[11pt,a4paper]{report}
+\usepackage{../common/preamble}
+\usepackage{cancel}
+
+% ---------- Cryptography notation ----------
+\newcommand{\Enc}{\mathsf{Enc}}
+\newcommand{\Dec}{\mathsf{Dec}}
+\newcommand{\Gen}{\mathsf{Gen}}
+\newcommand{\Tag}{\mathsf{Tag}}
+\newcommand{\Ext}{\mathsf{Ext}}
+\newcommand{\negl}{\mathsf{negl}}
+\newcommand{\SD}{\mathsf{SD}}
+\newcommand{\Col}{\mathsf{Col}}
+\newcommand{\Adv}{\mathsf{A}}
+\newcommand{\PrivK}{\mathsf{PrivK}^{\mathsf{eav}}}
+\newcommand{\sample}{\xleftarrow{R}}
+\newcommand{\Kspace}{\mathcal{K}}
+\newcommand{\Mspace}{\mathcal{M}}
+\newcommand{\Cspace}{\mathcal{C}}
+\newcommand{\Tspace}{\mathcal{T}}
+\newcommand{\Hfam}{\mathcal{H}}
+\newcommand{\Hmin}{H_\infty}
+
+\title{\textbf{Cryptography}\\[0.5em]\large Lecture Notes}
+\author{Bianchi}
+\date{Academic Year 2026/2027}
+
+\begin{document}
+\maketitle
+\tableofcontents
+
+\input{chapters/01-introduction}
+\input{chapters/02-information-theoretic}
+
+\appendix
+\input{chapters/A-probability}
+
+\end{document}

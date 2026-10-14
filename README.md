@@ -4,6 +4,7 @@ LaTeX lecture notes for my Master's degree in Cybersecurity (Sapienza).
 
 | Course | Folder |
 |---|---|
+| Cryptography | [`cryptography/`](cryptography/) |
 | Distributed Systems | [`distributed-systems/`](distributed-systems/) |
 | Network Infrastructures | [`network-infrastructures/`](network-infrastructures/) |
 | Statistics | [`statistics/`](statistics/) |
