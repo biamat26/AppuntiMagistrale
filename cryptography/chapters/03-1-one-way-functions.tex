@@ -76,6 +76,12 @@ Nobody knows whether one-way functions exist: proving it would imply $\mathsf{P}
 
 \subsection{Why $\mathsf{P} \neq \mathsf{NP}$ is not enough}
 
+\begin{itemize}
+  \item \textbf{$\mathsf{P}$} (\textit{polynomial time}) $\to$ the problems that can be \textbf{solved} efficiently, in time polynomial in the input length. For example, sorting a list or multiplying two numbers.
+  \item \textbf{$\mathsf{NP}$} (\textit{nondeterministic polynomial time}) $\to$ the problems whose solutions can be \textbf{verified} efficiently: given a candidate solution, checking it takes polynomial time, even if finding it may be hard. For example, a sudoku (checking a filled grid is immediate) or factoring (given $p$ and $q$, just multiply them).
+\end{itemize}
+Every problem in $\mathsf{P}$ is in $\mathsf{NP}$, and whether $\mathsf{P} = \mathsf{NP}$ (``is everything easy to verify also easy to solve?'') is a famous open problem.
+
 One could ask: why not simply assume $\mathsf{P} \neq \mathsf{NP}$? Because it is too \textit{weak} for cryptography.
 \begin{itemize}
   \item \textbf{OWFs imply $\mathsf{P} \neq \mathsf{NP}$.} Inverting $f$ is an $\mathsf{NP}$ search problem: given a candidate $x'$, checking that $f(x') = y$ is easy. If $\mathsf{P} = \mathsf{NP}$, every efficiently computable $f$ could be inverted, so no OWF would exist.
