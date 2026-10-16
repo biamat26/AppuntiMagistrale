@@ -55,16 +55,44 @@ Neither definition requires $f$ to be one-way, but intuitively a hard-core bit i
 \paragraph{Question 1: is there a universal hard-core predicate, hard-core for every OWF?} \textbf{No.}
 
 \begin{proof}
-  Suppose that an efficiently computable $h^*$ were hard-core for every OWF. Take any OWF $f$ and define
+  Suppose that an efficiently computable $h$ were hard-core for every OWF. Take any OWF $f$ and build a ``bad'' function that \textbf{publishes} the bit $h(x)$ next to $f(x)$:
   \[
-    \tilde f(x) = h^*(x) \concat f(x)
+    f_{\mathrm{BAD}}(x) = f(x) \concat h(x)
   \]
   \begin{itemize}
-    \item \textbf{$h^*$ is not hard-core for $\tilde f$}: the adversary that outputs the first bit of $\tilde f(x)$ guesses $h^*(x)$ with probability $1$.
-    \item \textbf{$\tilde f$ is still one-way.} Suppose a PPT $\tilde\Adv$ inverts $\tilde f$ with probability $\varepsilon(n)$. Build $\Adv$ for $f$: on input $y$, choose a random bit $b$ and output $\tilde\Adv(b \concat y)$. With probability $\frac{1}{2}$ the bit is right, $b = h^*(x)$, and then the input of $\tilde\Adv$ is distributed exactly as $\tilde f(x)$; so with probability $\varepsilon(n)$ it returns $x'$ with $\tilde f(x') = b \concat y$, which implies $f(x') = y$. Hence $\Adv$ inverts $f$ with probability at least $\frac{\varepsilon(n)}{2}$, so $\varepsilon$ must be negligible.
+    \item \textbf{$h$ is clearly not hard-core for $f_{\mathrm{BAD}}$}: the adversary that outputs the last bit of $f_{\mathrm{BAD}}(x)$ guesses $h(x)$ with probability $1$.
+    \item \textbf{$f_{\mathrm{BAD}}$ is still one-way.} We prove it by reduction. Suppose that there is a PPT adversary $\Adv$ that inverts $f_{\mathrm{BAD}}$ with probability at least $\frac{1}{\poly(n)}$, that is, not negligible. We build a PPT adversary $B$ that inverts $f$, playing between the challenger $C$ of the one-wayness game of $f$ and the adversary $\Adv$:
   \end{itemize}
-  So $\tilde f$ is a OWF for which $h^*$ is not hard-core, a contradiction.
+
+  \begin{center}
+    \begin{tikzpicture}[x=1cm, y=1cm]
+      \node (A) at (0,0) {$\Adv$};
+      \node (B) at (4.5,0) {$B$};
+      \node (C) at (9,0) {$C$};
+      \node[lbl, align=left] at (9,-1.2) {$x \sample \{0,1\}^n$};
+      \draw[msg] (9,-0.6) -- node[above] {$y = f(x)$} (4.5,-0.6);
+      \node[lbl] at (4.5,-1.2) {$\tilde b \sample \{0,1\}$};
+      \draw[msg] (4.5,-1.6) -- node[above] {$y \concat \tilde b$} (0,-1.6);
+      \draw[msg] (0,-2.4) -- node[above] {$x'$} (4.5,-2.4);
+      \draw[msg] (4.5,-2.4) -- node[above] {$x'$} (9,-2.4);
+    \end{tikzpicture}
+  \end{center}
+
+  $B$ receives $y = f(x)$, \textbf{guesses} the missing bit with a coin $\tilde b$, gives $y \concat \tilde b$ to $\Adv$ and forwards its answer $x'$.
+  \begin{itemize}
+    \item With probability $\frac{1}{2}$ the guess is right, $\tilde b = h(x)$. The coin is independent of $x$, so in this case the input of $\Adv$ is distributed \textbf{exactly} as $f_{\mathrm{BAD}}(x)$ for a random $x$, and $\Adv$ finds $x'$ with $f_{\mathrm{BAD}}(x') = y \concat \tilde b$ with probability at least $\frac{1}{\poly(n)}$.
+    \item $f_{\mathrm{BAD}}(x') = y \concat \tilde b$ implies in particular $f(x') = y$, so $B$ wins.
+  \end{itemize}
+  Therefore
+  \[
+    \Pr[B \text{ wins}] \geq \frac{1}{2} \cdot \Pr[\Adv \text{ wins}] \geq \frac{1}{2} \cdot \frac{1}{\poly(n)} = \frac{1}{\poly'(n)}
+  \]
+  which is not negligible, against the one-wayness of $f$. (The inequality is $\geq$ and not $=$ because $B$ may win even when the guess is wrong.)
+
+  So $f_{\mathrm{BAD}}$ is a OWF for which $h$ is not hard-core, a contradiction.
 \end{proof}
+
+\textbf{The next best thing.} Since no single $h$ works for every $f$, we reverse the quantifiers: instead of ``$\exists\, h\ \forall f$'' we look for ``$\forall f\ \exists\, h$'', that is, a hard-core predicate tailored to each function. Question 3 shows that this is possible, up to a small modification of $f$.
 
 \paragraph{Question 2: is every function with a hard-core predicate one-way?} \textbf{No.} Let $f$ delete the last bit, $f(x_1 \cdots x_n) = x_1 \cdots x_{n-1}$, and let $h(x) = x_n$ be the deleted bit. Since $x$ is uniform, $x_n$ is independent of $f(x)$, so $h$ is hard-core (no adversary can do better than $\frac{1}{2}$). But $f$ is trivially invertible: appending any bit to $y$ gives a valid preimage, so the adversary inverts with probability $1$.
 
@@ -81,7 +109,28 @@ Neither definition requires $f$ to be one-way, but intuitively a hard-core bit i
   \]
 \end{framedthm}
 
-The proof is long and was omitted in class. The intuition: $r$ is public and random, and $h(x,r)$ is the XOR of a \textbf{random subset} of the bits of $x$, the subset selected by $r$. Predicting this XOR for random subsets better than by chance would allow one to reconstruct $x$, and therefore to invert $f$. It is the same family of functions as in the Alice and Bob extraction example: the inner product with a random vector.
+How to read it:
+\begin{itemize}
+  \item \textbf{$r$ is public} $\to$ it appears in clear in the output $g(x, r)$, exactly like the seed of an extractor.
+  \item \textbf{$h(x, r)$ is the XOR of a random subset of the bits of $x$} $\to$ the subset is selected by $r$: bit $x_i$ is included if and only if $r_i = 1$. It is the same family of functions as in the Alice and Bob extraction example.
+  \item \textbf{$g$ is one-way} $\to$ the second half $r$ is in clear and carries no information about $x$, so inverting $g$ means inverting $f$.
+\end{itemize}
+
+\paragraph{Intuition: a perfect predictor would invert $f$.} Suppose there were a very good adversary $\Adv$ that, given $g(x, r) = f(x) \concat r$, always computes $h(x, r) = \langle x, r \rangle$, \textbf{for every} $r$. Then we could recover $x$ bit by bit, by choosing as $r$ the unit vectors $e_i = (0, \ldots, 0, 1, 0, \ldots, 0)$, with the $1$ in position $i$:
+\[
+  \langle x, e_1 \rangle = \langle x, 100\cdots0 \rangle = x_1, \qquad \ldots, \qquad \langle x, e_n \rangle = \langle x, 0\cdots01 \rangle = x_n
+\]
+So $n$ calls $\Adv(f(x) \concat e_i)$ would return all the bits of $x$, and $f$ would be inverted, against the hypothesis.
+
+\paragraph{Why the real proof is harder.} The hypothesis only gives an adversary that guesses $h(x, r)$ with probability $\frac{1}{2} + \frac{1}{\poly(n)}$, and only \textbf{on average over a random $r$}. Such an adversary may be wrong on every unit vector $e_i$, which are very particular values of $r$. The full proof (omitted in class) has to work with random $r$ only.
+
+\begin{framedobs}{Beyond the lecture: the self-correction trick}
+  An intermediate case shows how to avoid the particular values $e_i$. Suppose that $\Adv$ guesses $\langle x, r \rangle$ with probability at least $\frac{3}{4} + \varepsilon$ over a random $r$. Since the inner product is linear,
+  \[
+    \langle x, r \rangle \oplus \langle x, r \oplus e_i \rangle = \langle x, e_i \rangle = x_i
+  \]
+  So, to compute $x_i$, choose a \textbf{random} $r$ and ask $\Adv$ both $\langle x, r \rangle$ and $\langle x, r \oplus e_i \rangle$. Both $r$ and $r \oplus e_i$ are uniformly distributed, so each answer is wrong with probability at most $\frac{1}{4} - \varepsilon$, and by the union bound both are right with probability at least $\frac{1}{2} + 2\varepsilon$. Repeating with many independent $r$ and taking the majority gives $x_i$ with high probability. The real proof, for probability $\frac{1}{2} + \varepsilon$, needs a cleverer way of choosing the queries.
+\end{framedobs}
 
 \subsection{From one-way permutations to PRGs}
 
