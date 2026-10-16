@@ -47,6 +47,27 @@ Observations:
   \item \textbf{A first application.} With a PRG, Alice and Bob can share a short seed $s$ and use $G(s)$ as the pad of a One-Time Pad for a much longer message. The scheme is not perfectly secret (Shannon's theorem forbids it), but it is secure against efficient adversaries. We will make this precise in the next chapters.
 \end{itemize}
 
+\begin{framedprob}[label={prob:prg-unbounded}]{No PRG is secure against unbounded adversaries}
+  Let $G : \{0,1\}^n \to \{0,1\}^{n+\ell}$ with $\ell \geq 1$ be any deterministic function. Show that there is an (inefficient) distinguisher that tells $G(\Uni{n})$ apart from $\Uni{n+\ell}$ with advantage at least $1 - 2^{-\ell} \geq \frac{1}{2}$.
+\end{framedprob}
+
+\begin{proof}[Solution]
+  Consider the distinguisher $D$ that, on input $z \in \{0,1\}^{n+\ell}$, tries \textbf{all} the $2^n$ seeds $s'$, and outputs $1$ if $G(s') = z$ for some of them, $0$ otherwise. In other words, $D$ outputs $1$ exactly when $z$ is in the image of $G$.
+  \begin{itemize}
+    \item \textbf{If $z = G(s)$ for a uniform $s$} $\to$ the search finds at least $s$ itself, so
+    \[
+      \Pr[D(z) = 1 : z \leftarrow G(\Uni{n})] = 1
+    \]
+    \item \textbf{If $z$ is uniform} $\to$ $D$ outputs $1$ only if $z$ falls in the image of $G$, which contains at most $2^n$ strings out of $2^{n+\ell}$:
+    \[
+      \Pr[D(z) = 1 : z \leftarrow \Uni{n+\ell}] \leq \frac{2^n}{2^{n+\ell}} = 2^{-\ell}
+    \]
+  \end{itemize}
+  The advantage is at least $1 - 2^{-\ell} \geq \frac{1}{2}$, far from negligible. $D$ runs in time about $2^n$, so it is not PPT: the attack is allowed only because the adversary is unbounded.
+\end{proof}
+
+This is why pseudorandomness is an inherently \textbf{computational} notion: the output of a PRG is always very far from uniform in statistical distance (at least $1 - 2^{-\ell}$), it only \textit{looks} uniform to efficient observers.
+
 \subsection{Stretching a PRG}
 
 How much should a PRG stretch? Surprisingly, it is enough to build a PRG that adds \textbf{a single bit}: from it we can obtain a PRG that adds any polynomial number of bits.

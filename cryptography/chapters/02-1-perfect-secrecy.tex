@@ -363,9 +363,49 @@ When the three spaces have the same size, there is a very quick test for perfect
 
 The One-Time Pad passes both conditions immediately: keys are uniform, and $k = m \oplus c$ is the unique key.
 
-\subsection{Perfect indistinguishability and perfect secrecy}
+\subsection{Exercise: a game-based definition of perfect secrecy}\label{sec:ps-game}
 
-Perfect indistinguishability (\Cref{def:perfect-indist}) is \textbf{equivalent to perfect secrecy} (Katz and Lindell, Lemma 2.6). Intuitively, it is statement (iii) of \Cref{lem:equivalent} turned into a game: if the distribution of the ciphertext does not depend on the message, looking at $c$ cannot help Eve tell $m_0$ from $m_1$, so she cannot do better than $\frac{1}{2}$.
+In class this was given as an exercise. The professor's formulation does not choose the bit $b$ at random: it \textbf{fixes} it, and compares two versions of the same game.
+
+\begin{frameddefn}[label={def:ps-game}]{The games $\mathrm{GAME}_{\Pi,\Adv}(b)$}
+  For a scheme $\Pi$, an adversary $\Adv$ (even unbounded) and a \textbf{fixed} bit $b \in \{0,1\}$:
+  \begin{enumerate}
+    \item $\Adv$ outputs two messages $m_0, m_1 \in \Mspace$;
+    \item the key is sampled, $k \sample \Kspace$, and $\Adv$ receives $c = \Enc(k, m_b)$;
+    \item $\Adv$ outputs a bit $b'$, which is the output of the game.
+  \end{enumerate}
+  $\Pi$ is \textbf{perfectly secret in the game sense} if for every adversary $\Adv$
+  \[
+    \Pr\big[\mathrm{GAME}_{\Pi,\Adv}(0) = 1\big] - \Pr\big[\mathrm{GAME}_{\Pi,\Adv}(1) = 1\big] = 0
+  \]
+  that is, the output of the game has \textbf{the same distribution} whether $m_0$ or $m_1$ is encrypted.
+\end{frameddefn}
+
+\begin{framedprob}[label={prob:ps-game}]{}
+  Prove that $\Pi$ is perfectly secret (\Cref{def:perfect-secrecy}) if and only if it is perfectly secret in the game sense (\Cref{def:ps-game}).
+\end{framedprob}
+
+\begin{proof}[Solution]
+  By \Cref{lem:equivalent}, perfect secrecy is equivalent to statement (iii): for all $m, m', c$, $\Pr_K[\Enc(K, m) = c] = \Pr_K[\Enc(K, m') = c]$. So it is enough to show that (iii) is equivalent to the game definition.
+
+  \textbf{(iii) $\Rightarrow$ game.} Fix any adversary $\Adv$ and the pair $m_0, m_1$ it outputs. By (iii), the ciphertext $c = \Enc(K, m_0)$ and the ciphertext $c = \Enc(K, m_1)$ have \textbf{exactly the same distribution}. In both games, $\Adv$ computes $b'$ from $c$ (and from its own random bits, which do not depend on $b$). Applying the same procedure to the same distribution gives the same distribution, so $\Pr[b' = 1]$ is the same in the two games and the difference is $0$. If $\Adv$ chooses $m_0, m_1$ at random, the argument holds for every possible choice, and so also on average.
+
+  \textbf{Game $\Rightarrow$ (iii).} By contradiction, suppose that (iii) fails: there are $m_0, m_1, c^*$ with
+  \[
+    \Pr_K[\Enc(K, m_0) = c^*] \neq \Pr_K[\Enc(K, m_1) = c^*]
+  \]
+  Consider the adversary $\Adv$ that outputs exactly these $m_0, m_1$, and outputs $b' = 1$ if and only if the ciphertext it receives is $c^*$. Then
+  \[
+    \Pr\big[\mathrm{GAME}(0) = 1\big] - \Pr\big[\mathrm{GAME}(1) = 1\big] = \Pr_K[\Enc(K, m_0) = c^*] - \Pr_K[\Enc(K, m_1) = c^*] \neq 0
+  \]
+  which contradicts the game definition. (This adversary is even efficient: it only compares $c$ with a fixed string. The unbounded power is needed only to \textit{find} $m_0, m_1, c^*$, and the definition quantifies over every adversary, so we may assume it knows them.)
+\end{proof}
+
+\paragraph{Link with perfect indistinguishability.} The game definition is also equivalent to perfect indistinguishability (\Cref{def:perfect-indist}), where $b$ is uniform and the adversary must guess it. Write $p_b = \Pr[\mathrm{GAME}(b) = 1]$. When $b$ is uniform:
+\[
+  \Pr[b' = b] = \frac{1}{2}\Pr[b' = 0 \mid b = 0] + \frac{1}{2}\Pr[b' = 1 \mid b = 1] = \frac{1}{2}(1 - p_0) + \frac{1}{2}p_1 = \frac{1}{2} + \frac{1}{2}(p_1 - p_0)
+\]
+So $\Pr[b' = b] = \frac{1}{2}$ for every adversary if and only if $p_0 = p_1$ for every adversary. The three formulations (perfect secrecy, the game with fixed $b$, the game with random $b$) say the same thing (see also Katz and Lindell, Lemma 2.6).
 
 This is why the game-based formulation is so important: \textbf{all the computational definitions of the course follow the same pattern}, replacing ``every adversary'' with ``every probabilistic polynomial-time adversary'' and $\frac{1}{2}$ with $\frac{1}{2} + \negl(n)$.
 

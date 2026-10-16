@@ -38,6 +38,14 @@ This process is called \textbf{randomness extraction}, and a function that does 
   The output cannot contain \textbf{more} randomness than the input: an extractor \textbf{concentrates} the randomness already present in the source, it does not multiply it. Expanding a few random bits into many bits that only \textit{look} random is possible only against computationally bounded adversaries, with \textit{pseudorandom generators}, which we will see in the computational part of the course.
 \end{framedobs}
 
+\paragraph{The big picture: extract, expand, refresh.} In class the problem was framed as a pipeline with three steps, which is also how real systems (for example the random number generator of an operating system) are organized:
+\begin{enumerate}
+  \item \textbf{Extract} $\to$ from an imperfect physical source, obtain a few bits that are (almost) uniform. This is the topic of this section.
+  \item \textbf{Expand} $\to$ deterministically stretch those few bits into as many bits as needed, which only \textit{look} uniform. This needs a pseudorandom generator (\Cref{def:prg}), and works only against efficient adversaries.
+  \item \textbf{Refresh} $\to$ from time to time, mix new extracted randomness into the state, so that an adversary who learns the state at some point cannot predict the future outputs forever.
+\end{enumerate}
+Security depends on the randomness being both \textbf{uniform} and \textbf{fresh}: extraction takes care of the first, refreshing of the second.
+
 \subsection{A first, simple case: the biased coin}
 
 Let's start from the simplest possible weak source: a \textbf{biased coin} $B$, with $\Pr[B = 1] = p$ for some unknown $0 < p < 1$. We assume that the flips are \textbf{independent} and that the bias $p$ is \textbf{always the same}.
@@ -185,6 +193,13 @@ The proof uses the \textbf{pigeonhole principle}: if $N$ objects are distributed
 \end{framedobs}
 
 Why should a source be ``built against'' the extractor? Two reasons. First, we want a \textbf{guarantee} for every source with enough min-entropy, because we do not know the exact distribution of ours; the proposition shows that a fixed extractor cannot give this guarantee. Second, the source may really be influenced by an adversary: a server that uses the arrival times of network packets as randomness receives packets from the attacker too, who can choose when to send them. The attacker does not control the source completely, so it remains unpredictable, but she can \textit{shape} its distribution.
+
+\paragraph{Three ways out.} In class three ways around \Cref{prop:no-deterministic} were listed:
+\begin{enumerate}
+  \item \textbf{Several independent sources} $\to$ extract from two (or more) sources $X_1, X_2$, each with enough min-entropy, that are \textbf{independent} of each other. A single adversarial source can be built against a fixed function, but two independent ones cannot ``coordinate''. These are called \textit{two-source} (or multi-source) extractors; we do not study them.
+  \item \textbf{Cryptographic hash functions} $\to$ apply a hash function such as SHA-256 to the source. It works well in practice, but proving it requires \textbf{strong assumptions} on the hash function (it is modelled as a truly random function), so it is not an information-theoretic solution.
+  \item \textbf{A random seed} $\to$ give the extractor a short uniform seed, independent of the source. This is the approach we follow in the rest of the section (\Cref{sec:seeded}).
+\end{enumerate}
 
 \subsection{Measuring ``close to uniform'': statistical distance}\label{sec:sd}
 
@@ -393,6 +408,12 @@ We now have all the pieces: random hashing as the candidate extractor, and the c
   \]
   then $\Ext(s, x) = h_s(x)$ is a $(k, \varepsilon)$-extractor.
 \end{framedthm}
+
+\paragraph{The statement used in class.} The professor writes the output length as $m$ and states the lemma with
+\[
+  k = m + 2\log_2\frac{1}{\varepsilon}
+\]
+This is the form to remember for the exam. It is the same theorem: since $m + 2\log_2\frac{1}{\varepsilon} \geq m + 2\log_2\frac{1}{\varepsilon} - 2$, the professor's condition implies ours. The version above only gains $2$ bits, by keeping track of the constant $4$ in the lemma.
 
 \textbf{In words.} From a source with $k$ bits of min-entropy, hashing with a random public function gives about
 \[

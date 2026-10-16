@@ -184,6 +184,28 @@ This definition is equivalent to perfect secrecy (Katz and Lindell, Lemma 2.6), 
   In words: $f$ goes to zero faster than the inverse of \textbf{any} polynomial. For example, $2^{-n}$ is negligible, while $1/n^{10}$ is not.
 \end{frameddefn}
 
+Negligible functions are well behaved: combining them in the ways that occur in security proofs keeps them negligible. We will use these facts over and over (for example in the hybrid argument of \Cref{thm:stretch}).
+
+\begin{framedlem}[label={lem:negl-closure}]{Closure properties of negligible functions}
+  Let $\varepsilon_1, \varepsilon_2$ be negligible functions and $p$ a polynomial. Then:
+  \begin{enumerate}[label=(\roman*)]
+    \item $\varepsilon_1 + \varepsilon_2$ is negligible;
+    \item $\varepsilon_1 \cdot \varepsilon_2$ is negligible;
+    \item $p \cdot \varepsilon_1$ is negligible.
+  \end{enumerate}
+\end{framedlem}
+
+\begin{proof}
+  Fix any polynomial $q$; we must show that each function is eventually below $\frac{1}{q(n)}$.
+  \begin{itemize}
+    \item \textbf{(i)} Apply the definition with the polynomial $2q$: for $n$ large enough, $\varepsilon_1(n) < \frac{1}{2q(n)}$ and $\varepsilon_2(n) < \frac{1}{2q(n)}$, so the sum is $< \frac{1}{q(n)}$.
+    \item \textbf{(ii)} For $n$ large enough $\varepsilon_2(n) < 1$, so $\varepsilon_1(n)\,\varepsilon_2(n) \leq \varepsilon_1(n) < \frac{1}{q(n)}$.
+    \item \textbf{(iii)} $p \cdot q$ is a polynomial, so for $n$ large enough $\varepsilon_1(n) < \frac{1}{p(n)\,q(n)}$, that is, $p(n)\,\varepsilon_1(n) < \frac{1}{q(n)}$. \qedhere
+  \end{itemize}
+\end{proof}
+
+Point (iii) is the one that matters most: repeating an attempt that succeeds with negligible probability a \textbf{polynomial} number of times still gives a negligible probability. Careful: it fails for exponential factors, since $2^n \cdot 2^{-n} = 1$ is not negligible.
+
 \begin{frameddefn}[label={def:eav}]{Computational security against an eavesdropper}
   $\Pi = (\Gen, \Enc, \Dec)$ has \textbf{indistinguishable encryptions in the presence of an eavesdropper} if \textbf{for every} probabilistic polynomial-time adversary $\Adv$ \textbf{there exists} a negligible function $\negl$ such that, for every $n$:
   \[

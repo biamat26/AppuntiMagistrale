@@ -13,21 +13,37 @@ From now on, ``efficient'' means \textbf{polynomial time} in the input length $n
 The hard problem underlying all of symmetric cryptography is the existence of functions that are \textbf{easy to compute but hard to invert}. Multiplying two large primes is immediate, while recovering the two primes from their product (factoring) is, as far as we know, extremely hard. It is like breaking an egg: easy in one direction, impossible in the other.
 
 \begin{frameddefn}[label={def:owf}]{One-way function}
-  A function $f : \{0,1\}^n \to \{0,1\}^m$ is a \textbf{one-way function} (OWF) if:
+  Consider the \textbf{inversion experiment} $\mathsf{Invert}_{\Adv,f}(n)$:
   \begin{enumerate}
-    \item $f$ is computable in $\poly(n)$ time;
+    \item $x \sample \{0,1\}^n$ and $y = f(x)$;
+    \item $\Adv$ receives $(1^n, y)$ and outputs $x'$;
+    \item the output of the experiment is $1$ if $f(x') = y$, and $0$ otherwise.
+  \end{enumerate}
+  A deterministic function $f : \{0,1\}^* \to \{0,1\}^*$ is a \textbf{one-way function} (OWF) if:
+  \begin{enumerate}
+    \item $f$ is computable in polynomial time;
     \item for every PPT algorithm $\Adv$ there is a negligible function $\negl$ such that
     \[
-      \Pr\big[f(x') = y \;:\; x \sample \{0,1\}^n,\ y = f(x),\ x' \leftarrow \Adv(y)\big] \leq \negl(n)
+      \Pr\big[\mathsf{Invert}_{\Adv,f}(n) = 1\big] \leq \negl(n)
     \]
     where the probability is over the choice of $x$ and the random bits of $\Adv$.
   \end{enumerate}
+  In compact notation: $\Pr\big[f(x') = y \;:\; x \sample \{0,1\}^n,\ y = f(x),\ x' \leftarrow \Adv(1^n, y)\big] \leq \negl(n)$.
 \end{frameddefn}
+
+\begin{framedobs}{Why the adversary also receives $1^n$}
+  $1^n$ is the string of $n$ ones: it simply tells the adversary the security parameter, \textbf{written in unary}. Two reasons:
+  \begin{itemize}
+    \item \textbf{Running time} $\to$ ``PPT'' means polynomial in the length of the \textbf{input}. If $f$ shrinks its input a lot (say $|f(x)| = \log n$), then with only $y$ as input the adversary could run in time polynomial in $\log n$ only, too little to even write down an $n$-bit answer. With $1^n$ in the input, it is always allowed $\poly(n)$ steps.
+    \item \textbf{Unary, not binary} $\to$ the number $n$ written in binary has only $\log n$ bits, which would not help. Writing it in unary makes the input at least $n$ bits long.
+  \end{itemize}
+  When $|f(x)| \geq n$ (for example for permutations) the $1^n$ changes nothing, which is why it is often omitted informally.
+\end{framedobs}
 
 \begin{framedobs}{How to read $\Pr[\,\text{event} : \text{experiment}\,]$}
   The trick is to read the probability \textbf{from right to left}:
   \[
-    \Pr\big[\ \underbrace{f(x') = y}_{\text{what we measure}}\ :\ \underbrace{x \sample \{0,1\}^n,\ y = f(x),\ x' \leftarrow \Adv(y)}_{\text{what happens first}}\ \big]
+    \Pr\big[\ \underbrace{f(x') = y}_{\text{what we measure}}\ :\ \underbrace{x \sample \{0,1\}^n,\ y = f(x),\ x' \leftarrow \Adv(1^n, y)}_{\text{what happens first}}\ \big]
   \]
   \begin{itemize}
     \item \textbf{After the colon} there is an \textbf{experiment}: a list of steps executed \textbf{in order}, like the lines of a program.
@@ -40,14 +56,14 @@ The hard problem underlying all of symmetric cryptography is the existence of fu
 \begin{enumerate}
   \item \textbf{$x \sample \{0,1\}^n$} $\to$ choose $x$ \textbf{uniformly at random} among all the strings of $n$ bits. $\{0,1\}^n$ is not a distribution but the \textbf{set} of the $2^n$ strings of $n$ bits, and the $R$ on the arrow means ``uniformly at random''. For example, with $n = 3$, $x$ is one of $000, 001, \ldots, 111$, each with probability $\frac{1}{8}$. \textbf{$x$ is the secret}: the adversary does not see it.
   \item \textbf{$y = f(x)$} $\to$ compute $f$ on $x$. It is a computation, not a choice. \textbf{$y$ is what the adversary receives.}
-  \item \textbf{$x' \leftarrow \Adv(y)$} $\to$ give $y$ to the adversary $\Adv$, a PPT \textbf{algorithm}, and let $x'$ be its \textbf{answer}: its attempt to find an input that gives $y$. The arrow has \textbf{no $R$}: $x'$ is not uniform, it is the \textbf{output of the algorithm} $\Adv$. The arrow $\leftarrow$ instead of $=$ only says that $\Adv$ may use random bits internally.
+  \item \textbf{$x' \leftarrow \Adv(1^n, y)$} $\to$ give $y$ (and the security parameter $1^n$) to the adversary $\Adv$, a PPT \textbf{algorithm}, and let $x'$ be its \textbf{answer}: its attempt to find an input that gives $y$. The arrow has \textbf{no $R$}: $x'$ is not uniform, it is the \textbf{output of the algorithm} $\Adv$. The arrow $\leftarrow$ instead of $=$ only says that $\Adv$ may use random bits internally.
 \end{enumerate}
 
 \paragraph{The event.} $f(x') = y$ means that \textbf{the adversary wins}: its answer $x'$, given to $f$, produces exactly the value $y$ it received. So $y$ is the true output $f(x)$, and $f(x')$ is the output of the adversary's answer. It is not required that $x' = x$: \textbf{any} preimage is enough.
 
 \paragraph{The bound.} $\leq \negl(n)$ says that the winning probability is \textbf{negligible}. It is not a fixed tolerance, but a \textbf{function of $n$} that goes to zero faster than the inverse of every polynomial, like $2^{-n}$: the larger $n$, the more hopeless winning becomes. The probability is computed over \textbf{all the randomness of the experiment}: the choice of $x$ and the random bits of $\Adv$.
 
-\paragraph{In one sentence.} \textit{``Choose a random $x$ of $n$ bits, compute $y = f(x)$ and give $y$ to the adversary, who answers with $x'$. The probability that $x'$ is a preimage of $y$, that is $f(x') = y$, is negligible.''}
+\paragraph{In one sentence.} \textit{``Choose a random $x$ of $n$ bits, compute $y = f(x)$ and give $y$ (and $1^n$) to the adversary, who answers with $x'$. The probability that $x'$ is a preimage of $y$, that is $f(x') = y$, is negligible.''}
 
 \begin{framedex}{Multiplication}
   Take $f(p, q) = p \cdot q$.
@@ -72,7 +88,11 @@ Nobody knows whether one-way functions exist: proving it would imply $\mathsf{P}
   \item \textbf{Multiplication} $\to$ $f(p, q) = p \cdot q$ for random primes $p, q$; inverting it means factoring.
   \item \textbf{Modular exponentiation} $\to$ $f(x) = g^x \bmod p$; inverting it means computing the discrete logarithm.
   \item \textbf{Subset sum} $\to$ $f(a_1, \ldots, a_k, S) = (a_1, \ldots, a_k, \sum_{i \in S} a_i)$; inverting it means finding a subset with a given sum.
+  \item \textbf{Lattice problems} $\to$ for example $f(A, x) = (A,\ A x \bmod q)$, with $A$ a random matrix over $\Z_q$ and $x$ a vector with \textbf{small} entries. Inverting it means finding a short solution of a random linear system (the \textit{Short Integer Solution} problem), which is related to finding short vectors in a lattice. Subset sum is a special case of this idea.
+  \item \textbf{Decoding random linear codes} $\to$ $f(A, x, e) = (A,\ A x \oplus e)$ over $\{0,1\}$, with $A$ a random matrix and $e$ an error vector with few ones. Inverting it means \textbf{decoding} a random linear code: recovering $x$ from a noisy linear combination (the \textit{Learning Parity with Noise} problem).
 \end{itemize}
+
+The first two candidates come from \textbf{number theory}; the last ones come from \textbf{linear algebra with noise}. The difference matters: a quantum computer could factor and compute discrete logarithms efficiently (Shor's algorithm), while no efficient quantum algorithm is known for lattice and coding problems. This is why they are the basis of \textbf{post-quantum} cryptography.
 
 \subsection{Why $\mathsf{P} \neq \mathsf{NP}$ is not enough}
 

@@ -81,6 +81,25 @@ In words: Eve has seen $t$ valid pairs $(m_i, \tau_i)$. For any \textbf{new} mes
 
 We often write $\varepsilon = 2^{-\lambda}$, where $\lambda = \log_2 \frac{1}{\varepsilon}$ is the \textbf{security level in bits}: forging is as hard as guessing a random $\lambda$-bit string. For example, $\lambda = 128$ gives $\varepsilon = 2^{-128}$. With this notation, \Cref{obs:eps-lower-bound} says that tags must have \textbf{at least $\lambda$ bits}.
 
+\begin{framedprob}[label={prob:otp-mac}]{The One-Time Pad is not a MAC}
+  Let $\Mspace = \Kspace = \Tspace = \{0,1\}^n$ and $\Tag(k, m) = k \oplus m$. Show that this MAC is \textbf{not} $1$-time $\varepsilon$-statistically secure for any $\varepsilon < 1$.
+\end{framedprob}
+
+\begin{proof}[Solution]
+  Think of the forgery game: Eve sees one valid pair $(m, \tau)$ with $\tau = \Tag(k, m)$, and must output $(m', \tau')$ with $m' \neq m$ and $\tau' = \Tag(k, m')$.
+  \begin{enumerate}
+    \item \textbf{Recover the key.} From $\tau = k \oplus m$, XOR-ing both sides with $m$ gives $k = \tau \oplus m$. One valid pair reveals the whole key.
+    \item \textbf{Forge.} Choose any $m' \neq m$ and output $\tau' = (\tau \oplus m) \oplus m' = k \oplus m'$, which is exactly the correct tag of $m'$.
+  \end{enumerate}
+  Eve wins with probability $1$. In the language of \Cref{def:mac-security}: given $\Tag(K, m) = \tau$, the key is determined, so
+  \[
+    \Pr_K\big[\Tag(K, m') = \tau \oplus m \oplus m' \;\big|\; \Tag(K, m) = \tau\big] = 1
+  \]
+  and the scheme is $1$-time $\varepsilon$-secure only for $\varepsilon = 1$, that is, not secure at all.
+\end{proof}
+
+\textbf{The lesson.} The One-Time Pad is perfectly secret, yet it is useless for integrity. Secrecy asks that the output reveals nothing about the \textit{message}; a MAC needs more: after one tag, the tags of \textit{other} messages must still be unpredictable. Here the tag of $m$ and the tag of $m'$ are tied by the fixed relation $\Tag(k, m) \oplus \Tag(k, m') = m \oplus m'$. This is exactly what pairwise independence (below) rules out.
+
 \subsection{The price: long keys (again)}
 
 As with perfect secrecy, statistical security is expensive.
