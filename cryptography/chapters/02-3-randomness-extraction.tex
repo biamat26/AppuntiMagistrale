@@ -276,33 +276,111 @@ To prove it, we need to bound the statistical distance of $(S, h_S(X))$ from uni
   that is, the probability that two independent samples of $Y$ are equal.
 \end{frameddefn}
 
-The uniform distribution over a set $\mathcal{Y}$ has the \textbf{fewest possible collisions}, $\Col(U) = \frac{1}{|\mathcal{Y}|}$, while a distribution concentrated on a few values collides often. So few collisions should mean close to uniform, and the next lemma makes this precise.
+\textbf{Why it is a good measure.} It is the birthday paradox: two people in a room share their birthday with probability $\frac{1}{365}$ if birthdays are uniform, but much more often if almost everyone was born in January. \textbf{The more unbalanced a distribution is, the more it collides.} Let $N = |\mathcal{Y}|$ be the number of possible values:
+
+\begin{table}[H]
+  \centering
+  \small
+  \begin{tabular}{@{}lll@{}}
+    \toprule
+    \textbf{Distribution} & $\Col$ & \\
+    \midrule
+    uniform over $N$ values & $N \cdot \left(\frac{1}{N}\right)^2 = \frac{1}{N}$ & the minimum possible \\
+    fair coin & $\frac{1}{4} + \frac{1}{4} = 0.5$ & \\
+    coin with bias $90\%$ & $0.81 + 0.01 = 0.82$ & higher \\
+    constant & $1$ & the maximum possible \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsubsection{Collisions in excess}
+
+The uniform distribution has the \textbf{fewest possible collisions}, and $\Col(Y) = \frac{1}{N}$ if and only if $Y$ is uniform. So the collision probability of any $Y$ over $N$ values can be written as ``uniform plus an extra'':
+\[
+  \Col(Y) = \frac{1}{N}\,(1 + \delta) \qquad \text{with } \delta \geq 0
+\]
+\begin{itemize}
+  \item \textbf{The $1$} is the part that every distribution has, the collisions of the uniform distribution.
+  \item \textbf{The excess $\delta$} measures how much more $Y$ collides than the uniform distribution, that is, \textbf{how far $Y$ is from uniform}: $\delta = 0$ if and only if $Y$ is uniform, and $\delta = N - 1$ when $Y$ is constant.
+\end{itemize}
+
+Writing $q_y = \Pr[Y = y] - \frac{1}{N}$ for the \textbf{deviation} of the value $y$ from uniform, we will see in the proof below that
+\[
+  \delta = N \cdot \sum_y q_y^2
+\]
+so $\delta$ and the statistical distance measure the \textbf{same thing in two different ways}:
+\begin{itemize}
+  \item \textbf{the statistical distance} $\SD(Y; U) = \frac{1}{2}\sum_y |q_y|$ uses the \textbf{absolute values} of the deviations: it has a direct meaning (the best advantage of a distinguisher), but it is hard to compute;
+  \item \textbf{the excess} $\delta$ uses the \textbf{squares} of the deviations: it is easy to compute for hash functions.
+\end{itemize}
+The next lemma is the bridge between the two.
 
 \begin{framedlem}[label={lem:col-sd}]{From collisions to statistical distance}
-  If $\Col(Y) \leq \frac{1}{|\mathcal{Y}|}(1 + 4\varepsilon^2)$, then $\SD(Y; U) \leq \varepsilon$, where $U$ is uniform over $\mathcal{Y}$.
+  Let $Y$ take values in a set $\mathcal{Y}$ of size $N$, let $U$ be uniform over $\mathcal{Y}$, and write $\Col(Y) = \frac{1}{N}(1 + \delta)$. Then
+  \[
+    \SD(Y; U) \leq \frac{1}{2}\sqrt{\delta}
+  \]
+  In particular, if $\Col(Y) \leq \frac{1}{N}(1 + 4\varepsilon^2)$, then $\SD(Y; U) \leq \varepsilon$.
 \end{framedlem}
 
 \begin{proof}
-  For each value $y$, let $q_y = \Pr[Y = y] - \frac{1}{|\mathcal{Y}|}$ be how much $y$ deviates from uniform.
+  \leavevmode
   \begin{enumerate}
-    \item \textbf{Rewrite the distance with the deviations:} $\SD(Y; U) = \frac{1}{2}\sum_y |q_y|$.
-    \item \textbf{Cauchy--Schwarz.} Since $\sum_y |q_y| \cdot 1 \leq \sqrt{\sum_y q_y^2} \cdot \sqrt{\sum_y 1}$:
+    \item \textbf{Rewrite the distance with the deviations.} Since $\Pr[U = y] = \frac{1}{N}$ for every $y$:
     \[
-      \SD(Y; U) \leq \frac{1}{2}\sqrt{|\mathcal{Y}| \cdot \textstyle\sum_y q_y^2}
+      \SD(Y; U) = \frac{1}{2}\sum_y \Big|\Pr[Y = y] - \frac{1}{N}\Big| = \frac{1}{2}\sum_y |q_y|
     \]
-    \item \textbf{Compute the sum of squares.} Expanding the square and using $\sum_y \Pr[Y = y] = 1$:
+    The absolute values are what makes this hard to compute, so we want to move to squares.
+    \item \textbf{Cauchy--Schwarz.} A sum of $N$ numbers is at most $\sqrt{N}$ times the square root of the sum of their squares (with equality when the numbers are all equal):
     \[
-      \sum_y q_y^2 = \sum_y \Pr[Y = y]^2 - \frac{2}{|\mathcal{Y}|}\sum_y \Pr[Y = y] + \frac{|\mathcal{Y}|}{|\mathcal{Y}|^2}
-      = \Col(Y) - \frac{1}{|\mathcal{Y}|} \leq \frac{4\varepsilon^2}{|\mathcal{Y}|}
+      \sum_y |q_y| = \sum_y |q_y| \cdot 1 \leq \sqrt{\sum_y q_y^2} \cdot \sqrt{\sum_y 1^2} = \sqrt{N \cdot \sum_y q_y^2}
+    \]
+    so
+    \[
+      \SD(Y; U) \leq \frac{1}{2}\sqrt{N \cdot \sum_y q_y^2}
+    \]
+    \item \textbf{The sum of squares is the excess.} Expand $(a - b)^2 = a^2 - 2ab + b^2$:
+    \[
+      \sum_y q_y^2 = \underbrace{\sum_y \Pr[Y = y]^2}_{=\,\Col(Y)} - \frac{2}{N}\underbrace{\sum_y \Pr[Y = y]}_{=\,1} + \underbrace{\sum_y \frac{1}{N^2}}_{=\,\frac{1}{N}} = \Col(Y) - \frac{1}{N}
+    \]
+    and with $\Col(Y) = \frac{1}{N}(1 + \delta)$:
+    \[
+      \sum_y q_y^2 = \frac{1}{N} + \frac{\delta}{N} - \frac{1}{N} = \frac{\delta}{N}
     \]
     \item \textbf{Substitute:}
     \[
-      \SD(Y; U) \leq \frac{1}{2}\sqrt{|\mathcal{Y}| \cdot \frac{4\varepsilon^2}{|\mathcal{Y}|}} = \varepsilon \qedhere
+      \SD(Y; U) \leq \frac{1}{2}\sqrt{N \cdot \frac{\delta}{N}} = \frac{1}{2}\sqrt{\delta}
     \]
+    \item \textbf{Choose the threshold.} If $\delta \leq 4\varepsilon^2$, then $\SD(Y; U) \leq \frac{1}{2}\sqrt{4\varepsilon^2} = \varepsilon$. \qedhere
   \end{enumerate}
 \end{proof}
 
-So, to prove that hashing gives an extractor, it is enough to show that $(S, h_S(X))$ has few collisions.
+\begin{framedobs}{Where $1 + 4\varepsilon^2$ comes from}
+  The threshold is not the result of a computation: it is chosen \textbf{backwards}, starting from the goal $\SD \leq \varepsilon$.
+  \begin{itemize}
+    \item \textbf{The $1$} $\to$ the collisions that even the uniform distribution has.
+    \item \textbf{The $4\varepsilon^2$} $\to$ the largest excess of collisions compatible with $\SD \leq \varepsilon$, because $\frac{1}{2}\sqrt{\delta} \leq \varepsilon \iff \delta \leq 4\varepsilon^2$. The $4$ comes from the $\frac{1}{2}$ in the definition of the statistical distance: squaring $2\varepsilon$ gives $4\varepsilon^2$.
+  \end{itemize}
+\end{framedobs}
+
+\begin{framedex}{A coin}
+  For a coin, $N = 2$, so $\Col(Y) = \frac{1}{2}(1 + \delta)$ gives $\delta = 2\,\Col(Y) - 1$.
+  \begin{center}
+    \small
+    \begin{tabular}{@{}lcccc@{}}
+      \toprule
+      \textbf{Coin} & $\Col(Y)$ & $\delta$ & \textbf{Bound} $\frac{1}{2}\sqrt{\delta}$ & \textbf{True} $\SD$ \\
+      \midrule
+      fair ($50/50$) & $0.5$ & $0$ & $0$ & $0$ \\
+      biased ($90/10$) & $0.82$ & $0.64$ & $0.4$ & $\frac{1}{2}(0.4 + 0.4) = 0.4$ \\
+      constant ($100/0$) & $1$ & $1$ & $0.5$ & $\frac{1}{2}(0.5 + 0.5) = 0.5$ \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  With only two values the bound is even exact. With more values it is in general only an upper bound, but that is all we need.
+\end{framedex}
+
+So, to prove that hashing gives an extractor, it is enough to show that $(S, h_S(X))$ has \textbf{few collisions in excess}.
 
 \subsection{The Leftover Hash Lemma}
 
@@ -347,7 +425,16 @@ bits that are $\varepsilon$-close to uniform. The $2\log_2\frac{1}{\varepsilon}$
     \[
       \Col(Y) \leq 2^{-d}\big(2^{-k} + 2^{-\ell}\big) = \frac{1}{2^{d+\ell}}\big(1 + 2^{\ell - k}\big)
     \]
-    \item \textbf{Use the hypothesis on $k$.} From $k \geq \ell + 2\log_2\frac{1}{\varepsilon} - 2$ we get $\ell - k \leq 2 - 2\log_2\frac{1}{\varepsilon}$, so $2^{\ell - k} \leq 4\varepsilon^2$ and
+    This has exactly the form ``uniform plus an excess'', with $N = 2^{d+\ell}$:
+    \begin{itemize}
+      \item \textbf{the $1$} comes from the \textbf{different} inputs, which thanks to the hash collide as if they were uniform;
+      \item \textbf{the excess $\delta = 2^{\ell - k}$} comes from the \textbf{equal} inputs, that is, from the source repeating the same value. The higher the min-entropy $k$, the smaller it is.
+    \end{itemize}
+    \item \textbf{Use the hypothesis on $k$.} The lemma needs $\delta \leq 4\varepsilon^2$:
+    \[
+      2^{\ell - k} \leq 4\varepsilon^2 \iff \ell - k \leq 2 - 2\log_2\frac{1}{\varepsilon} \iff k \geq \ell + 2\log_2\frac{1}{\varepsilon} - 2
+    \]
+    which is exactly the hypothesis of the theorem (the $-2$ is $\log_2 4$, the same $4$ as in $4\varepsilon^2$). Hence
     \[
       \Col(Y) \leq \frac{1 + 4\varepsilon^2}{2^{d+\ell}}
     \]
