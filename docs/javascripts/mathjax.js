@@ -11,9 +11,11 @@ window.MathJax = {
   }
 };
 
+// Ri-renderizza le formule quando si cambia pagina (solo se MathJax è già caricato).
 document$.subscribe(() => {
-  MathJax.startup.output.clearCache()
-  MathJax.typesetClear()
-  MathJax.texReset()
-  MathJax.typesetPromise()
-})
+  if (!window.MathJax || !MathJax.startup || !MathJax.typesetPromise) return;
+  MathJax.startup.output.clearCache();
+  MathJax.typesetClear();
+  MathJax.texReset();
+  MathJax.typesetPromise();
+});
