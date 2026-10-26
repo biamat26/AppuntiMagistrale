@@ -1,0 +1,34 @@
+name: Sito crittografia-luiggi
+
+on:
+  push:
+    branches: [main, Luiggi]
+    paths:
+      - "crittografia-luiggi/**"
+      - ".github/workflows/sito-crittografia-luiggi.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sito-crittografia-luiggi
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install "mkdocs<2" "mkdocs-material==9.7.7"
+      - run: mkdocs build --strict -f crittografia-luiggi/mkdocs.yml -d ../site
+      - name: Pubblica sul branch gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site
+          publish_branch: gh-pages
+          force_orphan: true

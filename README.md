@@ -5,7 +5,7 @@ LaTeX lecture notes for my Master's degree in Cybersecurity (Sapienza).
 | Course | Folder |
 |---|---|
 | Cryptography | [`cryptography/`](cryptography/) |
-| Crittografia (appunti di Luiggi, in italiano) | [`crittografia-luiggi/`](crittografia-luiggi/) |
+| Crittografia (appunti di Luiggi, sito web: [biamat26.github.io/AppuntiMagistrale](https://biamat26.github.io/AppuntiMagistrale/)) | [`crittografia-luiggi/`](crittografia-luiggi/) |
 | Distributed Systems | [`distributed-systems/`](distributed-systems/) |
 | Network Infrastructures | [`network-infrastructures/`](network-infrastructures/) |
 | Statistics | [`statistics/`](statistics/) |

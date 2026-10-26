@@ -1,0 +1,66 @@
+site_name: Crittografia – appunti di Luiggi
+site_description: Appunti del corso di Crittografia (Prof. Daniele Venturi, Sapienza)
+site_url: https://biamat26.github.io/AppuntiMagistrale/
+repo_url: https://github.com/biamat26/AppuntiMagistrale
+repo_name: AppuntiMagistrale
+edit_uri: edit/Luiggi/crittografia-luiggi/docs/
+
+theme:
+  name: material
+  language: it
+  icon:
+    logo: material/lock-outline
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Tema scuro
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Tema chiaro
+  features:
+    - navigation.top
+    - navigation.footer
+    - toc.follow
+    - search.highlight
+    - search.suggest
+    - content.code.copy
+
+plugins:
+  - search:
+      lang: it
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.arithmatex:
+      generic: true
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js
+
+extra_css:
+  - stylesheets/extra.css
+
+nav:
+  - Home: index.md
+  - Ripasso probabilità: ripasso-probabilita.md
+  - "Lezione 1 – Segretezza perfetta": lezione-1.md
+  - "Lezione 2 – Shannon e MAC": lezione-2.md
+  - "Lezione 3 – Hash ed estrattori": lezione-3.md
+  - "Lezione 4 – Sicurezza computazionale e OWF": lezione-4.md
+  - "Lezione 5 – PRG e hard-core bit": lezione-5.md

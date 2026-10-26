@@ -1,27 +1,25 @@
 # Crittografia – appunti di Luiggi
 
-Appunti del corso di Crittografia (Prof. Daniele Venturi, Sapienza), in italiano. Seguono gli appunti scritti a mano dal prof; prima di ogni concetto importante c'è un riquadro **In breve**, e le parti aggiunte per capire meglio sono segnate *(non negli appunti del prof)*.
+Appunti del corso di Crittografia (Prof. Daniele Venturi, Sapienza), in italiano, pubblicati come sito web:
+**https://biamat26.github.io/AppuntiMagistrale/**
 
-È una sezione separata da [`cryptography/`](../cryptography/): usa lo stesso preambolo condiviso (`common/preamble.sty`) ma ha capitoli e riquadri propri.
+È una sezione separata da [`cryptography/`](../cryptography/). Seguono gli appunti scritti a mano dal prof; prima di ogni concetto importante c'è un riquadro **In breve**, e le parti aggiunte per capire meglio sono segnate *(non negli appunti del prof)*.
 
-| Capitolo | File |
-|---|---|
-| Lezione 1 – Introduzione e segretezza perfetta | `chapters/lezione-1.tex` |
-| Lezione 2 – Teorema di Shannon e MAC | `chapters/lezione-2.tex` |
-| Lezione 3 – MAC da hash ed estrazione di casualità | `chapters/lezione-3.tex` |
-| Lezione 4 – Sicurezza computazionale e OWF | `chapters/lezione-4.tex` |
-| Lezione 5 – Pseudocasualità, PRG e hard-core bit | `chapters/lezione-5.tex` |
-| Appendice – Ripasso di probabilità | `chapters/ripasso-probabilita.tex` |
+## Struttura
 
-## Compilare
+- `docs/` – le pagine (Markdown con formule LaTeX tra `$...$` e `$$...$$`)
+- `mkdocs.yml` – configurazione del sito (MkDocs Material) e menu
+- `tools/notion2mkdocs.py` – script usato per importare le pagine da Notion
+
+## Aggiungere una lezione
+
+1. Crea `docs/lezione-6.md`.
+2. Aggiungila sotto `nav:` in `mkdocs.yml`.
+3. Fai push: il sito si ricostruisce da solo (workflow `.github/workflows/sito-crittografia-luiggi.yml`).
+
+## Vedere il sito in locale
 
 ```bash
-cd crittografia-luiggi
-latexmk -pdf main.tex
+pip install "mkdocs<2" mkdocs-material
+mkdocs serve -f crittografia-luiggi/mkdocs.yml
 ```
-
-## Riquadri
-
-`inbreve` (definizione corta), `esempio`, `nota`, `approfondimento{Titolo}`: sono definiti in `main.tex`.
-
-I capitoli sono stati generati dalle pagine Notion con `tools/notion2latex.py` (pandoc + `tools/boxes.lua`); da qui in poi si modificano direttamente i `.tex`.
