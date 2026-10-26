@@ -5,7 +5,7 @@ Appunti della magistrale in Cybersecurity (Sapienza), una sezione per materia. U
 <div class="grid cards" markdown>
 
 - **[Crittografia](crittografia/index.md)**  
-  Prof. Daniele Venturi. Segretezza perfetta, MAC, estrattori, sicurezza computazionale, PRG.
+  Prof. Daniele Venturi. Segretezza perfetta, MAC, estrattori, sicurezza computazionale, PRG, cifratura computazionale.
 
 - **[Distributed Systems](sistemi-distribuiti/index.md)**  
   Modelli e link, tempo fisico e logico, failure detector e leader election.

@@ -439,7 +439,7 @@ Va bene se $f_{\text{BAD}}$ usa al suo interno un'altra OWF ausiliaria $f : \{0,
     Si prende $f_{\text{BAD}}(x) = f(x) \,\|\, h(x)$, cioè si scrive $h(x)$ <b>in chiaro</b> nell'output.
 
     - $h$<b> non è hard-core per </b>$f_{\text{BAD}}$: chi vede $f_{\text{BAD}}(x)$ legge direttamente $h(x)$ nell'ultimo bit. Altro che difficile da calcolare.
-    - $f_{\text{BAD}}$<b> è comunque one-way</b>: se qualcuno sapesse invertire $f_{\text{BAD}}$, cioè trovare $x'$ con $f(x') \| h(x') = f(x) \| h(x)$, avrebbe in particolare $f(x') = f(x)$, e quindi saprebbe invertire $f$. Ma $f$ è one-way. (È una riduzione!)
+    - $f_{\text{BAD}}$<b> è comunque one-way</b>: se qualcuno sapesse invertire $f_{\text{BAD}}$, cioè trovare $x'$ con $f(x') \| h(x') = f(x) \| h(x)$, avrebbe in particolare $f(x') = f(x)$, e quindi saprebbe invertire $f$. Ma $f$ è one-way. (È una riduzione! Il prof la fa per bene all'inizio della [Lezione 6](lezione-6.md): chi attacca $f$ non conosce $h(x)$ e deve indovinarlo.)
 
     Quindi nessun $h$ fissato funziona per tutte le OWF: l'hard-core bit va scelto in base alla funzione. È lo stesso schema del "nessun estrattore fisso funziona per tutte le fonti" della lezione 3.
 

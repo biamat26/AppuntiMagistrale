@@ -74,6 +74,7 @@ nav:
       - "Lezione 3 – Hash ed estrattori": crittografia/lezione-3.md
       - "Lezione 4 – Sicurezza computazionale e OWF": crittografia/lezione-4.md
       - "Lezione 5 – PRG e hard-core bit": crittografia/lezione-5.md
+      - "Lezione 6 – Goldreich-Levin e cifratura computazionale": crittografia/lezione-6.md
   - Distributed Systems:
       - sistemi-distribuiti/index.md
       - "Lezione 2 – Modelli, astrazioni e link": sistemi-distribuiti/lezione-2.md
