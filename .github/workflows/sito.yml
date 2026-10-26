@@ -2,7 +2,7 @@ name: Sito appunti
 
 on:
   push:
-    branches: [main, Luiggi]
+    branches: [Luiggi]
     paths:
       - "docs/**"
       - "mkdocs.yml"
