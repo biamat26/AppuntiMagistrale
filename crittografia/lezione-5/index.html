@@ -1,0 +1,2232 @@
+
+<!doctype html>
+<html lang="it" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Appunti della magistrale in Cybersecurity (Sapienza)">
+      
+      
+      
+        <link rel="canonical" href="https://biamat26.github.io/AppuntiMagistrale/crittografia/lezione-5/">
+      
+      
+        <link rel="prev" href="../lezione-4/">
+      
+      
+        <link rel="next" href="../lezione-6/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Lezione 5 – PRG e hard-core bit - Appunti di Luiggi</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#lezione-5-pseudocasualita-prg-e-hard-core-bit" class="md-skip">
+          Vai al contenuto
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Intestazione">
+    <a href="../.." title="Appunti di Luiggi" class="md-header__button md-logo" aria-label="Appunti di Luiggi" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 4v6l-2-2-2 2V4H9v16h10V4zM3 7V5h2V4a2 2 0 0 1 2-2h12c1.05 0 2 .95 2 2v16c0 1.05-.95 2-2 2H7c-1.05 0-2-.95-2-2v-1H3v-2h2v-4H3v-2h2V7zm2-2v2h2V5zm0 14h2v-2H5zm0-6h2v-2H5z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Appunti di Luiggi
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Lezione 5 – PRG e hard-core bit
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Tema scuro"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Tema scuro" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Tema chiaro"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Tema chiaro" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Cerca" placeholder="Cerca" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Cerca">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Cancella" aria-label="Cancella" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Inizializza la ricerca
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/biamat26/AppuntiMagistrale" title="Apri repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    AppuntiMagistrale
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Crittografia
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../sistemi-distribuiti/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Distributed Systems
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../network-infrastructures/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Network Infrastructures
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigazione" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Appunti di Luiggi" class="md-nav__button md-logo" aria-label="Appunti di Luiggi" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 4v6l-2-2-2 2V4H9v16h10V4zM3 7V5h2V4a2 2 0 0 1 2-2h12c1.05 0 2 .95 2 2v16c0 1.05-.95 2-2 2H7c-1.05 0-2-.95-2-2v-1H3v-2h2v-4H3v-2h2V7zm2-2v2h2V5zm0 14h2v-2H5zm0-6h2v-2H5z"/></svg>
+
+    </a>
+    Appunti di Luiggi
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/biamat26/AppuntiMagistrale" title="Apri repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    AppuntiMagistrale
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Crittografia
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Crittografia
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ripasso-probabilita/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ripasso probabilità
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lezione-1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 1 – Segretezza perfetta
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lezione-2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 2 – Shannon e MAC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lezione-3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 3 – Hash ed estrattori
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lezione-4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 4 – Sicurezza computazionale e OWF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 5 – PRG e hard-core bit
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 5 – PRG e hard-core bit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Indice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Indice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#pseudocasualita" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pseudocasualità
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#indistinguibilita-computazionale" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Indistinguibilità computazionale
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Indistinguibilità computazionale">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ensemble-di-distribuzioni" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ensemble di distribuzioni
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#definizione-del-prof" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Definizione (del prof)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#la-stessa-cosa-come-gioco" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        La stessa cosa come gioco
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#esempio-concreto-due-macchine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Esempio concreto: due macchine
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#statistica-vs-computazionale" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Statistica vs computazionale
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pseudorandom-generator-prg" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pseudorandom generator (PRG)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Pseudorandom generator (PRG)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#definizione-del-prof_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Definizione (del prof)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#esercizio-nessun-prg-e-sicuro-contro-attaccanti-illimitati" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Esercizio: nessun PRG è sicuro contro attaccanti illimitati
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#come-si-costruisce-un-prg" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Come si costruisce un PRG?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ingrediente-1-stretch-amplification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ingrediente 1: stretch amplification
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Ingrediente 1: stretch amplification">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#teorema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Teorema
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#la-costruzione-del-prof" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        La costruzione (del prof)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spiegazione-semplice-con-un-esempio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Spiegazione semplice con un esempio
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#come-dimostrarlo-per-riduzione" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Come dimostrarlo: per riduzione
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#argomento-ibrido-hybrid-argument" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Argomento ibrido (hybrid argument)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gli-ibridi-nel-nostro-caso" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gli ibridi nel nostro caso
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#la-riduzione-h0-c-h1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        La riduzione: H₀ ≈c H₁
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ingrediente-2-hard-core-bit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ingrediente 2: hard-core bit
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Ingrediente 2: hard-core bit">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hard-core-bit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hard-core bit
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#perche-e-utile-un-prg-da-una-one-way-permutation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Perché è utile: un PRG da una one-way permutation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#in-generale" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        In generale
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#domanda-esiste-un-unico-h-che-funziona-per-ogni-f" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Domanda: esiste un unico h che funziona per ogni f?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#riepilogo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Riepilogo
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lezione-6/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 6 – Goldreich-Levin e cifratura computazionale
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../sistemi-distribuiti/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Distributed Systems
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Distributed Systems
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sistemi-distribuiti/lezione-2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 2 – Modelli, astrazioni e link
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sistemi-distribuiti/lezione-3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 3 – Tempo (I): orologi fisici
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sistemi-distribuiti/lezione-4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 4 – Tempo (II): tempo logico
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sistemi-distribuiti/lezione-5/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 5 – Failure detector e leader election
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../network-infrastructures/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Network Infrastructures
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Network Infrastructures
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../network-infrastructures/lezione-1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 1 – Aree funzionali della rete
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../network-infrastructures/lezione-2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 2 – xDSL e PPP
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../network-infrastructures/lezione-3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 3 – FTTx e PON
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../network-infrastructures/kathara/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Kathará
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Indice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Indice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#pseudocasualita" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pseudocasualità
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#indistinguibilita-computazionale" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Indistinguibilità computazionale
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Indistinguibilità computazionale">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ensemble-di-distribuzioni" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ensemble di distribuzioni
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#definizione-del-prof" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Definizione (del prof)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#la-stessa-cosa-come-gioco" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        La stessa cosa come gioco
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#esempio-concreto-due-macchine" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Esempio concreto: due macchine
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#statistica-vs-computazionale" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Statistica vs computazionale
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pseudorandom-generator-prg" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pseudorandom generator (PRG)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Pseudorandom generator (PRG)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#definizione-del-prof_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Definizione (del prof)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#esercizio-nessun-prg-e-sicuro-contro-attaccanti-illimitati" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Esercizio: nessun PRG è sicuro contro attaccanti illimitati
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#come-si-costruisce-un-prg" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Come si costruisce un PRG?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ingrediente-1-stretch-amplification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ingrediente 1: stretch amplification
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Ingrediente 1: stretch amplification">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#teorema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Teorema
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#la-costruzione-del-prof" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        La costruzione (del prof)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spiegazione-semplice-con-un-esempio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Spiegazione semplice con un esempio
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#come-dimostrarlo-per-riduzione" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Come dimostrarlo: per riduzione
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#argomento-ibrido-hybrid-argument" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Argomento ibrido (hybrid argument)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gli-ibridi-nel-nostro-caso" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gli ibridi nel nostro caso
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#la-riduzione-h0-c-h1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        La riduzione: H₀ ≈c H₁
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ingrediente-2-hard-core-bit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ingrediente 2: hard-core bit
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Ingrediente 2: hard-core bit">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hard-core-bit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hard-core bit
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#perche-e-utile-un-prg-da-una-one-way-permutation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Perché è utile: un PRG da una one-way permutation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#in-generale" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        In generale
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#domanda-esiste-un-unico-h-che-funziona-per-ogni-f" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Domanda: esiste un unico h che funziona per ogni f?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#riepilogo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Riepilogo
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="lezione-5-pseudocasualita-prg-e-hard-core-bit">Lezione 5 – Pseudocasualità, PRG e hard-core bit<a class="headerlink" href="#lezione-5-pseudocasualita-prg-e-hard-core-bit" title="Permanent link">&para;</a></h1>
+<p><i>Segue gli appunti del prof. Le parti aggiunte per capire meglio sono segnate "non negli appunti del prof". Usa i concetti della Lezione 4: avversario PPT, funzioni trascurabili, one-way function.</i></p>
+<h2 id="pseudocasualita">Pseudocasualità<a class="headerlink" href="#pseudocasualita" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Una funzione <b>pseudocasuale</b> è una funzione <b>deterministica</b> che prende una stringa uniforme (corta) e restituisce <b>tanti bit</b> che "sembrano" casuali. "Sembrano" ha un significato preciso: <b>nessun avversario PPT riesce a distinguerli da bit davvero casuali</b>, se non con probabilità trascurabile.</p>
+</div>
+<p><b>Il collegamento con la lezione 3</b> <i>(non negli appunti del prof)</i>: l'estrattore tira fuori pochi bit puliti da una fonte sporca; la funzione pseudocasuale li usa come seme e ne genera quanti ne servono. È il passo 2 ("espansione") visto nella lezione 3.</p>
+<div class="highlight"><pre><span></span><code>fonte sporca → [Estrattore] → seme (pochi bit casuali) → [PRG] → tanti bit pseudocasuali
+</code></pre></div>
+<h2 id="indistinguibilita-computazionale">Indistinguibilità computazionale<a class="headerlink" href="#indistinguibilita-computazionale" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Due distribuzioni sono <b>computazionalmente indistinguibili</b> (<span class="arithmatex">\(\approx_c\)</span>) se nessun avversario PPT riesce a capire da quale delle due viene un campione, se non con vantaggio trascurabile. È la versione "per avversari efficienti" della distanza statistica della lezione 3.</p>
+</div>
+<h3 id="ensemble-di-distribuzioni">Ensemble di distribuzioni<a class="headerlink" href="#ensemble-di-distribuzioni" title="Permanent link">&para;</a></h3>
+<p>Con la sicurezza computazionale tutto dipende dal parametro <span class="arithmatex">\(\lambda\)</span> (più è grande, più l'avversario fatica). Per questo non si confrontano due distribuzioni singole, ma due <b>famiglie</b> di distribuzioni, una per ogni valore di <span class="arithmatex">\(\lambda\)</span>:</p>
+<div class="arithmatex">\[
+X = \{X_\lambda\}_{\lambda \in \mathbb{N}} \qquad Y = \{Y_\lambda\}_{\lambda \in \mathbb{N}}
+\]</div>
+<div class="admonition note">
+<p><b>Cosa vuol dire</b> <i>(non negli appunti del prof)</i>: <span class="arithmatex">\(X_\lambda\)</span> è un modo di generare stringhe casuali che dipende da <span class="arithmatex">\(\lambda\)</span>. Una famiglia così si chiama <b>ensemble</b>. Esempio: <span class="arithmatex">\(\{U_\lambda\}\)</span>, dove <span class="arithmatex">\(U_\lambda\)</span> è la distribuzione <b>uniforme</b> su stringhe di <span class="arithmatex">\(\lambda\)</span> bit (<span class="arithmatex">\(U_1\)</span> su 1 bit, <span class="arithmatex">\(U_2\)</span> su 2 bit, …).</p>
+</div>
+<h3 id="definizione-del-prof">Definizione (del prof)<a class="headerlink" href="#definizione-del-prof" title="Permanent link">&para;</a></h3>
+<p><span class="arithmatex">\(X \approx_c Y\)</span> se per ogni avversario PPT <span class="arithmatex">\(A\)</span>:</p>
+<div class="arithmatex">\[
+\Big| \Pr[A(X_\lambda) = 1] - \Pr[A(Y_\lambda) = 1] \Big| \le \text{negl}(\lambda)
+\]</div>
+<p>dove <span class="arithmatex">\(\Pr[A(X_\lambda) = 1]\)</span> è un'abbreviazione per <span class="arithmatex">\(\Pr[A(z) = 1 : z \leftarrow X_\lambda]\)</span>.</p>
+<div class="admonition note">
+<p><b>Cosa sono le cose</b></p>
+<ul>
+<li><span class="arithmatex">\(A\)</span> = un programma efficiente (il <b>distinguisher</b>) che riceve una stringa <span class="arithmatex">\(z\)</span> e risponde 1 ("secondo me viene da <span class="arithmatex">\(Y\)</span>") o 0 ("secondo me viene da <span class="arithmatex">\(X\)</span>"). È l'assaggiatore alla cieca.</li>
+<li><span class="arithmatex">\(z \leftarrow X_\lambda\)</span> = "<span class="arithmatex">\(z\)</span> è estratta dalla distribuzione <span class="arithmatex">\(X_\lambda\)</span>".</li>
+<li><span class="arithmatex">\(\Pr[A(z) = 1 : z \leftarrow X_\lambda]\)</span> = quanto spesso <span class="arithmatex">\(A\)</span> risponde 1 quando la stringa viene da <span class="arithmatex">\(X\)</span>. I due punti si leggono "nella situazione in cui".</li>
+<li>La differenza in valore assoluto è il <b>vantaggio</b> di <span class="arithmatex">\(A\)</span>: quanto cambia il suo comportamento a seconda della provenienza della stringa.</li>
+<li><span class="arithmatex">\(\le \text{negl}(\lambda)\)</span> = il vantaggio deve essere trascurabile, e questo per <b>ogni</b> <span class="arithmatex">\(A\)</span> PPT.</li>
+</ul>
+</div>
+<div class="admonition example">
+<p><b>Esempi di vantaggio</b> <i>(non negli appunti del prof)</i>: <span class="arithmatex">\(A\)</span> dice 1 il 50% delle volte con <span class="arithmatex">\(X\)</span> e il 50% con <span class="arithmatex">\(Y\)</span>: vantaggio 0, non distingue. <span class="arithmatex">\(A\)</span> dice 1 il 10% con <span class="arithmatex">\(X\)</span> e il 90% con <span class="arithmatex">\(Y\)</span>: vantaggio 0,8, distingue benissimo.</p>
+</div>
+<h3 id="la-stessa-cosa-come-gioco">La stessa cosa come gioco<a class="headerlink" href="#la-stessa-cosa-come-gioco" title="Permanent link">&para;</a></h3>
+<p><span class="arithmatex">\(\text{GAME}(\lambda, b)\)</span>, con <span class="arithmatex">\(b \in \{0, 1\}\)</span>:</p>
+<div class="highlight"><pre><span></span><code>Avversario A                          Challenger C
+                                      se b = 0: z ← X_λ
+                                      se b = 1: z ← Y_λ
+      ←──────────── z ─────────────
+      ──────── b' ∈ {0,1} ─────────→
+</code></pre></div>
+<p>Il challenger estrae <span class="arithmatex">\(z\)</span> da <span class="arithmatex">\(X_\lambda\)</span> (se <span class="arithmatex">\(b = 0\)</span>) o da <span class="arithmatex">\(Y_\lambda\)</span> (se <span class="arithmatex">\(b = 1\)</span>) e lo dà ad <span class="arithmatex">\(A\)</span>, che risponde con <span class="arithmatex">\(b'\)</span>. La definizione diventa:</p>
+<div class="arithmatex">\[
+\{\text{GAME}(\lambda, 0)\} \approx_c \{\text{GAME}(\lambda, 1)\}
+\]</div>
+<p>cioè la risposta di <span class="arithmatex">\(A\)</span> ha (quasi) la stessa distribuzione nei due giochi. È lo stesso schema di GAME(0)/GAME(1) della lezione 2.</p>
+<h3 id="esempio-concreto-due-macchine">Esempio concreto: due macchine<a class="headerlink" href="#esempio-concreto-due-macchine" title="Permanent link">&para;</a></h3>
+<p><i>(Non negli appunti del prof.)</i></p>
+<p><b>Lo scenario.</b> Ci sono due "macchine" che producono stringhe di bit: la macchina <span class="arithmatex">\(X\)</span> (es. l'uscita di un generatore pseudocasuale) e la macchina <span class="arithmatex">\(Y\)</span> (es. bit davvero casuali). Ad <span class="arithmatex">\(A\)</span> viene data <b>una</b> stringa e deve dire da quale macchina viene: risponde 1 ("viene da <span class="arithmatex">\(Y\)</span>") o 0 ("viene da <span class="arithmatex">\(X\)</span>"). La domanda è: <b>esiste un </b><span class="arithmatex">\(A\)</span><b> che si comporta in modo diverso a seconda della macchina da cui arriva la stringa?</b></p>
+<p><b>Caso 1: un generatore scarso.</b></p>
+<ul>
+<li>Macchina <span class="arithmatex">\(X\)</span>: produce 2 bit, ma sempre <b>uguali</b> tra loro: 00 oppure 11, metà e metà.</li>
+<li>Macchina <span class="arithmatex">\(Y\)</span>: produce 2 bit davvero casuali: 00, 01, 10, 11, ognuno al 25%.</li>
+<li>Regola di <span class="arithmatex">\(A\)</span>: <b>"rispondi 1 se i due bit sono diversi"</b>.</li>
+</ul>
+<p>Quanto spesso <span class="arithmatex">\(A\)</span> risponde 1?</p>
+<ul>
+<li>Se la stringa viene da <span class="arithmatex">\(X\)</span>: i bit sono sempre uguali, quindi <b>mai</b>: <span class="arithmatex">\(\Pr[A(z) = 1 : z \leftarrow X] = 0\)</span></li>
+<li>Se la stringa viene da <span class="arithmatex">\(Y\)</span>: i bit sono diversi in 01 e 10, metà dei casi: <span class="arithmatex">\(\Pr[A(z) = 1 : z \leftarrow Y] = 1/2\)</span></li>
+</ul>
+<p><b>Vantaggio</b> <span class="arithmatex">\(= |0 - 1/2| = 1/2\)</span>. <span class="arithmatex">\(A\)</span> si comporta in modo molto diverso nei due casi, quindi <b>distingue</b> le due macchine: questo generatore <b>non</b> è indistinguibile da bit casuali (<span class="arithmatex">\(X \not\approx_c Y\)</span>).</p>
+<p><b>Caso 2: un generatore buono.</b> Ora <span class="arithmatex">\(X\)</span> è un buon PRG. Qualunque regola efficiente <span class="arithmatex">\(A\)</span> provi, risponde 1 <b>quasi con la stessa frequenza</b> nei due casi, ad esempio:</p>
+<ul>
+<li><span class="arithmatex">\(\Pr[A \text{ risponde } 1 \text{ con } X] = 0{,}5000000001\)</span></li>
+<li><span class="arithmatex">\(\Pr[A \text{ risponde } 1 \text{ con } Y] = 0{,}5\)</span></li>
+</ul>
+<p>Il vantaggio è <span class="arithmatex">\(0{,}0000000001\)</span>, trascurabile. Se questo vale per <b>ogni</b> <span class="arithmatex">\(A\)</span> efficiente, allora <span class="arithmatex">\(X \approx_c Y\)</span>.</p>
+<p><b>La formula letta in italiano</b>: <i>"per ogni programma efficiente</i> <span class="arithmatex">\(A\)</span><i>, la frequenza con cui</i> <span class="arithmatex">\(A\)</span> <i>dice 1 sulle stringhe di</i> <span class="arithmatex">\(X\)</span> <i>e quella con cui dice 1 sulle stringhe di</i> <span class="arithmatex">\(Y\)</span> <i>differiscono di una quantità trascurabile"</i>. <span class="arithmatex">\(\lambda\)</span> è la lunghezza delle stringhe: il vantaggio deve diventare trascurabile al crescere di <span class="arithmatex">\(\lambda\)</span>.</p>
+<p><b>Il gioco è la stessa cosa</b>: il challenger tira una moneta <span class="arithmatex">\(b\)</span>; se <span class="arithmatex">\(b = 0\)</span> prende la stringa dalla macchina <span class="arithmatex">\(X\)</span>, se <span class="arithmatex">\(b = 1\)</span> dalla macchina <span class="arithmatex">\(Y\)</span>, e la dà ad <span class="arithmatex">\(A\)</span>, che risponde <span class="arithmatex">\(b'\)</span> (il suo tentativo di indovinare <span class="arithmatex">\(b\)</span>). "GAME(λ, 0) ≈c GAME(λ, 1)" vuol dire che <span class="arithmatex">\(A\)</span> dice 1 con quasi la stessa frequenza sia quando la stringa viene da <span class="arithmatex">\(X\)</span> sia quando viene da <span class="arithmatex">\(Y\)</span>: è esattamente la formula. Nella Lezione 2 le due macchine erano "cifra <span class="arithmatex">\(m_0\)</span>" e "cifra <span class="arithmatex">\(m_1\)</span>".</p>
+<h3 id="statistica-vs-computazionale">Statistica vs computazionale<a class="headerlink" href="#statistica-vs-computazionale" title="Permanent link">&para;</a></h3>
+<p><i>(Non negli appunti del prof.)</i></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Statistica (lezione 3)</th>
+<th>Computazionale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Simbolo</td>
+<td><span class="arithmatex">\(X \approx_\varepsilon Y\)</span></td>
+<td><span class="arithmatex">\(X \approx_c Y\)</span></td>
+</tr>
+<tr>
+<td>Chi prova a distinguere</td>
+<td>Chiunque, anche con potenza infinita</td>
+<td>Solo avversari PPT</td>
+</tr>
+<tr>
+<td>Vantaggio ammesso</td>
+<td>Al più un numero fissato ε</td>
+<td>Una funzione trascurabile di λ</td>
+</tr>
+</tbody>
+</table>
+<p>L'indistinguibilità computazionale è <b>più debole</b>: due distribuzioni possono essere molto diverse statisticamente, ma nessun avversario efficiente riesce ad accorgersene. È proprio questo che rende possibili i PRG.</p>
+<h2 id="pseudorandom-generator-prg">Pseudorandom generator (PRG)<a class="headerlink" href="#pseudorandom-generator-prg" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Un <b>PRG</b> è una funzione deterministica che prende un seme casuale di <span class="arithmatex">\(\lambda\)</span> bit e restituisce <span class="arithmatex">\(\lambda + \ell\)</span> bit, cioè <b>più</b> bit di quanti ne ha ricevuti, in modo che l'uscita sia computazionalmente indistinguibile da bit davvero casuali.</p>
+</div>
+<h3 id="definizione-del-prof_1">Definizione (del prof)<a class="headerlink" href="#definizione-del-prof_1" title="Permanent link">&para;</a></h3>
+<p>Una funzione <span class="arithmatex">\(G : \{0,1\}^\lambda \to \{0,1\}^{\lambda + \ell}\)</span>, con <span class="arithmatex">\(\ell &gt; 0\)</span>, è un <b>PRG (sicuro)</b> se</p>
+<div class="arithmatex">\[
+\{X_\lambda\} = \{G(U_\lambda)\}_\lambda \ \approx_c \ \{U_{\lambda + \ell}\}_\lambda = \{Y_\lambda\}
+\]</div>
+<div class="admonition note">
+<p><b>Cosa sono le cose</b></p>
+<ul>
+<li><span class="arithmatex">\(U_\lambda\)</span> = un seme di <span class="arithmatex">\(\lambda\)</span> bit scelto <b>uniformemente a caso</b>.</li>
+<li><span class="arithmatex">\(G(U_\lambda)\)</span> = la distribuzione che si ottiene scegliendo un seme a caso e applicandogli <span class="arithmatex">\(G\)</span>: escono <span class="arithmatex">\(\lambda + \ell\)</span> bit.</li>
+<li><span class="arithmatex">\(U_{\lambda + \ell}\)</span> = <span class="arithmatex">\(\lambda + \ell\)</span> bit davvero casuali.</li>
+<li><span class="arithmatex">\(\ell\)</span> = lo <b>stretch</b> ("allungamento"): quanti bit in più escono rispetto al seme.</li>
+<li>In parole: nessun avversario PPT distingue l'uscita di <span class="arithmatex">\(G\)</span> da bit davvero casuali.</li>
+<li><i>(Non negli appunti del prof)</i>: si intende anche che <span class="arithmatex">\(G\)</span> sia calcolabile in tempo polinomiale, altrimenti non servirebbe a niente.</li>
+</ul>
+</div>
+<p><b>Notare</b> <i>(non negli appunti del prof)</i>: <span class="arithmatex">\(G\)</span> è <b>deterministica</b> (stesso seme, stessa uscita). Tutta la casualità viene dal seme; <span class="arithmatex">\(G\)</span> la "stira" su più bit.</p>
+<h3 id="esercizio-nessun-prg-e-sicuro-contro-attaccanti-illimitati">Esercizio: nessun PRG è sicuro contro attaccanti illimitati<a class="headerlink" href="#esercizio-nessun-prg-e-sicuro-contro-attaccanti-illimitati" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Un PRG può essere sicuro <b>solo</b> contro avversari efficienti. Un avversario con potenza infinita lo rompe sempre, anche se il PRG allunga di un solo bit (<span class="arithmatex">\(G : \{0,1\}^\lambda \to \{0,1\}^{\lambda+1}\)</span>).</p>
+</div>
+<p><b>Soluzione del prof.</b> L'avversario <span class="arithmatex">\(A\)</span>, dato <span class="arithmatex">\(z \in \{0,1\}^{\lambda+1}\)</span>, cerca un seme <span class="arithmatex">\(s \in \{0,1\}^\lambda\)</span> tale che <span class="arithmatex">\(z = G(s)\)</span>. Se lo trova risponde 1, altrimenti 0.</p>
+<ul>
+<li><b>Se </b><span class="arithmatex">\(z\)</span><b> viene dal PRG</b> (<span class="arithmatex">\(z = G(s)\)</span> con <span class="arithmatex">\(s \leftarrow U_\lambda\)</span>): il seme esiste di sicuro, quindi <span class="arithmatex">\(\Pr[A(z) = 1] = 1\)</span>.</li>
+<li><b>Se </b><span class="arithmatex">\(z\)</span><b> è uniforme</b> (<span class="arithmatex">\(z \leftarrow U_{\lambda+1}\)</span>): <span class="arithmatex">\(\Pr[A(z) = 1] \le 1/2\)</span>.</li>
+</ul>
+<p>Quindi il vantaggio è almeno <span class="arithmatex">\(1 - 1/2 = 1/2\)</span>, per niente trascurabile.</p>
+<p><b>Perché</b> <span class="arithmatex">\(\le 1/2\)</span> <i>(non negli appunti del prof)</i>: i semi sono <span class="arithmatex">\(2^\lambda\)</span>, quindi <span class="arithmatex">\(G\)</span> produce al massimo <span class="arithmatex">\(2^\lambda\)</span> stringhe diverse. Le stringhe di <span class="arithmatex">\(\lambda + 1\)</span> bit sono <span class="arithmatex">\(2^{\lambda+1}\)</span>, il doppio. Quindi una stringa uniforme cade tra le uscite di <span class="arithmatex">\(G\)</span> al massimo nella metà dei casi.</p>
+<p><b>Perché non funziona contro un avversario PPT</b> <i>(non negli appunti del prof)</i>: per cercare il seme <span class="arithmatex">\(A\)</span> deve provare tutti i <span class="arithmatex">\(2^\lambda\)</span> semi, cioè fare un numero <b>esponenziale</b> di passi. Un avversario PPT non può farlo. Un PRG è sicuro proprio perché nessun avversario efficiente sa fare di meglio.</p>
+<h2 id="come-si-costruisce-un-prg">Come si costruisce un PRG?<a class="headerlink" href="#come-si-costruisce-un-prg" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Se esistono le one-way function, esistono PRG che allungano di quanto si vuole (un numero polinomiale di bit). La dimostrazione completa è difficile; il prof ne vede i due ingredienti principali.</p>
+</div>
+<p><b>Teorema</b>: se esistono le OWF, esistono PRG con stretch <span class="arithmatex">\(\ell(\lambda) = \text{poly}(\lambda)\)</span>.</p>
+<p>I due ingredienti:</p>
+<ol>
+<li><b>Stretch amplification</b>: passare da <span class="arithmatex">\(\ell(\lambda) = 1\)</span> a <span class="arithmatex">\(\ell(\lambda) = \text{poly}(\lambda)\)</span>, cioè da un PRG che allunga di 1 bit a uno che allunga di quanto si vuole.</li>
+<li><b>Hard-core bit</b>: per costruire il PRG che allunga di 1 bit, partendo da una OWF.</li>
+</ol>
+<h2 id="ingrediente-1-stretch-amplification">Ingrediente 1: stretch amplification<a class="headerlink" href="#ingrediente-1-stretch-amplification" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Basta un PRG che aggiunge <b>un solo bit</b> per ottenerne uno che ne aggiunge quanti ne vogliamo. L'idea è applicare <span class="arithmatex">\(G\)</span> più volte di fila, tenendo da parte un bit a ogni passo.</p>
+</div>
+<h3 id="teorema">Teorema<a class="headerlink" href="#teorema" title="Permanent link">&para;</a></h3>
+<p>Se <span class="arithmatex">\(G : \{0,1\}^\lambda \to \{0,1\}^{\lambda+1}\)</span> è un PRG, allora per ogni <span class="arithmatex">\(\ell(\lambda) = \text{poly}(\lambda)\)</span> esiste un PRG <span class="arithmatex">\(G^\ell : \{0,1\}^\lambda \to \{0,1\}^{\lambda + \ell}\)</span>.</p>
+<div class="admonition note">
+<p><b>Notazione</b> <i>(non negli appunti del prof)</i>: <span class="arithmatex">\(G^\ell\)</span> <b>non</b> è una potenza: è solo il nome del nuovo PRG, quello che allunga di <span class="arithmatex">\(\ell\)</span> bit.</p>
+</div>
+<h3 id="la-costruzione-del-prof">La costruzione (del prof)<a class="headerlink" href="#la-costruzione-del-prof" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>s0 ──→ [G] ──s1──→ [G] ──s2──→ ... ──s(ℓ-1)──→ [G] ──→ sℓ
+        │           │                           │
+        ↓           ↓                           ↓
+        b1          b2                          bℓ
+</code></pre></div>
+<ul>
+<li><span class="arithmatex">\(s_0 \leftarrow U_\lambda\)</span>: il seme iniziale, casuale</li>
+<li>per ogni <span class="arithmatex">\(i \in [\ell]\)</span> (cioè <span class="arithmatex">\(i = 1, \dots, \ell\)</span>): <span class="arithmatex">\((s_i, b_i) = G(s_{i-1})\)</span>, con <span class="arithmatex">\(s_i \in \{0,1\}^\lambda\)</span> e <span class="arithmatex">\(b_i \in \{0,1\}\)</span></li>
+<li><b>output</b>: <span class="arithmatex">\((b_1, \dots, b_\ell, s_\ell)\)</span></li>
+</ul>
+<p>In parole: <span class="arithmatex">\(G\)</span> prende <span class="arithmatex">\(\lambda\)</span> bit e ne restituisce <span class="arithmatex">\(\lambda + 1\)</span>. Si spezza l'uscita in due: <span class="arithmatex">\(\lambda\)</span> bit diventano il <b>nuovo seme</b> <span class="arithmatex">\(s_i\)</span>, l'ultimo bit <span class="arithmatex">\(b_i\)</span> si <b>mette da parte</b>. Si ripete <span class="arithmatex">\(\ell\)</span> volte e alla fine si restituiscono tutti i bit messi da parte più l'ultimo seme: <span class="arithmatex">\(\ell + \lambda\)</span> bit.</p>
+<h3 id="spiegazione-semplice-con-un-esempio">Spiegazione semplice con un esempio<a class="headerlink" href="#spiegazione-semplice-con-un-esempio" title="Permanent link">&para;</a></h3>
+<p><i>(Non negli appunti del prof.)</i></p>
+<p><b>L'idea: riusare l'uscita come nuovo seme.</b> <span class="arithmatex">\(G\)</span> prende 3 bit e ne restituisce 4. Li dividiamo: <b>3 bit</b> li <b>rimettiamo dentro</b> <span class="arithmatex">\(G\)</span> come nuovo seme (sembrano casuali, quindi vanno benissimo come seme), <b>1 bit</b> lo <b>teniamo da parte</b> come "guadagno". E ripetiamo: a ogni giro guadagniamo un bit.</p>
+<div class="admonition note">
+<p><b>Analogia</b>: un distributore che, se metti una moneta, ti ridà <b>la moneta + una caramella</b>. Rimetti la moneta, ti ridà moneta + caramella. Dopo 3 giri hai <b>3 caramelle</b> e ancora la moneta in mano.</p>
+</div>
+<p><b>Passo per passo</b> (valori di <span class="arithmatex">\(G\)</span> inventati, solo per vedere il meccanismo), seme iniziale <b>101</b>:</p>
+<ul>
+<li><b>Giro 1</b>: <span class="arithmatex">\(G(101) = 0110\)</span> → tieni da parte l'ultimo bit <b>0</b>, rimetti dentro <b>011</b></li>
+<li><b>Giro 2</b>: <span class="arithmatex">\(G(011) = 1101\)</span> → tieni da parte <b>1</b>, rimetti dentro <b>110</b></li>
+<li><b>Giro 3</b>: <span class="arithmatex">\(G(110) = 0001\)</span> → tieni da parte <b>1</b>, rimane <b>000</b></li>
+</ul>
+<p><b>Alla fine</b> si mettono insieme i bit messi da parte (0, 1, 1) e l'ultimo seme rimasto (000): <b>011 000</b> = 6 bit. Partiti da <b>3</b> bit, ne abbiamo ottenuti <b>6</b>. Con <span class="arithmatex">\(\ell\)</span> giri se ne ottengono <span class="arithmatex">\(3 + \ell\)</span>.</p>
+<p><b>I nomi nella formula del prof</b>:</p>
+<ul>
+<li><span class="arithmatex">\(s_0\)</span> = il seme iniziale (101)</li>
+<li><span class="arithmatex">\(s_i\)</span> = il seme che si rimette dentro al giro <span class="arithmatex">\(i\)</span> (011, 110, 000)</li>
+<li><span class="arithmatex">\(b_i\)</span> = il bit messo da parte al giro <span class="arithmatex">\(i\)</span> (0, 1, 1)</li>
+<li><span class="arithmatex">\((s_i, b_i) = G(s_{i-1})\)</span> = "al giro <span class="arithmatex">\(i\)</span>, <span class="arithmatex">\(G\)</span> applicato al seme precedente dà il nuovo seme e un bit"</li>
+<li>output <span class="arithmatex">\((b_1, \dots, b_\ell, s_\ell)\)</span> = tutti i bit messi da parte, più l'ultimo seme</li>
+<li><span class="arithmatex">\(G^\ell\)</span> = il nome di questo nuovo generatore, quello che fa <span class="arithmatex">\(\ell\)</span> giri</li>
+</ul>
+<h3 id="come-dimostrarlo-per-riduzione">Come dimostrarlo: per riduzione<a class="headerlink" href="#come-dimostrarlo-per-riduzione" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Una <b>riduzione</b> dimostra "se qualcuno sa rompere A, allora sa rompere anche B", costruendo un attaccante per B che usa quello per A come sottoprogramma. Se B è sicuro per ipotesi, allora anche A lo è.</p>
+</div>
+<p>Il piano del prof: <b>supponiamo che esista un avversario PPT </b><span class="arithmatex">\(A\)</span><b> che rompe </b><span class="arithmatex">\(G^\ell\)</span><b>; costruiamo un avversario PPT </b><span class="arithmatex">\(B\)</span><b> che rompe </b><span class="arithmatex">\(G\)</span><b>.</b> Siccome <span class="arithmatex">\(G\)</span> è un PRG per ipotesi, <span class="arithmatex">\(B\)</span> non può esistere, quindi nemmeno <span class="arithmatex">\(A\)</span>.</p>
+<div class="admonition note">
+<p><b>"Rompere"</b> <i>(non negli appunti del prof)</i> = distinguere l'uscita dall'uniforme con vantaggio <b>non trascurabile</b>, cioè almeno <span class="arithmatex">\(1/p(\lambda)\)</span> per qualche polinomio <span class="arithmatex">\(p\)</span>.</p>
+</div>
+<p><b>Il problema</b> (i "???" del prof):</p>
+<div class="highlight"><pre><span></span><code>A ←── z' ∈ {0,1}^(λ+ℓ) ─── B ←────── z ─────── C      z ← G(U_λ)  oppure  z ← U_(λ+1)
+          ???
+</code></pre></div>
+<p><span class="arithmatex">\(B\)</span> riceve dal challenger una stringa <span class="arithmatex">\(z\)</span> di <span class="arithmatex">\(\lambda + 1\)</span> bit, ma <span class="arithmatex">\(A\)</span> sa attaccare solo stringhe di <span class="arithmatex">\(\lambda + \ell\)</span> bit. Come fa <span class="arithmatex">\(B\)</span> a usare <span class="arithmatex">\(A\)</span>? Per risolvere questo serve una tecnica nuova: l'argomento ibrido.</p>
+<h3 id="argomento-ibrido-hybrid-argument">Argomento ibrido (hybrid argument)<a class="headerlink" href="#argomento-ibrido-hybrid-argument" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Per dimostrare che due distribuzioni "lontane" <span class="arithmatex">\(X\)</span> e <span class="arithmatex">\(Y\)</span> sono indistinguibili, si costruisce una <b>catena di distribuzioni intermedie</b> (gli <b>ibridi</b>) in cui ogni anello differisce dal successivo per un dettaglio piccolissimo. Se nessun avversario nota i singoli passi, non nota nemmeno la differenza tra i due estremi.</p>
+</div>
+<p><b>Definizione (del prof)</b>: per mostrare <span class="arithmatex">\(X \approx_c Y\)</span> si trovano ibridi <span class="arithmatex">\(H_0, H_1, \dots, H_\ell\)</span> tali che:</p>
+<ol>
+<li><span class="arithmatex">\(H_0 \equiv X\)</span> e <span class="arithmatex">\(H_\ell \equiv Y\)</span> (gli estremi sono le due distribuzioni da confrontare)</li>
+<li><span class="arithmatex">\(H_0 \approx_c H_1\)</span>, <span class="arithmatex">\(H_1 \approx_c H_2\)</span>, …, <span class="arithmatex">\(H_{\ell-1} \approx_c H_\ell\)</span> (ogni passo è indistinguibile)</li>
+</ol>
+<p>Allora, per la <b>disuguaglianza triangolare</b>, <span class="arithmatex">\(H_0 \approx_c H_\ell\)</span>, <b>purché</b> <span class="arithmatex">\(\ell(\lambda) = \text{poly}(\lambda)\)</span>.</p>
+<div class="admonition note">
+<p><b>Analogia</b> <i>(non negli appunti del prof)</i>: cambi una foto un pixel alla volta, finché diventa un'altra foto. Se a ogni passo nessuno nota la differenza con la versione precedente, e i passi sono "pochi" (polinomiali), nessuno distingue nemmeno la prima foto dall'ultima.</p>
+</div>
+<details class="note">
+<summary>Perché funziona e perché serve ℓ polinomiale (non negli appunti del prof)</summary>
+<p>Chiamiamo <span class="arithmatex">\(p_i = \Pr[A(z) = 1 : z \leftarrow H_i]\)</span>. La <b>disuguaglianza triangolare</b> dice che la distanza diretta tra due numeri non supera la somma delle distanze passando per numeri intermedi:</p>
+<p><span class="arithmatex">\(|p_0 - p_\ell| \le |p_0 - p_1| + |p_1 - p_2| + \dots + |p_{\ell-1} - p_\ell|\)</span></p>
+<p>A sinistra c'è il vantaggio di <span class="arithmatex">\(A\)</span> sugli estremi; a destra la somma dei vantaggi sui singoli passi. Ogni passo ha vantaggio trascurabile, e i passi sono <span class="arithmatex">\(\ell\)</span>: il totale è al più <span class="arithmatex">\(\ell \cdot \text{negl}(\lambda)\)</span>. Se <span class="arithmatex">\(\ell\)</span> è polinomiale, poly · negl = negl (Lezione 4), quindi il totale è ancora trascurabile.</p>
+<p>Se invece i passi fossero esponenziali (es. <span class="arithmatex">\(2^\lambda\)</span>), <span class="arithmatex">\(2^\lambda \cdot 2^{-\lambda} = 1\)</span>: non sarebbe più trascurabile e l'argomento crollerebbe.</p>
+</details>
+<h3 id="gli-ibridi-nel-nostro-caso">Gli ibridi nel nostro caso<a class="headerlink" href="#gli-ibridi-nel-nostro-caso" title="Permanent link">&para;</a></h3>
+<p>Gli estremi sono:</p>
+<ul>
+<li><span class="arithmatex">\(H_0 \equiv G^\ell(U_\lambda)\)</span>: tutto pseudocasuale</li>
+<li><span class="arithmatex">\(H_\ell \equiv U_{\ell + \lambda}\)</span>: tutto davvero casuale</li>
+</ul>
+<p>L'ibrido <span class="arithmatex">\(H_i\)</span> (definizione del prof):</p>
+<ul>
+<li><span class="arithmatex">\(b_1, \dots, b_i \leftarrow \{0,1\}\)</span>: i primi <span class="arithmatex">\(i\)</span> bit sono <b>davvero casuali</b></li>
+<li><span class="arithmatex">\(s_i \leftarrow U_\lambda\)</span>: il seme al passo <span class="arithmatex">\(i\)</span> è <b>davvero casuale</b></li>
+<li><span class="arithmatex">\((b_{i+1}, \dots, b_\ell, s_\ell) = G^{\ell - i}(s_i)\)</span>: il resto si calcola con la costruzione, facendo i rimanenti <span class="arithmatex">\(\ell - i\)</span> passi</li>
+</ul>
+<p>Cioè: <b>si sostituisce un bit pseudocasuale alla volta con un bit davvero casuale</b>, partendo da sinistra.</p>
+<div class="admonition example">
+<p><b>Esempio con </b><span class="arithmatex">\(\ell = 3\)</span> <i>(non negli appunti del prof)</i>:</p>
+<ul>
+<li><span class="arithmatex">\(H_0\)</span>: <span class="arithmatex">\(s_0\)</span> casuale, poi <span class="arithmatex">\(b_1, b_2, b_3, s_3\)</span> tutti calcolati con <span class="arithmatex">\(G\)</span> = <span class="arithmatex">\(G^3(U_\lambda)\)</span></li>
+<li><span class="arithmatex">\(H_1\)</span>: <span class="arithmatex">\(b_1\)</span> casuale, <span class="arithmatex">\(s_1\)</span> casuale, poi <span class="arithmatex">\(b_2, b_3, s_3\)</span> calcolati con <span class="arithmatex">\(G\)</span></li>
+<li><span class="arithmatex">\(H_2\)</span>: <span class="arithmatex">\(b_1, b_2\)</span> casuali, <span class="arithmatex">\(s_2\)</span> casuale, poi <span class="arithmatex">\(b_3, s_3\)</span> calcolati con <span class="arithmatex">\(G\)</span></li>
+<li><span class="arithmatex">\(H_3\)</span>: <span class="arithmatex">\(b_1, b_2, b_3\)</span> casuali e <span class="arithmatex">\(s_3\)</span> casuale = <span class="arithmatex">\(U_{3+\lambda}\)</span></li>
+</ul>
+</div>
+<p><b>Cosa cambia tra </b><span class="arithmatex">\(H_0\)</span><b> e </b><span class="arithmatex">\(H_1\)</span> <i>(non negli appunti del prof)</i>: solo il primo passo. In <span class="arithmatex">\(H_0\)</span> la coppia <span class="arithmatex">\((s_1, b_1) = G(s_0)\)</span> è <b>pseudocasuale</b>; in <span class="arithmatex">\(H_1\)</span> è <b>davvero casuale</b>. Tutto il resto si calcola allo stesso modo a partire da <span class="arithmatex">\(s_1\)</span>.</p>
+<h3 id="la-riduzione-h0-c-h1">La riduzione: H₀ ≈c H₁<a class="headerlink" href="#la-riduzione-h0-c-h1" title="Permanent link">&para;</a></h3>
+<p>Ora la riduzione funziona. Il prof la fa concretamente per <span class="arithmatex">\(H_0 \approx_c H_1\)</span>.</p>
+<p><b>Supponiamo per assurdo</b> che esista un PPT <span class="arithmatex">\(A\)</span> che distingue <span class="arithmatex">\(H_0\)</span> da <span class="arithmatex">\(H_1\)</span>. Costruiamo <span class="arithmatex">\(B\)</span> che rompe <span class="arithmatex">\(G\)</span>:</p>
+<div class="highlight"><pre><span></span><code>A ←── (b1, b2, ..., bℓ, sℓ) ─── B ←──── z ∈ {0,1}^(λ+1) ──── C     z ← G(U_λ)  oppure  z ← U_(λ+1)
+  ──────────── b' ────────────→   ────────── b' ─────────→
+</code></pre></div>
+<p><span class="arithmatex">\(B\)</span>, ricevuto <span class="arithmatex">\(z \in \{0,1\}^{\lambda+1}\)</span>:</p>
+<ol>
+<li>spezza <span class="arithmatex">\(z = (b_1, s_1)\)</span>, con <span class="arithmatex">\(b_1 \in \{0,1\}\)</span> e <span class="arithmatex">\(s_1 \in \{0,1\}^\lambda\)</span></li>
+<li>calcola il resto con la costruzione: <span class="arithmatex">\((b_2, \dots, b_\ell, s_\ell) = G^{\ell-1}(s_1)\)</span></li>
+<li>dà ad <span class="arithmatex">\(A\)</span> la stringa <span class="arithmatex">\((b_1, b_2, \dots, b_\ell, s_\ell)\)</span></li>
+<li>quando <span class="arithmatex">\(A\)</span> risponde <span class="arithmatex">\(b'\)</span>, <span class="arithmatex">\(B\)</span> risponde anche lui <span class="arithmatex">\(b'\)</span> al challenger</li>
+</ol>
+<p><b>Osservazione chiave (del prof)</b>:</p>
+<ul>
+<li>se <span class="arithmatex">\(z \leftarrow G(U_\lambda)\)</span>, la coppia <span class="arithmatex">\((b_1, s_1)\)</span> è un'uscita di <span class="arithmatex">\(G\)</span>, quindi la stringa data ad <span class="arithmatex">\(A\)</span> è distribuita come <span class="arithmatex">\(H_0\)</span></li>
+<li>se <span class="arithmatex">\(z \leftarrow U_{\lambda+1}\)</span>, la coppia <span class="arithmatex">\((b_1, s_1)\)</span> è davvero casuale, quindi la stringa è distribuita come <span class="arithmatex">\(H_1\)</span></li>
+</ul>
+<p><b>Per ipotesi</b>, <span class="arithmatex">\(A\)</span> distingue <span class="arithmatex">\(H_0\)</span> da <span class="arithmatex">\(H_1\)</span>:</p>
+<div class="arithmatex">\[
+\Big| \Pr[A(b_1, \dots, b_\ell, s_\ell) = 1 : (b_1, \dots, s_\ell) \leftarrow \underbrace{G^\ell(U_\lambda)}_{= H_0}] - \Pr[A(b_1, \dots, b_\ell, s_\ell) = 1 : (b_1, \dots, s_\ell) \leftarrow H_1] \Big| \ge \frac{1}{p(\lambda)}
+\]</div>
+<p>per qualche polinomio <span class="arithmatex">\(p(\lambda)\)</span>. E per l'osservazione chiave:</p>
+<div class="arithmatex">\[
+\Pr[B(z) = 1 : z \leftarrow G(U_\lambda)] = \Pr[A(b_1, \dots, b_\ell, s_\ell) = 1 : (b_1, \dots, s_\ell) \leftarrow H_0]
+\]</div>
+<div class="arithmatex">\[
+\Pr[B(z) = 1 : z \leftarrow U_{\lambda+1}] = \Pr[A(b_1, \dots, b_\ell, s_\ell) = 1 : (b_1, \dots, s_\ell) \leftarrow H_1]
+\]</div>
+<p>Quindi <span class="arithmatex">\(B\)</span> distingue <span class="arithmatex">\(G(U_\lambda)\)</span> da <span class="arithmatex">\(U_{\lambda+1}\)</span> con vantaggio <span class="arithmatex">\(\ge 1/p(\lambda)\)</span>, cioè <b>rompe </b><span class="arithmatex">\(G\)</span>. Ma <span class="arithmatex">\(G\)</span> è un PRG: <b>contraddizione</b>. Inoltre <span class="arithmatex">\(B\)</span> è PPT, perché chiama <span class="arithmatex">\(G\)</span> al più <span class="arithmatex">\(\ell\)</span> volte (polinomiale) e poi <span class="arithmatex">\(A\)</span>.</p>
+<p>Con una dimostrazione molto simile, <b>per ogni </b><span class="arithmatex">\(i\)</span><b>: </b><span class="arithmatex">\(H_i \approx_c H_{i+1}\)</span>, e per l'argomento ibrido <span class="arithmatex">\(G^\ell(U_\lambda) = H_0 \approx_c H_\ell = U_{\lambda+\ell}\)</span>. ∎</p>
+<details class="note">
+<summary>Il caso generale H_i ≈c H_(i+1) (non negli appunti del prof)</summary>
+<p>È uguale, ma <span class="arithmatex">\(B\)</span> inserisce <span class="arithmatex">\(z\)</span> al passo <span class="arithmatex">\(i+1\)</span> invece che al passo 1. Ricevuto <span class="arithmatex">\(z\)</span>:</p>
+<ol>
+<li>sceglie <span class="arithmatex">\(b_1, \dots, b_i\)</span> <b>davvero casuali</b></li>
+<li>spezza <span class="arithmatex">\(z = (b_{i+1}, s_{i+1})\)</span></li>
+<li>calcola <span class="arithmatex">\((b_{i+2}, \dots, b_\ell, s_\ell) = G^{\ell-i-1}(s_{i+1})\)</span></li>
+<li>dà ad <span class="arithmatex">\(A\)</span> la stringa <span class="arithmatex">\((b_1, \dots, b_\ell, s_\ell)\)</span> e ne inoltra la risposta</li>
+</ol>
+<p>Se <span class="arithmatex">\(z \leftarrow G(U_\lambda)\)</span>, il passo <span class="arithmatex">\(i+1\)</span> è pseudocasuale (come se <span class="arithmatex">\(s_i\)</span> fosse uniforme e <span class="arithmatex">\((s_{i+1}, b_{i+1}) = G(s_i)\)</span>): la stringa è distribuita come <span class="arithmatex">\(H_i\)</span>. Se <span class="arithmatex">\(z\)</span> è uniforme, il passo <span class="arithmatex">\(i+1\)</span> è davvero casuale: la stringa è distribuita come <span class="arithmatex">\(H_{i+1}\)</span>. Stesso ragionamento di prima.</p>
+</details>
+<h2 id="ingrediente-2-hard-core-bit">Ingrediente 2: hard-core bit<a class="headerlink" href="#ingrediente-2-hard-core-bit" title="Permanent link">&para;</a></h2>
+<p><b>Da dove si prende il primo</b> <span class="arithmatex">\(G : \{0,1\}^\lambda \to \{0,1\}^{\lambda+1}\)</span>? In teoria si può costruire partendo da <b>qualunque</b> OWF, ma non è molto efficiente. Più avanti si vedranno costruzioni efficienti basate su <b>teoria dei numeri</b>, <b>reticoli</b> (lattices), ecc.</p>
+<p>L'ingrediente principale sono gli <b>hard-core bit</b>.</p>
+<h3 id="hard-core-bit">Hard-core bit<a class="headerlink" href="#hard-core-bit" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Una OWF nasconde il suo input <span class="arithmatex">\(x\)</span> "nel complesso", ma potrebbe lasciar trapelare qualche pezzo di <span class="arithmatex">\(x\)</span>. Un <b>hard-core bit</b> è un bit <span class="arithmatex">\(h(x)\)</span>, calcolato da <span class="arithmatex">\(x\)</span>, che resta <b>impossibile da indovinare</b> anche conoscendo <span class="arithmatex">\(f(x)\)</span>: sembra un bit completamente casuale.</p>
+</div>
+<p>Sia <span class="arithmatex">\(f : \{0,1\}^n \to \{0,1\}^n\)</span> una OWF. La domanda del prof: <b>possiamo dire che un particolare bit di </b><span class="arithmatex">\(x\)</span><b> è difficile da calcolare?</b></p>
+<p><b>Intuitivamente</b>: <span class="arithmatex">\(h : \{0,1\}^n \to \{0,1\}\)</span> è <b>hard-core</b> per <span class="arithmatex">\(f\)</span> se <span class="arithmatex">\(h(x)\)</span> è difficile da calcolare conoscendo <span class="arithmatex">\(f(x)\)</span>.</p>
+<p><b>Formalmente (in alternativa)</b>:</p>
+<div class="arithmatex">\[
+(f(x), h(x)) \approx_c (f(x), u) \qquad u \leftarrow \{0,1\}
+\]</div>
+<div class="admonition note">
+<p><b>Cosa sono le cose</b></p>
+<ul>
+<li><span class="arithmatex">\(x\)</span> = l'input segreto, scelto a caso.</li>
+<li><span class="arithmatex">\(h\)</span> = una funzione che da <span class="arithmatex">\(x\)</span> calcola <b>un solo bit</b> (es. "il primo bit di <span class="arithmatex">\(x\)</span>", o lo XOR di alcuni bit di <span class="arithmatex">\(x\)</span>).</li>
+<li><span class="arithmatex">\((f(x), h(x))\)</span> = l'output della OWF <b>insieme</b> al bit <span class="arithmatex">\(h(x)\)</span>.</li>
+<li><span class="arithmatex">\((f(x), u)\)</span> = l'output della OWF insieme a un bit <span class="arithmatex">\(u\)</span> <b>completamente casuale</b>, che non c'entra niente con <span class="arithmatex">\(x\)</span>.</li>
+<li>In parole: anche conoscendo <span class="arithmatex">\(f(x)\)</span>, il bit <span class="arithmatex">\(h(x)\)</span> è indistinguibile da un bit tirato a caso.</li>
+</ul>
+</div>
+<p><b>Perché serve questa nozione</b> <i>(non negli appunti del prof)</i>: essere one-way vuol dire solo che non si riesce a ricavare <b>tutto</b> <span class="arithmatex">\(x\)</span>. Non garantisce che non si ricavi <b>qualche pezzo</b> di <span class="arithmatex">\(x\)</span>. Ad esempio se <span class="arithmatex">\(f\)</span> è one-way, anche <span class="arithmatex">\(f'(x) = f(x) \| x_1\)</span> (che scrive in chiaro il primo bit di <span class="arithmatex">\(x\)</span>) è one-way, ma il primo bit di <span class="arithmatex">\(x\)</span> ovviamente non è nascosto. Un hard-core bit è un bit che invece è <b>garantito</b> nascosto.</p>
+<h3 id="perche-e-utile-un-prg-da-una-one-way-permutation">Perché è utile: un PRG da una one-way permutation<a class="headerlink" href="#perche-e-utile-un-prg-da-una-one-way-permutation" title="Permanent link">&para;</a></h3>
+<p>Supponiamo che <span class="arithmatex">\(f : \{0,1\}^n \to \{0,1\}^n\)</span> sia una <b>one-way permutation (OWP)</b>.</p>
+<div class="admonition note">
+<p><b>Permutazione</b> <i>(definizione non negli appunti del prof)</i>: una funzione da <span class="arithmatex">\(\{0,1\}^n\)</span> a <span class="arithmatex">\(\{0,1\}^n\)</span> in cui <b>ogni output viene da esattamente un input</b> (una biiezione). In pratica "rimescola" le stringhe senza perderne nessuna. Quindi: <b>se </b><span class="arithmatex">\(s\)</span><b> è uniforme, anche </b><span class="arithmatex">\(f(s)\)</span><b> è uniforme</b>. Una OWP è una OWF che è anche una permutazione.</p>
+</div>
+<p>Allora il prof definisce:</p>
+<div class="arithmatex">\[
+G(s) = f(s) \,\|\, h(s) \qquad s \leftarrow U_n
+\]</div>
+<p>(<span class="arithmatex">\(\|\)</span> = <b>concatenazione</b>: si attaccano le due stringhe una dopo l'altra. Es. <span class="arithmatex">\(f(s) = 111\)</span> e <span class="arithmatex">\(h(s) = 1\)</span> danno <span class="arithmatex">\(f(s) \| h(s) = 1111\)</span>. Quindi gli <span class="arithmatex">\(n\)</span> bit di <span class="arithmatex">\(f(s)\)</span> più il bit <span class="arithmatex">\(h(s)\)</span> fanno <span class="arithmatex">\(n+1\)</span> bit: con <span class="arithmatex">\(n = 128\)</span>, escono 129 bit.)</p>
+<p><b>Perché è un PRG</b>, passo per passo:</p>
+<div class="arithmatex">\[
+G(s) = f(s) \,\|\, h(s) \ \approx_c \ f(s) \,\|\, b \ \equiv \ U_{n+1} \qquad b \leftarrow \{0,1\}
+\]</div>
+<ol>
+<li><span class="arithmatex">\(f(s) \| h(s) \approx_c f(s) \| b\)</span>: è esattamente la definizione di hard-core bit: <span class="arithmatex">\(h(s)\)</span> non si distingue da un bit casuale <span class="arithmatex">\(b\)</span>, anche conoscendo <span class="arithmatex">\(f(s)\)</span>.</li>
+<li><span class="arithmatex">\(f(s) \| b \equiv U_{n+1}\)</span>: <span class="arithmatex">\(f(s)\)</span> è uniforme su <span class="arithmatex">\(n\)</span> bit (perché <span class="arithmatex">\(f\)</span> è una permutazione e <span class="arithmatex">\(s\)</span> è uniforme), e <span class="arithmatex">\(b\)</span> è un bit uniforme indipendente. Insieme fanno <span class="arithmatex">\(n + 1\)</span> bit uniformi.</li>
+</ol>
+<p>Quindi <span class="arithmatex">\(G : \{0,1\}^n \to \{0,1\}^{n+1}\)</span> allunga di 1 bit ed è un PRG. Con l'ingrediente 1 si allunga poi di quanto si vuole.</p>
+<h3 id="in-generale">In generale<a class="headerlink" href="#in-generale" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Si riesce a far funzionare la stessa idea partendo da una qualunque <b>OWF</b> (non serve che sia una permutazione), ma è più complicato.</li>
+<li><b>Ogni</b> OWF <span class="arithmatex">\(f\)</span> ammette un hard-core bit <span class="arithmatex">\(h\)</span>. <i>(Non negli appunti del prof: è il teorema di Goldreich-Levin; l'hard-core bit è lo XOR di un sottoinsieme casuale dei bit di </i><span class="arithmatex">\(x\)</span><i>.)</i></li>
+</ul>
+<h3 id="domanda-esiste-un-unico-h-che-funziona-per-ogni-f">Domanda: esiste un unico h che funziona per ogni f?<a class="headerlink" href="#domanda-esiste-un-unico-h-che-funziona-per-ogni-f" title="Permanent link">&para;</a></h3>
+<p><b>No.</b> L'idea del prof: preso un qualunque <span class="arithmatex">\(h\)</span>, si costruisce una funzione <span class="arithmatex">\(f_{\text{BAD}}\)</span> tale che</p>
+<ul>
+<li><span class="arithmatex">\(h\)</span> <b>non</b> è hard-core per <span class="arithmatex">\(f_{\text{BAD}}\)</span></li>
+<li>ma <span class="arithmatex">\(f_{\text{BAD}}\)</span> è comunque una OWF</li>
+</ul>
+<p>Va bene se <span class="arithmatex">\(f_{\text{BAD}}\)</span> usa al suo interno un'altra OWF ausiliaria <span class="arithmatex">\(f : \{0,1\}^n \to \{0,1\}^n\)</span>.</p>
+<details class="note">
+<summary>Come si costruisce f_BAD (non negli appunti del prof)</summary>
+<p>Si prende <span class="arithmatex">\(f_{\text{BAD}}(x) = f(x) \,\|\, h(x)\)</span>, cioè si scrive <span class="arithmatex">\(h(x)\)</span> <b>in chiaro</b> nell'output.</p>
+<ul>
+<li><span class="arithmatex">\(h\)</span><b> non è hard-core per </b><span class="arithmatex">\(f_{\text{BAD}}\)</span>: chi vede <span class="arithmatex">\(f_{\text{BAD}}(x)\)</span> legge direttamente <span class="arithmatex">\(h(x)\)</span> nell'ultimo bit. Altro che difficile da calcolare.</li>
+<li><span class="arithmatex">\(f_{\text{BAD}}\)</span><b> è comunque one-way</b>: se qualcuno sapesse invertire <span class="arithmatex">\(f_{\text{BAD}}\)</span>, cioè trovare <span class="arithmatex">\(x'\)</span> con <span class="arithmatex">\(f(x') \| h(x') = f(x) \| h(x)\)</span>, avrebbe in particolare <span class="arithmatex">\(f(x') = f(x)\)</span>, e quindi saprebbe invertire <span class="arithmatex">\(f\)</span>. Ma <span class="arithmatex">\(f\)</span> è one-way. (È una riduzione! Il prof la fa per bene all'inizio della <a href="../lezione-6/">Lezione 6</a>: chi attacca <span class="arithmatex">\(f\)</span> non conosce <span class="arithmatex">\(h(x)\)</span> e deve indovinarlo.)</li>
+</ul>
+<p>Quindi nessun <span class="arithmatex">\(h\)</span> fissato funziona per tutte le OWF: l'hard-core bit va scelto in base alla funzione. È lo stesso schema del "nessun estrattore fisso funziona per tutte le fonti" della lezione 3.</p>
+</details>
+<h2 id="riepilogo">Riepilogo<a class="headerlink" href="#riepilogo" title="Permanent link">&para;</a></h2>
+<ul>
+<li><b>Pseudocasuale</b> = bit generati in modo deterministico da un seme corto, che nessun avversario PPT distingue da bit casuali (se non con probabilità trascurabile)</li>
+<li><span class="arithmatex">\(X \approx_c Y\)</span>: per ogni PPT <span class="arithmatex">\(A\)</span>, <span class="arithmatex">\(|\Pr[A(X_\lambda) = 1] - \Pr[A(Y_\lambda) = 1]| \le \text{negl}(\lambda)\)</span>; equivalente al gioco GAME(λ, 0) ≈c GAME(λ, 1)</li>
+<li><b>PRG</b>: <span class="arithmatex">\(G : \{0,1\}^\lambda \to \{0,1\}^{\lambda+\ell}\)</span> con <span class="arithmatex">\(G(U_\lambda) \approx_c U_{\lambda+\ell}\)</span></li>
+<li><b>Nessun PRG è sicuro contro avversari illimitati</b>: basta cercare il seme (vantaggio ≥ 1/2), ma richiede tempo esponenziale</li>
+<li><b>OWF ⇒ PRG</b> con stretch polinomiale; due ingredienti:</li>
+<li><b>Stretch amplification</b>: da stretch 1 a stretch poly, applicando <span class="arithmatex">\(G\)</span> in catena; si dimostra per <b>riduzione</b> usando l'<b>argomento ibrido</b> (ibridi <span class="arithmatex">\(H_i\)</span>: i primi <span class="arithmatex">\(i\)</span> bit davvero casuali)</li>
+<li><b>Hard-core bit</b>: <span class="arithmatex">\((f(x), h(x)) \approx_c (f(x), u)\)</span>; con una OWP, <span class="arithmatex">\(G(s) = f(s) \| h(s)\)</span> è un PRG con stretch 1</li>
+<li>Ogni OWF ha un hard-core bit, ma nessun <span class="arithmatex">\(h\)</span> funziona per tutte le OWF (<span class="arithmatex">\(f_{\text{BAD}}\)</span>)</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Torna su
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Piede" >
+        
+          
+          <a href="../lezione-4/" class="md-footer__link md-footer__link--prev" aria-label="Precedente: Lezione 4 – Sicurezza computazionale e OWF">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Precedente
+              </span>
+              <div class="md-ellipsis">
+                Lezione 4 – Sicurezza computazionale e OWF
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../lezione-6/" class="md-footer__link md-footer__link--next" aria-label="Successivo: Lezione 6 – Goldreich-Levin e cifratura computazionale">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Successivo
+              </span>
+              <div class="md-ellipsis">
+                Lezione 6 – Goldreich-Levin e cifratura computazionale
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.indexes", "navigation.top", "navigation.footer", "toc.follow", "search.highlight", "search.suggest", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiato", "clipboard.copy": "Copia", "search.result.more.one": "1 altro in questa pagina", "search.result.more.other": "# altri in questa pagina", "search.result.none": "Nessun documento trovato", "search.result.one": "1 documento trovato", "search.result.other": "# documenti trovati", "search.result.placeholder": "Scrivi per iniziare a cercare", "search.result.term.missing": "Non presente", "select.version": "Seleziona la versione"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="../../javascripts/mathjax/tex-mml-chtml.js"></script>
+      
+        <script src="../../javascripts/mermaid/mermaid.min.js"></script>
+      
+    
+  </body>
+</html>

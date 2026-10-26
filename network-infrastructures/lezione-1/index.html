@@ -1,0 +1,3136 @@
+
+<!doctype html>
+<html lang="it" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Appunti della magistrale in Cybersecurity (Sapienza)">
+      
+      
+      
+        <link rel="canonical" href="https://biamat26.github.io/AppuntiMagistrale/network-infrastructures/lezione-1/">
+      
+      
+        <link rel="prev" href="../">
+      
+      
+        <link rel="next" href="../lezione-2/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Lezione 1 – Aree funzionali della rete - Appunti di Luiggi</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#lezione-1-aree-funzionali-della-rete-accesso-core-backbone" class="md-skip">
+          Vai al contenuto
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Intestazione">
+    <a href="../.." title="Appunti di Luiggi" class="md-header__button md-logo" aria-label="Appunti di Luiggi" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 4v6l-2-2-2 2V4H9v16h10V4zM3 7V5h2V4a2 2 0 0 1 2-2h12c1.05 0 2 .95 2 2v16c0 1.05-.95 2-2 2H7c-1.05 0-2-.95-2-2v-1H3v-2h2v-4H3v-2h2V7zm2-2v2h2V5zm0 14h2v-2H5zm0-6h2v-2H5z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Appunti di Luiggi
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Lezione 1 – Aree funzionali della rete
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Tema scuro"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Tema scuro" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Tema chiaro"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Tema chiaro" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Cerca" placeholder="Cerca" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Cerca">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Cancella" aria-label="Cancella" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Inizializza la ricerca
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/biamat26/AppuntiMagistrale" title="Apri repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    AppuntiMagistrale
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../crittografia/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Crittografia
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../sistemi-distribuiti/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Distributed Systems
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Network Infrastructures
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigazione" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Appunti di Luiggi" class="md-nav__button md-logo" aria-label="Appunti di Luiggi" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 4v6l-2-2-2 2V4H9v16h10V4zM3 7V5h2V4a2 2 0 0 1 2-2h12c1.05 0 2 .95 2 2v16c0 1.05-.95 2-2 2H7c-1.05 0-2-.95-2-2v-1H3v-2h2v-4H3v-2h2V7zm2-2v2h2V5zm0 14h2v-2H5zm0-6h2v-2H5z"/></svg>
+
+    </a>
+    Appunti di Luiggi
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/biamat26/AppuntiMagistrale" title="Apri repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    AppuntiMagistrale
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../crittografia/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Crittografia
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Crittografia
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../crittografia/ripasso-probabilita/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ripasso probabilità
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../crittografia/lezione-1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 1 – Segretezza perfetta
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../crittografia/lezione-2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 2 – Shannon e MAC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../crittografia/lezione-3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 3 – Hash ed estrattori
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../crittografia/lezione-4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 4 – Sicurezza computazionale e OWF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../crittografia/lezione-5/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 5 – PRG e hard-core bit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../crittografia/lezione-6/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 6 – Goldreich-Levin e cifratura computazionale
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../sistemi-distribuiti/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Distributed Systems
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Distributed Systems
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sistemi-distribuiti/lezione-2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 2 – Modelli, astrazioni e link
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sistemi-distribuiti/lezione-3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 3 – Tempo (I): orologi fisici
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sistemi-distribuiti/lezione-4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 4 – Tempo (II): tempo logico
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sistemi-distribuiti/lezione-5/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 5 – Failure detector e leader election
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Network Infrastructures
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Network Infrastructures
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 1 – Aree funzionali della rete
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 1 – Aree funzionali della rete
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Indice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Indice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#di-cosa-parliamo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Di cosa parliamo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-la-mappa-della-rete" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. La mappa della rete
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-rete-daccesso-access-network" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Rete d'accesso (access network)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-rete-core-e-edge" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Rete core e edge
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Rete core e edge">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#core-network" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core network
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#edge-bordo-della-rete" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Edge (bordo della rete)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-tipi-di-accesso" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Tipi di accesso
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-esempio-la-rete-telecom-italia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Esempio: la rete Telecom Italia
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-terminologia-storica-usa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Terminologia storica (USA)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Terminologia storica (USA)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#esempi-fisici" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Esempi fisici
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-la-rete-di-distribuzione-in-rame" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. La rete di distribuzione in rame
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. La rete di distribuzione in rame">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#numeri-della-rete-daccesso-telecom-italia-2007" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Numeri della rete d'accesso Telecom Italia (2007)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-accesso-in-rame" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Accesso in rame
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-accesso-in-fibra-fttx" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Accesso in fibra (FTTx)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. Accesso in fibra (FTTx)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#accesso-ottico" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Accesso ottico
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fttx-fin-dove-arriva-la-fibra" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FTTx: fin dove arriva la fibra
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#architettura-di-riferimento" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architettura di riferimento
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#aon-vs-pon" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AON vs PON
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ftte-fttcab-fttcurb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FTTE, FTTCab, FTTCurb
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fttp-fttb-e-ftth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FTTP: FTTB e FTTH
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#accesso-cablato-quadro-complessivo-telecom-italia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Accesso cablato: quadro complessivo (Telecom Italia)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-quanta-banda-serve" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Quanta banda serve
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="10. Quanta banda serve">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#evoluzione-dal-rame-alla-fibra" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Evoluzione: dal rame alla fibra
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#numeri-di-oggi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Numeri di oggi
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-accesso-wireless" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Accesso wireless
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="11. Accesso wireless">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#architettura-2g-e-3g" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architettura 2G e 3G
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rete-5g" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rete 5G
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#copertura-mobile-in-italia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Copertura mobile in Italia
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#evoluzione-degli-standard-mobili" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Evoluzione degli standard mobili
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#famiglie-wireless-per-estensione" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Famiglie wireless per estensione
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#evoluzione-del-wi-fi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Evoluzione del Wi-Fi
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-accesso-satellitare-leo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. Accesso satellitare: LEO
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="12. Accesso satellitare: LEO">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#leo-vs-geo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LEO vs GEO
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#esempio-starlink" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Esempio: Starlink
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#13-tecnologie-e-velocita-nel-tempo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13. Tecnologie e velocità nel tempo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#14-il-backbone-telecom-italia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14. Il backbone Telecom Italia
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="14. Il backbone Telecom Italia">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#topologia-logica-opb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Topologia logica: OPB
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#topologia-fisica" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Topologia fisica
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#infrastrutture-globali" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Infrastrutture globali
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15-gartner-hype-cycle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        15. Gartner hype cycle
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#domande-di-ripasso" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Domande di ripasso
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#riepilogo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Riepilogo
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lezione-2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 2 – xDSL e PPP
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lezione-3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 3 – FTTx e PON
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kathara/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Kathará
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Indice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Indice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#di-cosa-parliamo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Di cosa parliamo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-la-mappa-della-rete" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. La mappa della rete
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-rete-daccesso-access-network" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Rete d'accesso (access network)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-rete-core-e-edge" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Rete core e edge
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Rete core e edge">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#core-network" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core network
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#edge-bordo-della-rete" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Edge (bordo della rete)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-tipi-di-accesso" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Tipi di accesso
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-esempio-la-rete-telecom-italia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Esempio: la rete Telecom Italia
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-terminologia-storica-usa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Terminologia storica (USA)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Terminologia storica (USA)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#esempi-fisici" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Esempi fisici
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-la-rete-di-distribuzione-in-rame" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. La rete di distribuzione in rame
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. La rete di distribuzione in rame">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#numeri-della-rete-daccesso-telecom-italia-2007" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Numeri della rete d'accesso Telecom Italia (2007)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-accesso-in-rame" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Accesso in rame
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-accesso-in-fibra-fttx" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Accesso in fibra (FTTx)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. Accesso in fibra (FTTx)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#accesso-ottico" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Accesso ottico
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fttx-fin-dove-arriva-la-fibra" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FTTx: fin dove arriva la fibra
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#architettura-di-riferimento" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architettura di riferimento
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#aon-vs-pon" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        AON vs PON
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ftte-fttcab-fttcurb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FTTE, FTTCab, FTTCurb
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fttp-fttb-e-ftth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FTTP: FTTB e FTTH
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#accesso-cablato-quadro-complessivo-telecom-italia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Accesso cablato: quadro complessivo (Telecom Italia)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-quanta-banda-serve" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Quanta banda serve
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="10. Quanta banda serve">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#evoluzione-dal-rame-alla-fibra" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Evoluzione: dal rame alla fibra
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#numeri-di-oggi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Numeri di oggi
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-accesso-wireless" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Accesso wireless
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="11. Accesso wireless">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#architettura-2g-e-3g" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architettura 2G e 3G
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rete-5g" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rete 5G
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#copertura-mobile-in-italia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Copertura mobile in Italia
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#evoluzione-degli-standard-mobili" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Evoluzione degli standard mobili
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#famiglie-wireless-per-estensione" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Famiglie wireless per estensione
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#evoluzione-del-wi-fi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Evoluzione del Wi-Fi
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-accesso-satellitare-leo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. Accesso satellitare: LEO
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="12. Accesso satellitare: LEO">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#leo-vs-geo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LEO vs GEO
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#esempio-starlink" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Esempio: Starlink
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#13-tecnologie-e-velocita-nel-tempo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13. Tecnologie e velocità nel tempo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#14-il-backbone-telecom-italia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14. Il backbone Telecom Italia
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="14. Il backbone Telecom Italia">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#topologia-logica-opb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Topologia logica: OPB
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#topologia-fisica" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Topologia fisica
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#infrastrutture-globali" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Infrastrutture globali
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#15-gartner-hype-cycle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        15. Gartner hype cycle
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#domande-di-ripasso" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Domande di ripasso
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#riepilogo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Riepilogo
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="lezione-1-aree-funzionali-della-rete-accesso-core-backbone">Lezione 1 – Aree funzionali della rete: accesso, core, backbone<a class="headerlink" href="#lezione-1-aree-funzionali-della-rete-accesso-core-backbone" title="Permanent link">&para;</a></h1>
+<h2 id="di-cosa-parliamo">Di cosa parliamo<a class="headerlink" href="#di-cosa-parliamo" title="Permanent link">&para;</a></h2>
+<p>Una rete di telecomunicazioni non è un blocco unico: si divide in <b>aree funzionali</b>, ognuna con un compito diverso. Questa lezione introduce la mappa generale che il corso userà sempre: la <b>rete d'accesso</b> (l'ultimo tratto verso l'utente), la <b>rete metropolitana/regionale</b> e la <b>rete core/backbone</b> (la dorsale che collega tutto). Poi passa in rassegna le tecnologie d'accesso (rame, fibra, wireless, satellite), con numeri reali della rete Telecom Italia/TIM.</p>
+<h2 id="1-la-mappa-della-rete">1. La mappa della rete<a class="headerlink" href="#1-la-mappa-della-rete" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Dall'utente verso il centro della rete si attraversano tre strati. La rete d'accesso porta l'utente fino al primo nodo dell'operatore; la rete metropolitana raccoglie il traffico di una città o regione; il backbone collega le città tra loro ad altissima velocità.</p>
+</div>
+<pre class="mermaid"><code>flowchart LR
+  U["Utenti&lt;br&gt;case, aziende, telefoni"] --&gt;|"rete d'accesso"| AN["Access node&lt;br&gt;es. DSLAM, OLT, antenna"]
+  AN --&gt;|"rete metro/regionale"| POP["POP&lt;br&gt;Point of Presence"]
+  POP --&gt;|"backbone / core"| POP2["Altri POP"]
+  POP2 --&gt; NET(("Altri operatori&lt;br&gt;Internet"))</code></pre>
+<ul>
+<li><b>Access node</b>: il primo apparato dell'operatore che l'utente incontra (DSLAM, OLT, stazione radio base).</li>
+<li><b>POP</b> (<i>Point of Presence</i>): il punto in cui la rete metropolitana entra nel backbone; è un nodo "multiservizio" dove stanno router, BRAS, apparati per la rete mobile, ecc.</li>
+<li><b>Metropolitan area</b>: la rete che collega gli access node di un'area urbana al POP.</li>
+<li><b>Backbone</b>: il centro della rete, fatto di router potenti connessi a maglia.</li>
+</ul>
+<h2 id="2-rete-daccesso-access-network">2. Rete d'accesso (access network)<a class="headerlink" href="#2-rete-daccesso-access-network" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>È la parte di rete che collega l'abbonato al suo fornitore di servizio. È il "tratto finale" (o primo, visto dall'utente): il doppino, la fibra o il collegamento radio che arriva a casa tua.</p>
+</div>
+<ul>
+<li>Si contrappone alla <b>rete core</b>.</li>
+<li>Si può dividere ulteriormente in:<ul>
+<li><b>feeder plant</b> (o rete di distribuzione primaria): dalla centrale agli armadi stradali;</li>
+<li><b>drop plant</b> (o <i>edge network</i>): dagli armadi alle singole case.</li>
+</ul>
+</li>
+<li>Ruolo: collega operatori e fornitori di servizi con le persone e le aziende che servono.</li>
+<li>Storicamente fatta di <b>linee in rame</b> per il telefono; oggi lo stesso rame porta anche la banda larga (<b>DSL</b>) insieme alla voce.</li>
+<li>Gli operatori investono molto nella <b>fibra ottica</b> per l'accesso fisso, grazie alla sua velocità e stabilità.</li>
+</ul>
+<h2 id="3-rete-core-e-edge">3. Rete core e edge<a class="headerlink" href="#3-rete-core-e-edge" title="Permanent link">&para;</a></h2>
+<h3 id="core-network">Core network<a class="headerlink" href="#core-network" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>La rete core è il "centro" della rete. Raccoglie il traffico che arriva da tutte le reti d'accesso e lo smista ad alta velocità verso la destinazione, che sia un altro utente dello stesso operatore o un'altra rete.</p>
+</div>
+<div class="admonition note">
+<p><b>Analogia</b>: se la rete d'accesso sono le strade di quartiere che portano a casa tua, la rete core è l'autostrada. Ha pochi ingressi, enorme capacità e collega tutte le città tra loro.</p>
+</div>
+<ul>
+<li>Topologia tipicamente a <b>maglia</b> (<i>mesh</i>): ci sono più cammini tra due nodi, quindi la rete resiste ai guasti.</li>
+<li>Fornisce connessioni <b>any-to-any</b> tra i dispositivi della rete.</li>
+<li>Fatta di <b>switch</b> (es. ATM, <i>Asynchronous Transfer Mode</i>) oppure di <b>router IP</b>.</li>
+<li>Poggia su un <b>backbone ottico</b>.</li>
+<li>Internet si può vedere come un gigantesco core network: in realtà è fatto di tanti operatori, ognuno con il suo core, <b>interconnessi</b> tra loro.</li>
+</ul>
+<h3 id="edge-bordo-della-rete">Edge (bordo della rete)<a class="headerlink" href="#edge-bordo-della-rete" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>L'edge è il confine tra il core e le reti degli utenti. È lì che si fanno le operazioni "intelligenti" (classificare il traffico, scegliere il percorso), così il core può limitarsi a inoltrare velocemente.</p>
+</div>
+<ul>
+<li>L'edge può svolgere funzioni che il core <b>non</b> fa.</li>
+<li><b>Esempio con MPLS</b> (<i>Multiprotocol Label Switching</i>): l'edge switch esamina ogni pacchetto e, in base alle sue proprietà (destinazione, tipo di traffico, ...), sceglie un <b>percorso</b> attraverso la rete e gli attacca un'<b>etichetta</b> (<i>label</i>).</li>
+<li>Il core poi <b>commuta</b> i pacchetti guardando solo l'etichetta, invece di fare <b>routing hop-by-hop</b> (cioè decidere a ogni router guardando l'indirizzo IP). È molto più veloce.</li>
+<li>Paradigma: <b>core "stupido" ed edge "intelligente"</b>: la scelta del percorso la decide l'edge.</li>
+</ul>
+<h2 id="4-tipi-di-accesso">4. Tipi di accesso<a class="headerlink" href="#4-tipi-di-accesso" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Ci si può collegare alla rete in tanti modi diversi, a seconda del mezzo fisico: cavo (rame, coassiale, fibra, rete elettrica), onde radio (Wi-Fi, cellulare, 5G) o satellite. Ognuno ha un compromesso tra velocità, copertura, mobilità e costo.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Tipo</th>
+<th>Mezzo</th>
+<th>Vantaggi</th>
+<th>Usi tipici</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Wired (cablato)</td>
+<td>Cavi fisici</td>
+<td>Affidabile, stabile, veloce</td>
+<td>Ethernet, fibra, DSL</td>
+</tr>
+<tr>
+<td>Wireless</td>
+<td>Onde radio</td>
+<td>Mobilità, flessibilità, facile da installare</td>
+<td>Wi-Fi, Bluetooth, cellulare</td>
+</tr>
+<tr>
+<td>Satellitare</td>
+<td>Satelliti in orbita</td>
+<td>Copertura vastissima, zone remote</td>
+<td>Internet rurale, comunicazioni globali</td>
+</tr>
+<tr>
+<td>Fibra ottica</td>
+<td>Fibre di vetro/plastica, luce</td>
+<td>Banda altissima, bassa latenza, sicura</td>
+<td>Internet veloce, data center</td>
+</tr>
+<tr>
+<td>DSL</td>
+<td>Doppino telefonico</td>
+<td>Diffusissimo, economico</td>
+<td>Casa, piccole aziende</td>
+</tr>
+<tr>
+<td>Cavo</td>
+<td>Cavo coassiale</td>
+<td>Veloce; infrastruttura condivisa</td>
+<td>Banda larga residenziale, TV via cavo</td>
+</tr>
+<tr>
+<td>Cellulare</td>
+<td>Reti mobili</td>
+<td>Connessione in movimento</td>
+<td>Smartphone, dati mobili</td>
+</tr>
+<tr>
+<td>Powerline</td>
+<td>Impianto elettrico</td>
+<td>Nessun cavo nuovo</td>
+<td>Rete domestica, estendere il Wi-Fi</td>
+</tr>
+<tr>
+<td>5G</td>
+<td>Rete mobile di 5ª generazione</td>
+<td>Velocissima, bassa latenza, IoT, AR/VR</td>
+<td>Applicazioni emergenti, smart city</td>
+</tr>
+</tbody>
+</table>
+<p>Nota sul <b>cavo coassiale</b>: "infrastruttura condivisa" significa che più utenti dello stesso ramo si dividono la banda (al contrario del doppino DSL, che è dedicato a un solo abbonato).</p>
+<h2 id="5-esempio-la-rete-telecom-italia">5. Esempio: la rete Telecom Italia<a class="headerlink" href="#5-esempio-la-rete-telecom-italia" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Un operatore reale mette insieme tutto: accesso fisso (ADSL, VDSL, fibra) e mobile (HSPA, LTE) convergono su una rete metropolitana ottica, che arriva ai POP e da lì al backbone nazionale.</p>
+</div>
+<p>Tre livelli:</p>
+<ul>
+<li><b>Access network</b> (aree metropolitane):<ul>
+<li>ADSL2+ (circa 10 Mbit/s) dagli <b>IP-DSLAM</b> (circa 4.000);</li>
+<li><b>FTTC</b> con VDSL2 (circa 50 Mbit/s) da <b>IP-MSAN</b> (l'ONU nell'armadio);</li>
+<li><b>FTTH/FTTB</b> (100 Mbit/s) tramite <b>GPON</b>;</li>
+<li>mobile HSPA/LTE/WiMAX (circa 10 Mbit/s).</li>
+</ul>
+</li>
+<li><b>Regional/metropolitan network</b>: anelli <b>ottici a pacchetto</b> (<i>optical packet metro</i>) che raccolgono il traffico.</li>
+<li><b>Multiservice edge node (POP)</b>: contiene gli apparati di bordo:<ul>
+<li>per il mobile: MSC-S, xGSN, RNC (lato <b>RAN/CN</b>, rete radio e core mobile);</li>
+<li>per la banda larga fissa (<b>BBAN edge</b>): <b>DPI</b> (<i>Deep Packet Inspection</i>), <b>BRAS</b> (<i>Broadband Remote Access Server</i>, termina le sessioni PPP degli utenti), <b>PE</b> (<i>Provider Edge</i> router, il bordo MPLS);</li>
+<li>storage.</li>
+</ul>
+</li>
+<li><b>Backbone network</b>: l'<b>optical packet backbone</b>, un anello di router ad alta capacità.</li>
+</ul>
+<h2 id="6-terminologia-storica-usa">6. Terminologia storica (USA)<a class="headerlink" href="#6-terminologia-storica-usa" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Nella telefonia americana si distingue chi gestisce le chiamate locali (LEC) da chi gestisce quelle a lunga distanza (IXC). Questi termini si incontrano ancora spesso.</p>
+</div>
+<ul>
+<li><b>Exchange area</b>: area servita da una centrale; si distingue traffico <b>locale</b> e a <b>lunga distanza</b>.</li>
+<li><b>LEC</b> (<i>Local Exchange Carrier</i>): operatore della telefonia locale.<ul>
+<li><b>ILEC</b> (<i>Incumbent LEC</i>): l'operatore storico, ex monopolista (in Italia il corrispondente è Telecom Italia/TIM).</li>
+<li><b>CLEC</b> (<i>Competitive LEC</i>): operatore concorrente, nato dopo la liberalizzazione.</li>
+</ul>
+</li>
+<li><b>CO</b> (<i>Central Office</i>): la centrale telefonica.</li>
+<li><b>Trunk</b>: collegamenti tra centrali, in fibra ottica.</li>
+<li><b>LATA</b> (<i>Local Access and Transport Area</i>): area geografica di traffico locale.</li>
+<li><b>IXC</b> (<i>Inter-exchange Carrier</i>): operatore che trasporta il traffico <b>tra LATA diverse</b> (lunga distanza).</li>
+</ul>
+<p>Nello schema del prof:</p>
+<ul>
+<li><b>dominio LEC</b> = <b>rete d'accesso (locale)</b>: telefoni → <i>distribution network</i> → <b>Remote Terminal (RT)</b> o <b>central end office</b> → <i>feeder network</i> → <b>central tandem office</b> (centrale di transito);</li>
+<li>poi una <b>rete regionale</b> fino al <b>POP</b> dell'IXC;</li>
+<li><b>dominio IXC</b> = <b>rete a lunga distanza</b>: anello di <b>tandem switch</b>.</li>
+</ul>
+<h3 id="esempi-fisici">Esempi fisici<a class="headerlink" href="#esempi-fisici" title="Permanent link">&para;</a></h3>
+<ul>
+<li><b>Distribution frame</b> (permutatore): il telaio in centrale dove i doppini vengono collegati <b>uno per uno</b> agli apparati della centrale.</li>
+<li><b>Collocation space</b>: spazio nella centrale dove i <b>CLEC</b> possono installare i loro apparati. È ciò che permette la concorrenza: un operatore alternativo affitta il doppino dell'incumbent (<i>unbundling</i>) e lo collega al suo DSLAM in centrale.</li>
+</ul>
+<h2 id="7-la-rete-di-distribuzione-in-rame">7. La rete di distribuzione in rame<a class="headerlink" href="#7-la-rete-di-distribuzione-in-rame" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Dalla centrale locale partono cavi grossi verso gli armadi stradali; dagli armadi partono cavi più piccoli verso i distributori (vicino agli edifici); dai distributori parte il doppino del singolo abbonato. È una struttura ad albero.</p>
+</div>
+<pre class="mermaid"><code>flowchart LR
+  C(("Centrale locale")) --&gt;|"rete primaria"| A1["Armadio"]
+  C --&gt; A2["Armadio"]
+  A1 --&gt;|"rete secondaria"| D1["Distributore"]
+  A1 --&gt; D2["Distributore"]
+  D1 --&gt;|"raccordo d'utente"| U1["Abbonato"]
+  D1 --&gt; U2["Abbonato"]</code></pre>
+<ul>
+<li><b>Centrale locale</b> → <b>armadio ripartilinea</b> (cabinet) → <b>distributore</b> → <b>abbonato</b> (borchia, cioè la presa a muro).</li>
+</ul>
+<h3 id="numeri-della-rete-daccesso-telecom-italia-2007">Numeri della rete d'accesso Telecom Italia (2007)<a class="headerlink" href="#numeri-della-rete-daccesso-telecom-italia-2007" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Elemento</th>
+<th>Quantità</th>
+<th>Unità</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Borchie d'utente (prese)</td>
+<td>33.576.000</td>
+<td>numero</td>
+</tr>
+<tr>
+<td>Distributori</td>
+<td>3.893.000</td>
+<td>numero</td>
+</tr>
+<tr>
+<td>Armadi ripartilinea</td>
+<td>142.500</td>
+<td>numero</td>
+</tr>
+<tr>
+<td>Cavi a coppie simmetriche</td>
+<td>105.700.000</td>
+<td>km-circuito</td>
+</tr>
+<tr>
+<td>Cavi (tracciato)</td>
+<td>575.000</td>
+<td>km</td>
+</tr>
+<tr>
+<td>Palificazioni</td>
+<td>8.893.000</td>
+<td>pali</td>
+</tr>
+<tr>
+<td>Infrastrutture di posa</td>
+<td>20.000</td>
+<td>km di tubazioni</td>
+</tr>
+</tbody>
+</table>
+<p>Differenza tra le due righe sui cavi: il <b>tracciato</b> (575.000 km) è la lunghezza dei percorsi fisici; i <b>km-circuito</b> (105,7 milioni) contano ogni coppia separatamente (un cavo da 100 coppie lungo 1 km vale 100 km-circuito).</p>
+<h2 id="8-accesso-in-rame">8. Accesso in rame<a class="headerlink" href="#8-accesso-in-rame" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>La rete in rame dell'operatore storico porta sia la banda larga (ADSL, VDSL) sia il telefono. Il suo punto di forza è che c'è già ovunque; il suo limite è che è stata progettata per la voce, non per i dati.</p>
+</div>
+<ul>
+<li>Fornisce banda larga (<b>ADSL, VDSL</b>) e telefono tradizionale; la voce può migrare verso IP mantenendo la stessa qualità.</li>
+<li><b>Vantaggio principale</b>: diffusione capillare. Riusare l'infrastruttura esistente è molto competitivo, soprattutto nelle aree ben coperte.</li>
+<li>Di solito è gestita dall'<b>operatore incumbent</b>, spesso (storicamente) a proprietà pubblica.</li>
+<li><b>Problemi</b>:<ul>
+<li>è cresciuta un pezzo alla volta nel corso di decenni: l'architettura <b>non è ottimizzata</b> per le tecnologie attuali;</li>
+<li>se si costruisse oggi una rete da zero, <b>non</b> sarebbe in rame e avrebbe un progetto molto diverso;</li>
+<li>è pensata per il <b>POTS</b> (telefono), mentre il traffico è sempre più <b>IP</b>: in alcune zone ci sono problemi di capacità e di qualità del servizio.</li>
+</ul>
+</li>
+</ul>
+<h2 id="9-accesso-in-fibra-fttx">9. Accesso in fibra (FTTx)<a class="headerlink" href="#9-accesso-in-fibra-fttx" title="Permanent link">&para;</a></h2>
+<h3 id="accesso-ottico">Accesso ottico<a class="headerlink" href="#accesso-ottico" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>La fibra sarà (ed è già) la scelta principale per l'accesso fisso nei prossimi anni, perché porta velocità altissime in modo affidabile.</p>
+</div>
+<p>Sistemi citati:</p>
+<ul>
+<li><b>GE-PON</b> (<i>Gigabit Ethernet PON</i>): per utenti residenziali;</li>
+<li><b>GPON</b> (<i>Gigabit PON</i>): per aziende (in Italia è usata anche per le case);</li>
+<li><b>COF</b> (<i>Code Division Multiplexing over Fiber</i>): per lunghe distanze.</li>
+</ul>
+<p><b>PON</b> = <i>Passive Optical Network</i> (sezione 9.3).</p>
+<h3 id="fttx-fin-dove-arriva-la-fibra">FTTx: fin dove arriva la fibra<a class="headerlink" href="#fttx-fin-dove-arriva-la-fibra" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>FTTx = <i>Fiber To The x</i>. La x dice <b>fin dove</b> arriva la fibra; dopo quel punto il segnale prosegue su rame (o radio). Più la x è vicina all'utente, più la connessione è veloce.</p>
+</div>
+<ul>
+<li><b>FTTH</b> – Home (fino in casa)</li>
+<li><b>FTTC</b> – Curb (fino al marciapiede/armadio)</li>
+<li><b>FTTN</b> – Node o Neighborhood (fino a un nodo di quartiere)</li>
+<li><b>FTTP</b> – Premises (fino alla proprietà dell'utente)</li>
+<li><b>FTTB</b> – Building o Business (fino all'edificio)</li>
+<li><b>FTTU</b> – User</li>
+<li><b>FTTZ</b> – Zone</li>
+<li><b>FTTO</b> – Office</li>
+<li><b>FTTD</b> – Desk (fino alla scrivania)</li>
+</ul>
+<h3 id="architettura-di-riferimento">Architettura di riferimento<a class="headerlink" href="#architettura-di-riferimento" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>In centrale c'è l'OLT, il trasmettitore ottico dell'operatore. Da lì la fibra si dirama (rete ODN) fino alle ONU/ONT vicine o dentro le case. Se la fibra non arriva in casa, l'ONU converte il segnale e prosegue in rame con xDSL.</p>
+</div>
+<ul>
+<li><b>OLT</b> (<i>Optical Line Terminal</i>): terminale ottico in centrale, lato operatore.</li>
+<li><b>ODN</b> (<i>Optical Distribution Network</i>): la rete di fibre e splitter tra OLT e utenti.</li>
+<li><b>ONU</b> (<i>Optical Network Unit</i>): converte da ottico a elettrico in un punto intermedio (armadio, edificio). Se dopo c'è rame, l'ONU contiene un modem <b>xDSL</b> che parla con l'<b>NT</b> dell'utente sul doppino (<i>cp</i>, coppia in rame).</li>
+<li><b>ONT</b> (<i>Optical Network Termination</i>): l'ONU quando sta <b>dentro casa</b> dell'utente (FTTH). <b>NT</b> = <i>Network Termination</i>, il punto di terminazione della rete.</li>
+</ul>
+<h3 id="aon-vs-pon">AON vs PON<a class="headerlink" href="#aon-vs-pon" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Due modi per distribuire la fibra. <b>AON</b>: ogni utente ha la sua fibra, oppure c'è un nodo attivo (alimentato) che smista. <b>PON</b>: una fibra si divide passivamente in tante con splitter ottici, senza apparati alimentati in mezzo.</p>
+</div>
+<p><b>AON</b> (<i>Active Optical Network</i>), detta anche <b>Point-to-Point (P2P)</b>:</p>
+<ul>
+<li>(a) una fibra <b>dedicata</b> dalla centrale a ogni utente/armadio/edificio, oppure</li>
+<li>(b) una fibra fino a un <b>nodo attivo</b> (switch alimentato) che poi distribuisce con fibre dedicate.</li>
+<li>Pro: banda dedicata, semplice. Contro: tante fibre in centrale, apparati attivi da alimentare e mantenere.</li>
+</ul>
+<p><b>PON</b> (<i>Passive Optical Network</i>):</p>
+<ul>
+<li>una fibra dalla centrale arriva a uno <b>splitter/combiner ottico passivo</b> (nessuna alimentazione) che divide la potenza ottica su più fibre, con topologia <b>ad albero</b>.</li>
+<li>Pro: meno fibre e nessun apparato attivo sul campo, quindi costi bassi. Contro: la banda della fibra iniziale è <b>condivisa</b> tra gli utenti dello stesso albero.</li>
+</ul>
+<p>In entrambe, gli ultimi metri possono essere FTTCab/FTTC (poi rame da meno di 300 m fino a 4 km), FTTH o FTTB.</p>
+<h3 id="ftte-fttcab-fttcurb">FTTE, FTTCab, FTTCurb<a class="headerlink" href="#ftte-fttcab-fttcurb" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Più vicino all'utente si mette l'ONU, più corto è il rame, più alta la velocità.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Architettura</th>
+<th>Dove finisce la fibra</th>
+<th>Tratto in rame (TIM)</th>
+<th>Tecnologia sul rame</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FTTE (Exchange)</td>
+<td>Centrale (CO)</td>
+<td>1,2 – 1,5 km</td>
+<td>ADSL</td>
+</tr>
+<tr>
+<td>FTTCab (Cabinet)</td>
+<td>ONU nell'armadio stradale</td>
+<td>200 – 300 m</td>
+<td>VDSL</td>
+</tr>
+<tr>
+<td>FTTCurb</td>
+<td>ONU sul marciapiede/palo</td>
+<td>50 – 150 m</td>
+<td>VDSL</td>
+</tr>
+</tbody>
+</table>
+<p>Le foto della slide 24 mostrano gli <b>armadi stradali</b> (con i doppini attestati sulle morsettiere), una <b>muffola/box ottico</b> in posa e un <b>box su palo</b> (tipico del FTTCurb).</p>
+<h3 id="fttp-fttb-e-ftth">FTTP: FTTB e FTTH<a class="headerlink" href="#fttp-fttb-e-ftth" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Nel FTTP la fibra arriva fino alla proprietà dell'utente. Nel FTTB si ferma alla base dell'edificio (poi rame o radio negli ultimi metri); nel FTTH entra in ogni appartamento.</p>
+</div>
+<ul>
+<li><b>FTTB</b> (<i>Building</i>): fibra fino a un'<b>ONU</b> nell'edificio; dentro l'edificio si prosegue con <b>VDSL, Ethernet o wireless</b>.</li>
+<li><b>FTTH</b> (<i>Home</i>): fibra fino a un elemento ottico (splitter) nell'edificio e poi fibra fino a un'<b>ONT</b> in ogni appartamento.</li>
+</ul>
+<h3 id="accesso-cablato-quadro-complessivo-telecom-italia">Accesso cablato: quadro complessivo (Telecom Italia)<a class="headerlink" href="#accesso-cablato-quadro-complessivo-telecom-italia" title="Permanent link">&para;</a></h3>
+<p>Distanze e numero di nodi lungo il percorso:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Exchange</th>
+<th>Cabinet</th>
+<th>Curb</th>
+<th>Premises</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Quanti (circa)</td>
+<td>10 mila</td>
+<td>140 mila</td>
+<td>5 milioni</td>
+<td>22 milioni</td>
+</tr>
+</tbody>
+</table>
+<p>Distanze: centrale → armadio 1–1,2 km; armadio → curb 200–300 m; curb → casa 50–70 m; in totale 1,2–1,5 km.</p>
+<table>
+<thead>
+<tr>
+<th>Soluzione</th>
+<th>In centrale</th>
+<th>Collegamento</th>
+<th>A casa</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Banda larga attuale</td>
+<td>DSLAM / aggregazione ATM</td>
+<td>Rame fino a casa: ADSL/ADSL2+</td>
+<td>Modem DSL</td>
+</tr>
+<tr>
+<td>FTTCab</td>
+<td>Aggregazione</td>
+<td>Fibra fino al DSLAM nell'armadio, poi rame VDSL/VDSL2</td>
+<td>Modem DSL + set-top + home gateway</td>
+</tr>
+<tr>
+<td>FTTCurb</td>
+<td>Aggregazione</td>
+<td>Fibra (GE/EPON/GPON) fino all'ONU sul curb, poi rame VDSL2</td>
+<td>Modem DSL + set-top + home gateway</td>
+</tr>
+<tr>
+<td>FTTH</td>
+<td>OLT</td>
+<td>Fibra (GE/EPON/GPON) fino a casa</td>
+<td>ONT + set-top + home gateway</td>
+</tr>
+</tbody>
+</table>
+<h2 id="10-quanta-banda-serve">10. Quanta banda serve<a class="headerlink" href="#10-quanta-banda-serve" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Servizi diversi chiedono velocità diverse, sia in download sia in upload. ADSL basta per navigare; per video HD, storage remoto o TV 3D serve fibra.</p>
+</div>
+<p>Dal grafico TIM (stime, in Mbit/s):</p>
+<ul>
+<li><b>ADSL/2+</b> basta per: web surfing, videochiamate, SDTV VoD, peer-to-peer, SDTV live.</li>
+<li><b>FTTCab VDSL2</b> serve per: gaming e didattica a distanza, web hosting, telemedicina (che chiedono anche <b>upload</b> alto).</li>
+<li><b>FTTB VDSL2</b>: HDTV VoD.</li>
+<li><b>FTTH</b>: remote storage (molto upload e download, fino a 50+ Mbit/s per lato) e TV 3D di nuova generazione (circa 100 Mbit/s in download).</li>
+</ul>
+<p>Idea chiave: l'<b>upload</b> diventa importante con servizi come hosting, storage, telemedicina; ed è proprio l'upload il punto debole di ADSL.</p>
+<h3 id="evoluzione-dal-rame-alla-fibra">Evoluzione: dal rame alla fibra<a class="headerlink" href="#evoluzione-dal-rame-alla-fibra" title="Permanent link">&para;</a></h3>
+<p>Il passaggio avviene per gradi:</p>
+<ol>
+<li><b>FTTE</b>: tutta la rete d'accesso in rame (fibra solo fino alla centrale).</li>
+<li>Mix: <b>FTTCab</b> in alcune zone, <b>FTTB</b> e <b>FTTH</b> in altre, FTTE nel resto.</li>
+<li><b>FTTH</b> ovunque: l'accesso è tutto in fibra.</li>
+</ol>
+<h3 id="numeri-di-oggi">Numeri di oggi<a class="headerlink" href="#numeri-di-oggi" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Dati aperti su <a href="https://rete.gruppotim.it/">rete.gruppotim.it</a>: mappa delle centrali con OLT (pronte per la fibra), collegamenti in fibra e in ponte radio. Nella zona di Roma: copertura ADSL 100% delle abitazioni, copertura <b>NGAN</b> (<i>Next Generation Access Network</i>) 91,8%, 4G nel 91,7% dei comuni.</li>
+<li>Altre fonti: <a href="https://www.fibercop.it/en/">fibercop.it</a> (la società che oggi gestisce la rete d'accesso ex TIM), <a href="https://bandaultralarga.italia.it/">bandaultralarga.italia.it</a>.</li>
+<li>Mappe per regione (dati SOStariffe, fine 2022):<ul>
+<li>copertura <b>FTTH</b>: bassa, circa 3–20% per regione (es. Lazio circa 9,5%);</li>
+<li>copertura <b>FTTC</b>: circa 47–76% (es. Lazio circa 52,7%);</li>
+<li><b>digital divide</b>: quota di popolazione <b>non</b> raggiunta da 30 Mbit/s: Italia 77,7% contro una media europea del 36%.</li>
+</ul>
+</li>
+</ul>
+<h2 id="11-accesso-wireless">11. Accesso wireless<a class="headerlink" href="#11-accesso-wireless" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>L'accesso radio è quello su cui ci sono più aspettative per una rete "ovunque": niente cavi, mobilità, e sempre più velocità.</p>
+</div>
+<p>Tecnologie:</p>
+<ul>
+<li><b>WLL</b> (<i>Wireless Local Loop</i>): sostituisce il doppino con un collegamento radio tra una stazione base (collegata alla centrale o via satellite) e unità fisse presso gli abbonati, a cui si collegano telefono, fax, modem. Utile dove posare cavi costa troppo.</li>
+<li><b>3G</b> (reti mobili di terza generazione).</li>
+<li><b>WiMAX</b> (IEEE 802.16).</li>
+<li>Obiettivo: comunicazioni continue e banda larga, con accesso <b>fisso e mobile in un unico sistema</b>.</li>
+</ul>
+<h3 id="architettura-2g-e-3g">Architettura 2G e 3G<a class="headerlink" href="#architettura-2g-e-3g" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>La rete mobile ha una parte radio (antenne e i loro controllori) e una parte core (centrali che gestiscono chiamate, dati e database degli utenti).</p>
+</div>
+<p><b>Parte radio (RAN)</b>:</p>
+<ul>
+<li><b>2G (GSM)</b>: <b>BTS</b> (<i>Base Transceiver Station</i>, l'antenna) controllate da una <b>BSC</b> (<i>Base Station Controller</i>).</li>
+<li><b>3G (UMTS)</b>: <b>Node B</b> (l'antenna) controllati da un <b>RNC</b> (<i>Radio Network Controller</i>). Il telefono è la <b>MS</b> (<i>Mobile Station</i>) = <b>ME</b> (<i>Mobile Equipment</i>, il terminale) + <b>USIM</b> (la SIM).</li>
+<li>Interfacce 3G: <b>Uu</b> (radio, telefono ↔ Node B), <b>Iub</b> (Node B ↔ RNC), <b>Iur</b> (RNC ↔ RNC).</li>
+<li>Il territorio è diviso in <b>celle</b>; più celle formano l'area di un RNC.</li>
+</ul>
+<p><b>Parte core</b>:</p>
+<ul>
+<li><b>Circuit Switched (CS)</b>, per la voce: <b>MSC</b> (<i>Mobile Switching Center</i>), con i database <b>HLR</b> (<i>Home Location Register</i>: profilo e posizione di tutti gli abbonati) e <b>VLR</b> (<i>Visitor Location Register</i>: utenti attualmente nell'area di quell'MSC). Collegamento RNC ↔ MSC: <b>Iu-CS</b>.</li>
+<li><b>Packet Switched (PS)</b>, per i dati: <b>SGSN</b> (<i>Serving GPRS Support Node</i>) e <b>GGSN</b> (<i>Gateway GPRS Support Node</i>, il gateway verso Internet), collegati dall'interfaccia <b>Gn</b>. Collegamento RNC ↔ SGSN: <b>Iu-PS</b>.</li>
+</ul>
+<p>Numeri (rete TIM, slide):</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>GSM (2G)</th>
+<th>UMTS (3G)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Siti (tralicci)</td>
+<td>14.000</td>
+<td>8.030</td>
+</tr>
+<tr>
+<td>Stazioni radio</td>
+<td>13.865 BTS (13.863 macro + 1.150 micro nello schema)</td>
+<td>8.030 Node B (8.000 macro + 50 micro)</td>
+</tr>
+<tr>
+<td>Controllori</td>
+<td>463 BSC</td>
+<td>70 RNC</td>
+</tr>
+<tr>
+<td>Trasmettitori</td>
+<td>90.090</td>
+<td>–</td>
+</tr>
+<tr>
+<td>Celle</td>
+<td>24.522 (900 MHz) + 7.551 (1800 MHz)</td>
+<td>22.094</td>
+</tr>
+<tr>
+<td>Canali</td>
+<td>556.264 (900 MHz) + 164.458 (1800 MHz)</td>
+<td>834.752</td>
+</tr>
+<tr>
+<td>Frequenze</td>
+<td>900 e 1800 MHz</td>
+<td>10 MHz a 2100 MHz</td>
+</tr>
+</tbody>
+</table>
+<h3 id="rete-5g">Rete 5G<a class="headerlink" href="#rete-5g" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Nel 5G il core è diviso in funzioni software separate. Il <b>piano di controllo</b> (chi sei, dove sei, che sessione hai) è separato dal <b>piano utente</b> (dove passano davvero i tuoi dati).</p>
+</div>
+<ul>
+<li><b>UE</b> (<i>User Equipment</i>): il terminale.</li>
+<li><b>gNB</b>: la stazione radio base 5G (fa parte della <b>5G RAN</b>).</li>
+<li><b>5G Core (5GC)</b>:<ul>
+<li><b>AMF</b> (<i>Access and Mobility Management Function</i>): gestisce accesso e mobilità (registrazione, handover). Piano di controllo.</li>
+<li><b>SMF</b> (<i>Session Management Function</i>): crea e gestisce le sessioni dati. Piano di controllo.</li>
+<li><b>UPF</b> (<i>User Plane Function</i>): inoltra i pacchetti dell'utente verso Internet. Piano utente.</li>
+</ul>
+</li>
+<li>Interfacce: <b>N2</b> (gNB ↔ AMF, controllo), <b>N3</b> (gNB ↔ UPF, dati), <b>N4</b> (SMF ↔ UPF, l'SMF configura l'UPF), <b>N6</b> (UPF ↔ Internet).</li>
+</ul>
+<h3 id="copertura-mobile-in-italia">Copertura mobile in Italia<a class="headerlink" href="#copertura-mobile-in-italia" title="Permanent link">&para;</a></h3>
+<ul>
+<li><a href="https://www.tim.it/fisso-e-mobile/mobile/mappa-copertura-mobile">Mappa copertura TIM</a></li>
+<li><a href="https://www.opensignal.com/coverage-maps">OpenSignal coverage maps</a>: mappe costruite in <b>crowdsourcing</b> dalle misure dell'app installata sugli smartphone degli utenti (la mappa di Roma mostra zone verdi di segnale forte e rosse di segnale debole). Il prof suggerisce di provare l'app.</li>
+</ul>
+<h3 id="evoluzione-degli-standard-mobili">Evoluzione degli standard mobili<a class="headerlink" href="#evoluzione-degli-standard-mobili" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Periodo</th>
+<th>Famiglia 3GPP (GSM)</th>
+<th>Famiglia 3GPP2 (CDMA)</th>
+<th>IEEE</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Prima del 2000</td>
+<td>GSM/PDC, GPRS/PDC-P, EDGE</td>
+<td>IS-95</td>
+<td>–</td>
+</tr>
+<tr>
+<td>2000–2010</td>
+<td>UMTS, HSDPA, HSUPA</td>
+<td>CDMA2000, 1X/nX EV-DO</td>
+<td>Mobile WiMAX (dal 2007)</td>
+</tr>
+<tr>
+<td>Dal 2010</td>
+<td>LTE</td>
+<td>UMB</td>
+<td>WiMAX phase 2, 3</td>
+</tr>
+</tbody>
+</table>
+<p>(Storicamente ha vinto LTE; UMB e WiMAX mobile sono stati abbandonati.)</p>
+<h3 id="famiglie-wireless-per-estensione">Famiglie wireless per estensione<a class="headerlink" href="#famiglie-wireless-per-estensione" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Le reti wireless si classificano per raggio di copertura, dal piccolissimo (attorno al corpo) al regionale.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Tipo</th>
+<th>Copertura</th>
+<th>Standard</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PAN (Personal)</td>
+<td>Pochi metri</td>
+<td>IEEE 802.15 (WiMedia, Bluetooth)</td>
+</tr>
+<tr>
+<td>LAN (Local)</td>
+<td>Casa, ufficio</td>
+<td>IEEE 802.11 (Wi-Fi)</td>
+</tr>
+<tr>
+<td>MAN (Metropolitan)</td>
+<td>Città</td>
+<td>IEEE 802.16 (WiMAX fisso e mobile, "wireless DSL")</td>
+</tr>
+<tr>
+<td>RAN (Regional)</td>
+<td>Regione</td>
+<td>IEEE 802.22 (WRAN, usa le frequenze TV libere)</td>
+</tr>
+</tbody>
+</table>
+<p>Tendenza: con il servizio <b>anytime, anywhere, anyone</b>, alla telefonia cellulare e al Wi-Fi si aggiunge la richiesta di <b>banda larga mobile</b> e comunicazioni senza interruzioni.</p>
+<h3 id="evoluzione-del-wi-fi">Evoluzione del Wi-Fi<a class="headerlink" href="#evoluzione-del-wi-fi" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Nome</th>
+<th>Standard</th>
+<th>Anno</th>
+<th>Velocità max</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Wi-Fi 1</td>
+<td>802.11</td>
+<td>1997</td>
+<td>2 Mbit/s</td>
+</tr>
+<tr>
+<td>Wi-Fi 2</td>
+<td>802.11b</td>
+<td>1999</td>
+<td>11 Mbit/s</td>
+</tr>
+<tr>
+<td>Wi-Fi 3</td>
+<td>802.11g</td>
+<td>2003</td>
+<td>54 Mbit/s</td>
+</tr>
+<tr>
+<td>Wi-Fi 4</td>
+<td>802.11n</td>
+<td>2008</td>
+<td>600 Mbit/s</td>
+</tr>
+<tr>
+<td>Wi-Fi 5</td>
+<td>802.11ac</td>
+<td>2014</td>
+<td>6,9 Gbit/s</td>
+</tr>
+<tr>
+<td>Wi-Fi 6</td>
+<td>802.11ax</td>
+<td>2019</td>
+<td>9,6 Gbit/s</td>
+</tr>
+</tbody>
+</table>
+<p>Oltre alla velocità cresce il numero di utenti serviti contemporaneamente (Wi-Fi 6 è pensato per ambienti affollati).</p>
+<h2 id="12-accesso-satellitare-leo">12. Accesso satellitare: LEO<a class="headerlink" href="#12-accesso-satellitare-leo" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>I satelliti LEO orbitano bassi (poche centinaia di km), quindi il segnale fa un viaggio breve e la latenza è bassa. Ma ogni satellite copre una zona piccola e si muove velocemente: ne servono migliaia per coprire la Terra.</p>
+</div>
+<p><b>LEO</b> (<i>Low Earth Orbit</i>):</p>
+<ul>
+<li>quota circa <b>500–2000 km</b>;</li>
+<li>periodo orbitale breve, circa <b>90–120 minuti</b>;</li>
+<li><b>bassa latenza</b> rispetto ai satelliti GEO;</li>
+<li>servono <b>grandi costellazioni</b> per una copertura continua;</li>
+<li>applicazioni: accesso a Internet, osservazione della Terra, IoT, navigazione;</li>
+<li>bande <b>Ku</b> (12–18 GHz) e <b>Ka</b> (circa 26,5–40 GHz; la slide riporta per errore 12–18 GHz anche per la Ka).</li>
+</ul>
+<p><b>Vantaggi</b>: latenza circa 20–40 ms (contro 500+ ms del GEO), alta banda potenziale, copertura globale anche in zone rurali e remote.</p>
+<p><b>Sfide</b>: migliaia di satelliti necessari, costi di lancio e manutenzione alti, rischio <b>detriti spaziali</b> e vita breve dei satelliti (circa 5–7 anni).</p>
+<h3 id="leo-vs-geo">LEO vs GEO<a class="headerlink" href="#leo-vs-geo" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>LEO</th>
+<th>GEO (geostazionario)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Quota</td>
+<td>500 – 2000 km</td>
+<td>circa 35.786 km</td>
+</tr>
+<tr>
+<td>Latenza</td>
+<td>circa 20 – 40 ms</td>
+<td>circa 500+ ms</td>
+</tr>
+<tr>
+<td>Copertura</td>
+<td>Servono grandi costellazioni</td>
+<td>Un satellite copre circa 1/3 della Terra</td>
+</tr>
+<tr>
+<td>Vita</td>
+<td>circa 5 – 7 anni</td>
+<td>circa 15 anni</td>
+</tr>
+</tbody>
+</table>
+<p><b>Perché la latenza GEO è così alta</b> (<i>complemento</i>): il segnale va utente → satellite → stazione a terra, cioè circa <span class="arithmatex">\(2 \times 35.786\)</span> km. Alla velocità della luce (<span class="arithmatex">\(3 \cdot 10^5\)</span> km/s) sono circa 240 ms solo andata; andata e ritorno di una richiesta superano i 480 ms. Un GEO è "fermo" nel cielo perché ruota con la Terra (periodo 24 h).</p>
+<h3 id="esempio-starlink">Esempio: Starlink<a class="headerlink" href="#esempio-starlink" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Costellazione LEO di <b>SpaceX</b>, oltre 5.000 satelliti lanciati (dato 2025).</li>
+<li>Obiettivo: banda larga globale per case, aziende e mezzi in movimento (navi, aerei).</li>
+<li>Terminale utente: piccola antenna ("Dishy"); latenza 20–40 ms.</li>
+</ul>
+<h2 id="13-tecnologie-e-velocita-nel-tempo">13. Tecnologie e velocità nel tempo<a class="headerlink" href="#13-tecnologie-e-velocita-nel-tempo" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Fisso</th>
+<th>Velocità tipica</th>
+<th>Mobile</th>
+<th>Velocità tipica</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Dial-up</td>
+<td>circa 64 kbit/s</td>
+<td>GSM</td>
+<td>circa 10 kbit/s</td>
+</tr>
+<tr>
+<td>ADSL free</td>
+<td>256 – 640 kbit/s</td>
+<td>EDGE</td>
+<td>circa 100 kbit/s</td>
+</tr>
+<tr>
+<td>ADSL flat</td>
+<td>2 – 6 Mbit/s</td>
+<td>UMTS</td>
+<td>circa 300 kbit/s</td>
+</tr>
+<tr>
+<td>ADSL2+</td>
+<td>10 – 20 Mbit/s</td>
+<td>HSPA 1 / 2 / 2+</td>
+<td>3 / 7 / 14 Mbit/s</td>
+</tr>
+<tr>
+<td>VDSL2</td>
+<td>50 – 100 Mbit/s</td>
+<td>–</td>
+<td>–</td>
+</tr>
+</tbody>
+</table>
+<h2 id="14-il-backbone-telecom-italia">14. Il backbone Telecom Italia<a class="headerlink" href="#14-il-backbone-telecom-italia" title="Permanent link">&para;</a></h2>
+<h3 id="topologia-logica-opb">Topologia logica: OPB<a class="headerlink" href="#topologia-logica-opb" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Il backbone IP di TIM (OPB, <i>Optical Packet Backbone</i>) è fatto di 32 POP. Quattro, a Roma e Milano, formano il "cuore" collegato a 10 Gbit/s; gli altri si appoggiano a questi.</p>
+</div>
+<ul>
+<li><b>32 PoP</b> in tutto:<ul>
+<li><b>Inner core</b>: 4 PoP (2 a Roma, 2 a Milano), collegati a <b>10 Gbit/s (STM-64)</b>;</li>
+<li><b>Outer core</b>: 28 PoP, collegati a 10 Gbit/s (STM-64), <b>2,5 Gbit/s (STM-16)</b> o <b>155 Mbit/s (STM-1)</b>.</li>
+</ul>
+</li>
+<li>Ogni PoP è in <b>dual homing</b>: collegato a due nodi dell'inner core (es. Roma e Milano), così sopravvive al guasto di uno dei due.</li>
+<li>Circa 100 router Cisco GSR (<i>Gigabit Switch Router</i>).</li>
+<li>Capacità: circa 80 Gbit/s interni, 13 Gbit/s verso la "Big Internet", 12 Gbit/s di peering pubblici e privati.</li>
+<li>I link sono usati al <b>50%</b>: margine per assorbire il traffico se un collegamento si guasta (il dual homing ha senso solo se il link superstite regge il traffico dell'altro).</li>
+</ul>
+<p><b>STM-n</b> (<i>Synchronous Transport Module</i>, gerarchia SDH): STM-1 = 155 Mbit/s, STM-16 = 2,5 Gbit/s, STM-64 = 10 Gbit/s (ogni livello è un multiplo di STM-1).</p>
+<h3 id="topologia-fisica">Topologia fisica<a class="headerlink" href="#topologia-fisica" title="Permanent link">&para;</a></h3>
+<ul>
+<li>La rete IP poggia sulla <b>rete di trasporto ottica</b> (OTN).</li>
+<li>Nodi con <b>ODXC</b> (<i>Optical Digital Cross Connect</i>): commutano interi flussi ottici.</li>
+<li>Collegamenti in <b>DWDM</b> (<i>Dense Wavelength Division Multiplexing</i>: molte lunghezze d'onda, cioè molti canali, sulla stessa fibra) o fibra ottica.</li>
+<li>Topologia a <b>maglia</b> che copre tutta Italia (TO, MI, VE, BO, FI, RM, NA, BA, Lamezia, PA, CT, ...).</li>
+</ul>
+<p><b>Differenza logica vs fisica</b>: la topologia logica dice quali router IP si "vedono" direttamente; la fisica dice dove passano davvero le fibre. Un singolo link logico Roma–Milano può attraversare fisicamente più nodi ottici.</p>
+<h3 id="infrastrutture-globali">Infrastrutture globali<a class="headerlink" href="#infrastrutture-globali" title="Permanent link">&para;</a></h3>
+<ul>
+<li><a href="http://www.submarinecablemap.com/">submarinecablemap.com</a>: mappa dei <b>cavi sottomarini</b> che collegano i continenti; la quasi totalità del traffico intercontinentale passa da qui, non dai satelliti.</li>
+</ul>
+<h2 id="15-gartner-hype-cycle">15. Gartner hype cycle<a class="headerlink" href="#15-gartner-hype-cycle" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Un modello che descrive come cresce l'attenzione verso una nuova tecnologia: prima entusiasmo eccessivo, poi delusione, poi maturità e adozione reale. Serve a non confondere l'hype con l'utilità effettiva.</p>
+</div>
+<p>Cinque fasi (aspettative in funzione del tempo):</p>
+<ol>
+<li><b>Technology trigger</b>: ricerca, prime startup e primi finanziamenti, prodotti di prima generazione costosi e da personalizzare.</li>
+<li><b>Peak of inflated expectations</b>: hype mediatico, tanti fornitori, attività oltre gli early adopter.</li>
+<li><b>Trough of disillusionment</b>: stampa negativa, fallimenti e consolidamento dei fornitori; meno del 5% del pubblico potenziale ha adottato davvero.</li>
+<li><b>Slope of enlightenment</b>: prodotti di seconda e terza generazione, metodologie e best practice.</li>
+<li><b>Plateau of productivity</b>: adozione di massa (20–30% del pubblico potenziale).</li>
+</ol>
+<p><b>Hype cycle 2024</b> (tecnologie emergenti, agosto 2024):</p>
+<ul>
+<li>in salita (innovation trigger): Large Action Models, robot umanoidi, digital twin, <b>6G</b>, cybersecurity mesh architecture, sistemi multi-agente, AI supercomputing, agenti autonomi, reinforcement learning, AGI, federated learning;</li>
+<li>vicino al picco: <b>homomorphic encryption</b>, prompt engineering, AI TRiSM, GitOps, superapps, AI per l'ingegneria del software;</li>
+<li>in discesa verso la disillusione: <b>generative AI</b>, WebAssembly, cloud-native.</li>
+</ul>
+<h2 id="domande-di-ripasso">Domande di ripasso<a class="headerlink" href="#domande-di-ripasso" title="Permanent link">&para;</a></h2>
+<details class="note">
+<summary>Che differenza c'è tra rete d'accesso e rete core?</summary>
+<p>L'accesso collega il singolo abbonato al primo nodo dell'operatore (rame, fibra, radio): è capillare, con tantissimi collegamenti a bassa capacità. Il core è la dorsale: pochi nodi potenti a maglia, collegamenti ad altissima capacità, connessioni any-to-any.</p>
+</details>
+<details class="note">
+<summary>Perché si dice 'core stupido, edge intelligente'?</summary>
+<p>Con MPLS l'edge esamina i pacchetti, sceglie il percorso e assegna un'etichetta; il core commuta solo in base all'etichetta, senza routing hop-by-hop. Le decisioni sono al bordo, il centro è veloce e semplice.</p>
+</details>
+<details class="note">
+<summary>Differenza tra AON e PON?</summary>
+<p>AON (P2P): fibra dedicata per utente o nodo attivo alimentato che distribuisce. PON: splitter ottici passivi, topologia ad albero, banda condivisa tra gli utenti dello stesso ramo, nessun apparato alimentato sul campo, costi più bassi.</p>
+</details>
+<details class="note">
+<summary>FTTE, FTTCab, FTTH: quanto rame resta?</summary>
+<p>FTTE: 1,2–1,5 km di rame (ADSL). FTTCab: 200–300 m (VDSL). FTTCurb: 50–150 m (VDSL). FTTH: nessuno, fibra fino all'ONT in casa.</p>
+</details>
+<details class="note">
+<summary>Perché un satellite LEO ha latenza molto più bassa di uno GEO?</summary>
+<p>Perché è circa 20–70 volte più vicino alla Terra (500–2000 km contro 35.786 km): la propagazione è molto più breve. In cambio copre un'area piccola e si muove, quindi servono migliaia di satelliti.</p>
+</details>
+<details class="note">
+<summary>Perché i link del backbone TIM sono usati solo al 50%?</summary>
+<p>Per la protezione: con il dual homing, se un collegamento si guasta il traffico passa sull'altro, che deve poter reggere anche il carico del primo.</p>
+</details>
+<h2 id="riepilogo">Riepilogo<a class="headerlink" href="#riepilogo" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Rete = <b>accesso</b> (utente → primo nodo) + <b>metro/regionale</b> + <b>core/backbone</b> (dorsale a maglia, any-to-any).</li>
+<li><b>Edge intelligente, core veloce</b> (MPLS: l'edge sceglie il percorso, il core commuta per etichetta).</li>
+<li><b>Tipi di accesso</b>: rame (DSL), coassiale, fibra, powerline, Wi-Fi, cellulare/5G, satellite.</li>
+<li><b>Rame</b>: c'è ovunque, ma è pensato per la voce e non ottimizzato per IP. Struttura: centrale → armadio → distributore → presa.</li>
+<li><b>Fibra (FTTx)</b>: OLT → ODN → ONU/ONT. <b>AON</b> (punto-punto o nodo attivo) vs <b>PON</b> (splitter passivi, banda condivisa). FTTE / FTTCab / FTTCurb / FTTB / FTTH: più vicina la fibra, più corto il rame, più velocità.</li>
+<li><b>Mobile</b>: 2G (BTS/BSC), 3G (Node B/RNC, MSC per la voce, SGSN/GGSN per i dati), 5G (gNB + AMF/SMF/UPF, controllo separato dai dati).</li>
+<li><b>Satellite LEO</b>: bassa quota e latenza (20–40 ms), servono grandi costellazioni (Starlink); GEO: un satellite copre 1/3 della Terra ma latenza 500+ ms.</li>
+<li><b>Backbone TIM</b>: 32 PoP, inner core Roma/Milano a 10 Gbit/s, dual homing, link al 50%; sotto c'è la rete ottica DWDM.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Torna su
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Piede" >
+        
+          
+          <a href="../" class="md-footer__link md-footer__link--prev" aria-label="Precedente: Network Infrastructures">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Precedente
+              </span>
+              <div class="md-ellipsis">
+                Network Infrastructures
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../lezione-2/" class="md-footer__link md-footer__link--next" aria-label="Successivo: Lezione 2 – xDSL e PPP">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Successivo
+              </span>
+              <div class="md-ellipsis">
+                Lezione 2 – xDSL e PPP
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.indexes", "navigation.top", "navigation.footer", "toc.follow", "search.highlight", "search.suggest", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiato", "clipboard.copy": "Copia", "search.result.more.one": "1 altro in questa pagina", "search.result.more.other": "# altri in questa pagina", "search.result.none": "Nessun documento trovato", "search.result.one": "1 documento trovato", "search.result.other": "# documenti trovati", "search.result.placeholder": "Scrivi per iniziare a cercare", "search.result.term.missing": "Non presente", "select.version": "Seleziona la versione"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="../../javascripts/mathjax/tex-mml-chtml.js"></script>
+      
+        <script src="../../javascripts/mermaid/mermaid.min.js"></script>
+      
+    
+  </body>
+</html>

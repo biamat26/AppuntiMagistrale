@@ -1,0 +1,2906 @@
+
+<!doctype html>
+<html lang="it" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Appunti della magistrale in Cybersecurity (Sapienza)">
+      
+      
+      
+        <link rel="canonical" href="https://biamat26.github.io/AppuntiMagistrale/network-infrastructures/lezione-3/">
+      
+      
+        <link rel="prev" href="../lezione-2/">
+      
+      
+        <link rel="next" href="../kathara/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Lezione 3 – FTTx e PON - Appunti di Luiggi</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#lezione-3-fttx-e-reti-ottiche-passive-pon" class="md-skip">
+          Vai al contenuto
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Intestazione">
+    <a href="../.." title="Appunti di Luiggi" class="md-header__button md-logo" aria-label="Appunti di Luiggi" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 4v6l-2-2-2 2V4H9v16h10V4zM3 7V5h2V4a2 2 0 0 1 2-2h12c1.05 0 2 .95 2 2v16c0 1.05-.95 2-2 2H7c-1.05 0-2-.95-2-2v-1H3v-2h2v-4H3v-2h2V7zm2-2v2h2V5zm0 14h2v-2H5zm0-6h2v-2H5z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Appunti di Luiggi
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Lezione 3 – FTTx e PON
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Tema scuro"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Tema scuro" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Tema chiaro"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Tema chiaro" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Cerca" placeholder="Cerca" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Cerca">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Cancella" aria-label="Cancella" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Inizializza la ricerca
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/biamat26/AppuntiMagistrale" title="Apri repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    AppuntiMagistrale
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../crittografia/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Crittografia
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../sistemi-distribuiti/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Distributed Systems
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Network Infrastructures
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigazione" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Appunti di Luiggi" class="md-nav__button md-logo" aria-label="Appunti di Luiggi" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 4v6l-2-2-2 2V4H9v16h10V4zM3 7V5h2V4a2 2 0 0 1 2-2h12c1.05 0 2 .95 2 2v16c0 1.05-.95 2-2 2H7c-1.05 0-2-.95-2-2v-1H3v-2h2v-4H3v-2h2V7zm2-2v2h2V5zm0 14h2v-2H5zm0-6h2v-2H5z"/></svg>
+
+    </a>
+    Appunti di Luiggi
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/biamat26/AppuntiMagistrale" title="Apri repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    AppuntiMagistrale
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../crittografia/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Crittografia
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Crittografia
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../crittografia/ripasso-probabilita/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ripasso probabilità
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../crittografia/lezione-1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 1 – Segretezza perfetta
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../crittografia/lezione-2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 2 – Shannon e MAC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../crittografia/lezione-3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 3 – Hash ed estrattori
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../crittografia/lezione-4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 4 – Sicurezza computazionale e OWF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../crittografia/lezione-5/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 5 – PRG e hard-core bit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../crittografia/lezione-6/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 6 – Goldreich-Levin e cifratura computazionale
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../sistemi-distribuiti/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Distributed Systems
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Distributed Systems
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sistemi-distribuiti/lezione-2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 2 – Modelli, astrazioni e link
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sistemi-distribuiti/lezione-3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 3 – Tempo (I): orologi fisici
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sistemi-distribuiti/lezione-4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 4 – Tempo (II): tempo logico
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sistemi-distribuiti/lezione-5/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 5 – Failure detector e leader election
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Network Infrastructures
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Network Infrastructures
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lezione-1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 1 – Aree funzionali della rete
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lezione-2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 2 – xDSL e PPP
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 3 – FTTx e PON
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 3 – FTTx e PON
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Indice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Indice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#di-cosa-parliamo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Di cosa parliamo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-perche-fttx" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Perché FTTx
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Perché FTTx">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#banda-e-distanza-delle-tecnologie-daccesso" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Banda e distanza delle tecnologie d'accesso
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#la-rete-daccesso-in-rame-struttura-fisica" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        La rete d'accesso in rame: struttura fisica
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-principi-dei-sistemi-in-fibra-ottica" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Principi dei sistemi in fibra ottica
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Principi dei sistemi in fibra ottica">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#attenuazione-della-fibra" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Attenuazione della fibra
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dispersione" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dispersione
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#laser-sorgenti" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Laser (sorgenti)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fotodiodi-ricevitori" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fotodiodi (ricevitori)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#splitter-passivi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Splitter passivi
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#power-budget" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Power budget
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-posa-della-fibra" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Posa della fibra
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-architetture-fttx" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Architetture FTTx
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Architetture FTTx">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#come-portare-la-fibra-a-piu-case" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Come portare la fibra a più case
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#capacita-daccesso-telecom-italia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Capacità d'accesso (Telecom Italia)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#esempio-fastweb-2000-il-primo-ftth-in-europa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Esempio: Fastweb (2000), il primo FTTH in Europa
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#distribuzione-nelledificio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Distribuzione nell'edificio
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-pon-funzionamento-di-base" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. PON: funzionamento di base
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-condividere-la-fibra-tdma-vs-wdma" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Condividere la fibra: TDMA vs WDMA
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Condividere la fibra: TDMA vs WDMA">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#spiegato-semplice-laula" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Spiegato semplice: l'aula
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tdm-pon-vs-wdm-pon" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TDM-PON vs WDM-PON
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#downstream-scheduling-tdm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Downstream: scheduling TDM
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#upstream-scheduling-tdma" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Upstream: scheduling TDMA
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ricezione-dei-burst-upstream" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ricezione dei burst upstream
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-gli-standard-pon" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Gli standard PON
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Gli standard PON">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#evoluzione" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Evoluzione
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#epon-ethernet-pon" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EPON (Ethernet PON)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#overhead-dei-burst-bpon-gpon-epon" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overhead dei burst: BPON, GPON, EPON
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#meccanismi-di-protezione" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Meccanismi di protezione
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#carrier-ethernet-per-epon" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Carrier Ethernet per EPON
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-il-futuro-wdm-pon" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Il futuro: WDM-PON
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. Il futuro: WDM-PON">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#evoluzione-della-fotonica" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Evoluzione della fotonica
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-mercato-e-costi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Mercato e costi
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. Mercato e costi">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#situazione-internazionale-exfo-2007" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Situazione internazionale (EXFO, 2007)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#costi-fttx-capex-relativo-tim" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Costi FTTx (CAPEX relativo, TIM)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#domande-di-ripasso" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Domande di ripasso
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#riepilogo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Riepilogo
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kathara/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Kathará
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Indice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Indice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#di-cosa-parliamo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Di cosa parliamo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-perche-fttx" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Perché FTTx
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Perché FTTx">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#banda-e-distanza-delle-tecnologie-daccesso" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Banda e distanza delle tecnologie d'accesso
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#la-rete-daccesso-in-rame-struttura-fisica" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        La rete d'accesso in rame: struttura fisica
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-principi-dei-sistemi-in-fibra-ottica" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Principi dei sistemi in fibra ottica
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Principi dei sistemi in fibra ottica">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#attenuazione-della-fibra" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Attenuazione della fibra
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dispersione" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dispersione
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#laser-sorgenti" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Laser (sorgenti)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fotodiodi-ricevitori" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fotodiodi (ricevitori)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#splitter-passivi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Splitter passivi
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#power-budget" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Power budget
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-posa-della-fibra" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Posa della fibra
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-architetture-fttx" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Architetture FTTx
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Architetture FTTx">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#come-portare-la-fibra-a-piu-case" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Come portare la fibra a più case
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#capacita-daccesso-telecom-italia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Capacità d'accesso (Telecom Italia)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#esempio-fastweb-2000-il-primo-ftth-in-europa" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Esempio: Fastweb (2000), il primo FTTH in Europa
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#distribuzione-nelledificio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Distribuzione nell'edificio
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-pon-funzionamento-di-base" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. PON: funzionamento di base
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-condividere-la-fibra-tdma-vs-wdma" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Condividere la fibra: TDMA vs WDMA
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Condividere la fibra: TDMA vs WDMA">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#spiegato-semplice-laula" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Spiegato semplice: l'aula
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tdm-pon-vs-wdm-pon" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TDM-PON vs WDM-PON
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#downstream-scheduling-tdm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Downstream: scheduling TDM
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#upstream-scheduling-tdma" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Upstream: scheduling TDMA
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ricezione-dei-burst-upstream" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ricezione dei burst upstream
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-gli-standard-pon" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Gli standard PON
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Gli standard PON">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#evoluzione" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Evoluzione
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#epon-ethernet-pon" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EPON (Ethernet PON)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#overhead-dei-burst-bpon-gpon-epon" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overhead dei burst: BPON, GPON, EPON
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#meccanismi-di-protezione" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Meccanismi di protezione
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#carrier-ethernet-per-epon" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Carrier Ethernet per EPON
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-il-futuro-wdm-pon" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Il futuro: WDM-PON
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. Il futuro: WDM-PON">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#evoluzione-della-fotonica" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Evoluzione della fotonica
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-mercato-e-costi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Mercato e costi
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. Mercato e costi">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#situazione-internazionale-exfo-2007" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Situazione internazionale (EXFO, 2007)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#costi-fttx-capex-relativo-tim" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Costi FTTx (CAPEX relativo, TIM)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#domande-di-ripasso" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Domande di ripasso
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#riepilogo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Riepilogo
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="lezione-3-fttx-e-reti-ottiche-passive-pon">Lezione 3 – FTTx e reti ottiche passive (PON)<a class="headerlink" href="#lezione-3-fttx-e-reti-ottiche-passive-pon" title="Permanent link">&para;</a></h1>
+<h2 id="di-cosa-parliamo">Di cosa parliamo<a class="headerlink" href="#di-cosa-parliamo" title="Permanent link">&para;</a></h2>
+<p>La lezione 2 ha mostrato che il rame ha un limite fisico: più è lungo, meno banda porta. La soluzione è portare la <b>fibra ottica</b> sempre più vicino all'utente (<b>FTTx</b>). Questa lezione spiega <b>perché</b> serve la fibra, <b>come</b> si costruisce una rete d'accesso in fibra economica (la <b>PON</b>, rete ottica passiva), i componenti ottici che servono (fibra, laser, fotodiodi, splitter), come si condivide la fibra tra tanti utenti (TDMA), gli standard (APON, BPON, EPON, GPON), il futuro (WDM-PON) e i costi.</p>
+<h2 id="1-perche-fttx">1. Perché FTTx<a class="headerlink" href="#1-perche-fttx" title="Permanent link">&para;</a></h2>
+<h3 id="banda-e-distanza-delle-tecnologie-daccesso">Banda e distanza delle tecnologie d'accesso<a class="headerlink" href="#banda-e-distanza-delle-tecnologie-daccesso" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Ogni tecnologia d'accesso ha una "zona" di funzionamento fatta di velocità e distanza. Solo la fibra copre tutto: velocità fino a 10 Gbit/s e distanze di decine di km.</p>
+</div>
+<p>Dal grafico <i>access/backhaul</i> (velocità vs distanza):</p>
+<ul>
+<li><b>xDSL</b>: da circa 100 Mbit/s su poche decine di metri a 1 Mbit/s verso i 5 km.</li>
+<li><b>Optical wireless</b> (laser in aria libera): fino a 10 Gbit/s ma solo fino a circa 1 km.</li>
+<li><b>LMDS</b> (<i>Local Multipoint Distribution Service</i>, radio a microonde punto-multipunto): circa 1–100 Mbit/s fino a qualche km.</li>
+<li><b>Microwave</b> (ponti radio): circa 100 Mbit/s su 1–15 km.</li>
+<li><b>Fibra</b>: da 100 Mbit/s a 10 Gbit/s, su qualunque distanza (15 km e oltre).</li>
+</ul>
+<p><b>Backhaul</b> = il collegamento che porta il traffico dai nodi d'accesso (es. un DSLAM o una stazione radio) verso la rete core.</p>
+<h3 id="la-rete-daccesso-in-rame-struttura-fisica">La rete d'accesso in rame: struttura fisica<a class="headerlink" href="#la-rete-daccesso-in-rame-struttura-fisica" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Dalla centrale parte un cavo primario enorme (migliaia di coppie) verso l'armadio; dall'armadio partono cavi secondari più piccoli verso i box vicino agli edifici; dal box parte il doppino di ogni casa.</p>
+</div>
+<pre class="mermaid"><code>flowchart LR
+  CO["Central office"] --&gt;|"cavo primario&lt;br&gt;2000-2400 coppie"| CAB["Distribution cabinet&lt;br&gt;armadio"]
+  CAB --&gt;|"cavo secondario&lt;br&gt;10-100 coppie"| BOX["Distribution point&lt;br&gt;box"]
+  BOX --&gt;|"doppino"| H["Casa / home network"]
+  CAB -.-&gt;|"linea dedicata"| AZ["Aziende"]</code></pre>
+<ul>
+<li><b>Rete primaria</b> (<i>feeder</i>): obiettivo <b>condivisione alta</b> e <b>costi minimi</b>. Cavi da 2000–2400 coppie, posati in tubi o canalizzazioni.</li>
+<li><b>Rete secondaria</b> (<i>distribution</i>): obiettivo <b>flessibilità</b> e <b>ramificazione</b>. Cavi da 10–100 coppie, interrati o aerei (su pali).</li>
+<li>Mettere più livelli di armadi in cascata è possibile ma raro.</li>
+</ul>
+<p><b>Rete Telecom Italia in rame</b> (dati della slide):</p>
+<ul>
+<li>628 <b>SGU</b> (<i>Stadi di Gruppo Urbano</i>, centrali di commutazione) e 10.313 <b>SL</b> (<i>Stadi di Linea</i>, le centrali locali dove ci sono DSLAM e <b>permutatore</b>);</li>
+<li>140.000 armadi, circa 5,5 milioni di distributori/terminazioni (1,5 milioni di box interni agli edifici, 3,9 milioni esterni);</li>
+<li>circa 530.000 km di cavo e 110 milioni di km-coppia;</li>
+<li>i cavi della rete primaria sono <b>pressurizzati</b> (aria in pressione per tenere fuori l'umidità).</li>
+</ul>
+<p><b>Lunghezza dei doppini</b>: dal grafico, in Italia quasi tutti i doppini sono sotto i 4–5 km e circa il 70% sotto i 2 km: la rete italiana è <b>più corta</b> di quella USA e giapponese. Questo rende il VDSL dagli armadi (FTTCab) molto efficace in Italia.</p>
+<h2 id="2-principi-dei-sistemi-in-fibra-ottica">2. Principi dei sistemi in fibra ottica<a class="headerlink" href="#2-principi-dei-sistemi-in-fibra-ottica" title="Permanent link">&para;</a></h2>
+<h3 id="attenuazione-della-fibra">Attenuazione della fibra<a class="headerlink" href="#attenuazione-della-fibra" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>La luce in fibra perde potenza molto lentamente, ma quanto dipende dalla lunghezza d'onda. Ci sono tre "finestre" dove la fibra attenua poco e si trasmette lì.</p>
+</div>
+<ul>
+<li>Per le lunghe distanze si usa fibra <b>monomodale</b> (<b>SMF</b>, <i>Single Mode Fiber</i>), standard <b>ITU G.652</b>.</li>
+<li>Attenuazione in funzione della lunghezza d'onda <span class="arithmatex">\(\lambda\)</span>:</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Finestra</th>
+<th><span class="arithmatex">\(\lambda\)</span></th>
+<th>Attenuazione (circa)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Prima</td>
+<td>850 nm</td>
+<td>circa 2 dB/km</td>
+</tr>
+<tr>
+<td>Seconda</td>
+<td>1310 nm</td>
+<td>circa 0,35 dB/km</td>
+</tr>
+<tr>
+<td>Terza</td>
+<td>1550 nm</td>
+<td>circa 0,2 dB/km (minimo)</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Nella fibra standard (<b>G.652, STD</b>) c'è il <b>water peak</b>: un picco di attenuazione intorno a 1383 nm, dovuto a residui di acqua (ioni OH) nel vetro, che rende inutilizzabile la banda <b>1360–1480 nm</b>.</li>
+<li>La fibra <b>G.652c/d (ZWP, zero water peak)</b> elimina il picco: tutta la banda da 1300 a 1600 nm è utilizzabile, quindi ci stanno più canali.</li>
+</ul>
+<h3 id="dispersione">Dispersione<a class="headerlink" href="#dispersione" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Un impulso di luce che parte "stretto" arriva "allargato". Se si allarga troppo, invade il bit successivo e i bit si confondono. Questo limita il prodotto velocità × distanza.</p>
+</div>
+<ul>
+<li><b>Dispersione cromatica</b>: un laser non emette una sola lunghezza d'onda ma un piccolo intervallo; lunghezze d'onda diverse viaggiano a velocità leggermente diverse nel vetro. Risultato: l'impulso si <b>allarga</b> (<i>pulse broadening</i>).</li>
+<li>Più lo spettro del laser è largo, più dispersione.</li>
+</ul>
+<p>Tipi di fibra (e dispersione <b>modale</b>, dovuta ai diversi percorsi della luce):</p>
+<table>
+<thead>
+<tr>
+<th>Fibra</th>
+<th>Nucleo</th>
+<th>Come viaggia la luce</th>
+<th>Impulso in uscita</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Multimodo step index</td>
+<td>circa 200 µm</td>
+<td>Tanti raggi rimbalzano con angoli diversi: percorsi di lunghezza diversa</td>
+<td>Molto allargato</td>
+</tr>
+<tr>
+<td>Multimodo graded index</td>
+<td>50–100 µm</td>
+<td>Indice di rifrazione che cala verso il bordo: i raggi curvano e arrivano quasi insieme</td>
+<td>Poco allargato</td>
+</tr>
+<tr>
+<td>Monomodo (SMF)</td>
+<td>circa 10 µm</td>
+<td>Un solo modo, praticamente in linea retta</td>
+<td>Quasi identico (resta solo la cromatica)</td>
+</tr>
+</tbody>
+</table>
+<p>(Il diametro esterno del rivestimento, <i>cladding</i>, è 125 µm in entrambe le fibre standard.)</p>
+<h3 id="laser-sorgenti">Laser (sorgenti)<a class="headerlink" href="#laser-sorgenti" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Il trasmettitore è un diodo laser. Quello economico (Fabry-Perot) emette più righe ed è "sporco"; quello costoso (DFB) emette una riga sola, quindi soffre meno la dispersione.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Fabry-Perot (FP)</th>
+<th>Distributed Feedback (DFB)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Costo</td>
+<td>Economico</td>
+<td>Più caro</td>
+</tr>
+<tr>
+<td>Spettro</td>
+<td>Più righe (multimodo longitudinale), rumoroso</td>
+<td>Una riga stretta</td>
+</tr>
+<tr>
+<td>Dispersione cromatica</td>
+<td>Molto sensibile</td>
+<td>Poco sensibile</td>
+</tr>
+<tr>
+<td>Uso</td>
+<td>1310 nm (dove la dispersione della G.652 è quasi nulla)</td>
+<td>1550 nm (o 1310 nm)</td>
+</tr>
+</tbody>
+</table>
+<p>Struttura: entrambi hanno una zona di <b>guadagno</b> tra due specchi; nel FP gli specchi sono le facce tagliate del cristallo (<i>cleave</i>), nel DFB c'è un <b>reticolo</b> lungo il laser che seleziona una sola <span class="arithmatex">\(\lambda\)</span> (e una faccia ha un rivestimento antiriflesso, <i>AR coating</i>).</p>
+<h3 id="fotodiodi-ricevitori">Fotodiodi (ricevitori)<a class="headerlink" href="#fotodiodi-ricevitori" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Il ricevitore trasforma la luce in corrente. Il PIN è economico e sente fino a circa −22 dBm; l'APD amplifica internamente e sente segnali più deboli (circa −30 dBm), ma costa molto di più.</p>
+</div>
+<ul>
+<li><b>PIN</b>:<ul>
+<li>sensibilità circa <b>−22 dBm</b> (la potenza minima che riesce a ricevere correttamente);</li>
+<li>in <b>silicio</b> per le <span class="arithmatex">\(\lambda\)</span> corte (850 nm), in <b>InGaAs</b> per le lunghe (1310/1550 nm).</li>
+</ul>
+</li>
+<li><b>APD</b> (<i>Avalanche Photodiode</i>):<ul>
+<li>sensibilità circa <b>−30 dBm</b> (effetto valanga: ogni fotone genera molti elettroni);</li>
+<li>usati per distanze lunghe a velocità di Gbit/s;</li>
+<li>molto più costosi.</li>
+</ul>
+</li>
+</ul>
+<p><b>Ricorda</b>: dBm = potenza in decibel rispetto a 1 mW. 0 dBm = 1 mW; −30 dBm = 1 µW. Una sensibilità "più negativa" è migliore.</p>
+<h3 id="splitter-passivi">Splitter passivi<a class="headerlink" href="#splitter-passivi" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Lo splitter ottico divide la luce di una fibra su più fibre, senza alimentazione. Il prezzo è la potenza: ogni divisione in due dimezza il segnale, cioè toglie 3 dB.</p>
+</div>
+<ul>
+<li>L'elemento base (1×2) è fatto di <b>due fibre fuse insieme</b>; uno dei due ingressi non si usa.</li>
+<li>Uno splitter <b>1×N</b> è una cascata di 1×2: per <span class="arithmatex">\(N = 2^k\)</span> servono <span class="arithmatex">\(k\)</span> livelli.</li>
+<li>Ogni divisione in due: <span class="arithmatex">\(10 \log_{10}(0{,}5) \approx -3\)</span> dB.</li>
+</ul>
+<div class="arithmatex">\[
+\text{Perdita} \approx 3 \text{ dB} \times \log_2(N_{ONU})
+\]</div>
+<ul>
+<li>Valori reali di uno splitter 1×2: <b>3,7 dB</b> convenzionale, <b>3,4 dB</b> low-loss (più dei 3 dB ideali per le perdite in eccesso).</li>
+</ul>
+<p><b>Esempio</b>: 1×32 → <span class="arithmatex">\(\log_2 32 = 5\)</span> livelli → circa 15 dB ideali, circa 18,5 dB con splitter convenzionali.</p>
+<h3 id="power-budget">Power budget<a class="headerlink" href="#power-budget" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Il power budget è quanta attenuazione totale può sopportare il collegamento: differenza tra la potenza che esce dal trasmettitore e la potenza minima che serve al ricevitore. Splitter, fibra e connettori devono starci dentro.</p>
+</div>
+<div class="arithmatex">\[
+\text{Budget [dB]} = P_{TX} \text{ [dBm]} - S_{RX} \text{ [dBm]}
+\]</div>
+<p>Ipotesi della slide:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>TX power</th>
+<th>RX sensitivity</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ONU (FP + PIN, economica)</td>
+<td>0 dBm</td>
+<td>−22 dBm</td>
+</tr>
+<tr>
+<td>OLT (DFB + APD, costosa)</td>
+<td>1 dBm</td>
+<td>−30 dBm</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><b>Upstream</b> (ONU → OLT, a 1310 nm): <span class="arithmatex">\(0 - (-30) = 30\)</span> dB.</li>
+<li><b>Downstream</b> (OLT → ONU, a 1490 nm): <span class="arithmatex">\(1 - (-22) = 23\)</span> dB; la slide riporta <b>22 dB</b> (arrotondamento/margine).</li>
+<li>Logica di progetto: gli apparati costosi (DFB, APD) si mettono nell'<b>OLT</b>, che è uno solo e condiviso; le ONU, che sono tante, usano componenti economici.</li>
+</ul>
+<p><b>Esempio di verifica</b> (<i>complemento</i>): downstream con splitter 1×32 (circa 17 dB) + 10 km di fibra a 0,3 dB/km (3 dB) = 20 dB, sotto i 22 dB disponibili: funziona, con circa 2 dB di margine. Con 1×64 (circa 21 dB di splitter) non ci si starebbe più: ecco perché split ratio e distanza sono limitati.</p>
+<h2 id="3-posa-della-fibra">3. Posa della fibra<a class="headerlink" href="#3-posa-della-fibra" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Il costo vero della fibra non è il vetro, è lo scavo. Per ridurlo si usano tecniche leggere come la microtrincea e il soffiaggio.</p>
+</div>
+<ul>
+<li><b>Minitrincea/microtrincea</b>: un taglio nell'asfalto largo circa <b>5 cm</b> e profondo <b>25–30 cm</b>; dentro si mette un tubo con il cavo in fibra, poi materiale di riempimento, binder e un tappetino d'asfalto. Costo circa <b>30–40 k€/km</b>: molto meno di uno scavo tradizionale.</li>
+<li><b>Soffiaggio</b> (<i>fiber blowing</i>): la fibra viene spinta dentro un minitubo già posato usando aria compressa; comodo anche dentro gli edifici.</li>
+</ul>
+<h2 id="4-architetture-fttx">4. Architetture FTTx<a class="headerlink" href="#4-architetture-fttx" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Si sposta il DSLAM (o il punto in cui finisce la fibra) sempre più vicino all'utente: prima in centrale, poi nell'armadio, poi nel secondo armadio, poi nell'edificio, infine in casa.</p>
+</div>
+<p>Distanze tipiche: centrale → primo armadio 500–1000 m, primo → secondo armadio 100–300 m, secondo armadio → edificio 50–200 m.</p>
+<table>
+<thead>
+<tr>
+<th>Architettura</th>
+<th>Dove sta il DSLAM / ONU</th>
+<th>Cosa resta in rame</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>a) Attuale (FTTE)</td>
+<td>DSLAM in centrale</td>
+<td>Tutto, dalla centrale a casa</td>
+</tr>
+<tr>
+<td>b) Fiber to the cabinet</td>
+<td>DSLAM nel primo armadio</td>
+<td>Dal primo armadio a casa</td>
+</tr>
+<tr>
+<td>c) Fiber to the curb</td>
+<td>DSLAM nel secondo armadio</td>
+<td>Dal secondo armadio a casa</td>
+</tr>
+<tr>
+<td>d) Fiber to the building</td>
+<td>DSLAM (D) nell'edificio</td>
+<td>Solo il cablaggio interno</td>
+</tr>
+<tr>
+<td>e) Fiber to the home</td>
+<td>–</td>
+<td>Niente: fibra fino a ogni appartamento</td>
+</tr>
+</tbody>
+</table>
+<p>In tutte le architetture con fibra, in centrale il DSLAM viene sostituito da uno <b>switch/router</b> che manda il traffico in fibra.</p>
+<h3 id="come-portare-la-fibra-a-piu-case">Come portare la fibra a più case<a class="headerlink" href="#come-portare-la-fibra-a-piu-case" title="Permanent link">&para;</a></h3>
+<p>Tre modi:</p>
+<ul>
+<li><b>a) Punto-punto</b>: una fibra dedicata dalla centrale a ogni casa. Massime prestazioni, ma tantissime fibre e porte in centrale.</li>
+<li><b>b) Curb switch</b>: una fibra fino a uno <b>switch attivo</b> vicino alle case, che poi distribuisce (<b>AON</b>). Serve alimentazione sul campo.</li>
+<li><b>c) PON</b>: una fibra fino a uno <b>splitter ottico passivo</b>, che la divide verso le case. Nessun apparato alimentato sul campo, poche fibre in centrale.</li>
+</ul>
+<h3 id="capacita-daccesso-telecom-italia">Capacità d'accesso (Telecom Italia)<a class="headerlink" href="#capacita-daccesso-telecom-italia" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Architettura</th>
+<th>Tecnologia</th>
+<th>Downstream</th>
+<th>Upstream</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FTTE</td>
+<td>ADSL2+ dalla centrale (rame 200–3000 m + 100–700 m)</td>
+<td>3–20 Mbit/s</td>
+<td>sotto 1 Mbit/s</td>
+</tr>
+<tr>
+<td>FTTCab</td>
+<td>VDSL2 profilo 17 MHz dall'ONU nell'armadio</td>
+<td>25–50 Mbit/s</td>
+<td>2–10 Mbit/s</td>
+</tr>
+<tr>
+<td>FTTB</td>
+<td>VDSL2 profilo 30 MHz dall'ONU nell'edificio</td>
+<td>50–100 Mbit/s</td>
+<td>25–40 Mbit/s</td>
+</tr>
+<tr>
+<td>FTTH</td>
+<td>Ottica fino a casa</td>
+<td>0,1–1 Gbit/s</td>
+<td>0,1–1 Gbit/s</td>
+</tr>
+</tbody>
+</table>
+<h3 id="esempio-fastweb-2000-il-primo-ftth-in-europa">Esempio: Fastweb (2000), il primo FTTH in Europa<a class="headerlink" href="#esempio-fastweb-2000-il-primo-ftth-in-europa" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Fastweb non ha usato una PON, ma una rete <b>Gigabit Ethernet</b> attiva: switch IP in ogni edificio, collegati tra loro ad anello verso il core.</p>
+</div>
+<ul>
+<li>Architettura <b>daisy chain</b>: gli switch GbE sono collegati <b>in catena ad anello</b> che parte e torna al core (se un link si rompe, il traffico gira dall'altra parte); ogni switch serve un gruppo di case.</li>
+<li><b>FTTH residenziale</b>: fibra fino a un <b>IP switch</b> nello scantinato dell'edificio; da lì a ogni appartamento, dove l'<b>HAG</b> (<i>Home Access Gateway</i>) collega PC, TV (IPTV) e telefono (VoIP).</li>
+<li><b>FTTB business</b>: fibra fino a un <b>router</b> nella sala tecnica dell'edificio, che collega la LAN aziendale e il centralino telefonico (<b>PABX</b>).</li>
+</ul>
+<h3 id="distribuzione-nelledificio">Distribuzione nell'edificio<a class="headerlink" href="#distribuzione-nelledificio" title="Permanent link">&para;</a></h3>
+<ul>
+<li><b>Building Optical Distribution Point</b> (spesso in un box su palo o in facciata): collega la fibra in arrivo alle singole fibre degli appartamenti o uffici.</li>
+<li>Contiene e protegge connessioni, giunzioni e, a seconda del progetto, gli <b>splitter ottici</b>.</li>
+<li>È <b>passivo</b>: non richiede alimentazione.</li>
+</ul>
+<h2 id="5-pon-funzionamento-di-base">5. PON: funzionamento di base<a class="headerlink" href="#5-pon-funzionamento-di-base" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>In una PON un unico apparato in centrale (OLT) parla con fino a 32–64 utenti (ONT) attraverso uno splitter passivo. In discesa l'OLT trasmette a tutti; in salita gli utenti parlano a turno, ognuno nel suo intervallo di tempo.</p>
+</div>
+<pre class="mermaid"><code>flowchart LR
+  OLT["OLT&lt;br&gt;laser DFB 1490/1550 nm&lt;br&gt;ricevitore burst-mode 1310 nm"] ---|"una fibra"| S(("Splitter&lt;br&gt;1xN passivo"))
+  S --- O1["ONT 1"]
+  S --- O2["ONT 2"]
+  S --- O3["ONT N"]</code></pre>
+<ul>
+<li><b>Downstream</b>: l'<b>OLT</b> trasmette in <b>broadcast</b> su circa <b>1490–1510 nm</b> ("1,5xx nm").</li>
+<li><b>Upstream</b>: le <b>ONT</b> trasmettono <b>a burst</b> su <b>1310 nm</b>, ognuna nel suo <b>time slot</b> assegnato.</li>
+<li>Le due direzioni usano <span class="arithmatex">\(\lambda\)</span> diverse sulla <b>stessa fibra</b> (WDM a due lunghezze d'onda).</li>
+<li>Esempio FSAN BPON: upstream 155 Mbit/s, downstream 155/622 Mbit/s; fino a <b>32 ONT</b>, ognuna può servire più utenti.</li>
+<li>(La terza <span class="arithmatex">\(\lambda\)</span>, 1550 nm, è tipicamente usata per il video broadcast analogico/RF, <i>complemento</i>.)</li>
+</ul>
+<p><b>Elementi di una PON</b> (schema completo):</p>
+<ul>
+<li>In <b>centrale</b>: l'<b>OLT</b>, collegato verso la rete a un nodo ATM (interfacce VB5.1/VB5.2), a una rete dati/CDN e alla PSTN/ISDN (interfacce V5.1/V5.2).</li>
+<li><b>Rete primaria</b>: fibra fino a un <b>diramatore 1:N</b> (lo splitter).</li>
+<li><b>Rete secondaria</b>: fibre verso ONU in <b>cabinet</b>, <b>curb</b> o <b>building</b>.</li>
+<li>Dall'ONU si prosegue con <b>VDSL</b> su coppia in rame fino all'<b>NT</b> dell'utente, a cui si collegano la rete domestica e il <b>set-top box (STB)</b>.</li>
+</ul>
+<h2 id="6-condividere-la-fibra-tdma-vs-wdma">6. Condividere la fibra: TDMA vs WDMA<a class="headerlink" href="#6-condividere-la-fibra-tdma-vs-wdma" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>In discesa non c'è problema, parla solo l'OLT. In salita invece tanti ONU parlano verso uno solo e i loro segnali si sommano nello splitter: se trasmettono insieme, collidono. Serve una regola di accesso: o turni di tempo (TDMA) o colori diversi (WDMA).</p>
+</div>
+<h3 id="spiegato-semplice-laula">Spiegato semplice: l'aula<a class="headerlink" href="#spiegato-semplice-laula" title="Permanent link">&para;</a></h3>
+<p>Immagina un'<b>aula</b>: l'<b>OLT</b> è il professore, le <b>ONU</b> sono gli studenti, lo <b>splitter</b> è la stanza che li collega.</p>
+<p><b>Downstream (OLT → ONU): parla il professore</b></p>
+<ul>
+<li>La voce del professore arriva <b>a tutti</b>. Lo splitter fa proprio questo: <b>copia</b> la luce dell'OLT su tutte le fibre, verso tutte le case.</li>
+<li>Il professore dice: "Mario, il tuo voto è 28. Luca, il tuo voto è 25." Tutti sentono tutto, ma ognuno <b>tiene solo la frase con il suo nome</b>.</li>
+<li>Nella PON: l'OLT manda pacchetti con l'indirizzo della ONU destinataria; ogni ONU li riceve tutti e tiene solo i suoi.</li>
+<li><b>Nessun problema</b>: parla una persona sola. È un <b>broadcast</b> (uno parla, tutti sentono), in una rete <b>punto-multipunto</b>.</li>
+</ul>
+<p><b>Upstream (ONU → OLT): parlano gli studenti</b></p>
+<ul>
+<li>Se gli studenti parlano <b>tutti insieme</b>, il professore sente solo confusione.</li>
+<li>Nella PON lo splitter, al contrario, fa da <b>imbuto</b>: unisce la luce di tutte le ONU in un'unica fibra verso l'OLT. Se due ONU trasmettono nello stesso momento, le loro luci <b>si sommano</b> e all'OLT arriva un segnale illeggibile: è la <b>collisione</b>.</li>
+<li>È una rete <b>multipunto-punto</b>.</li>
+<li><b>Perché le ONU non si sentono tra loro?</b> Lo splitter manda la luce di una ONU <b>solo verso l'OLT</b>, non verso le altre ONU. Una ONU non può "ascoltare" se un'altra sta parlando e aspettare da sola: è come se gli studenti fossero in cabine insonorizzate che comunicano solo con il professore.</li>
+</ul>
+<p><b>La soluzione: il professore assegna i turni (TDMA)</b></p>
+<ul>
+<li>"Mario, parli tu da 0 a 2 secondi. Luca, tu da 2 a 4. Giulia, tu da 4 a 6." Nessuno si sovrappone.</li>
+<li>Nella PON l'OLT assegna a ogni ONU un <b>time slot</b>; ogni ONU accumula i suoi dati e li manda <b>solo nel suo turno</b>. È il <b>TDMA</b> (<i>Time Division Multiple Access</i>).</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Chi parla</th>
+<th>Problema</th>
+<th>Soluzione</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Downstream</td>
+<td>Solo l'OLT</td>
+<td>Nessuno</td>
+<td>Broadcast, ogni ONU prende il suo</td>
+</tr>
+<tr>
+<td>Upstream</td>
+<td>Tante ONU</td>
+<td>Si sommano nello splitter (collisioni) e non si sentono tra loro</td>
+<td>L'OLT assegna i turni (TDMA)</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><b>Downstream</b> = rete <b>punto-multipunto</b>: l'OLT gestisce tutta la banda.</li>
+<li><b>Upstream</b> = rete <b>multipunto-punto</b>:<ul>
+<li>le ONU trasmettono solo verso l'OLT e <b>non possono comunicare direttamente</b> tra loro;</li>
+<li>una ONU <b>non sente</b> le trasmissioni delle altre (lo splitter manda la loro luce verso l'OLT, non verso le altre ONU), quindi non può fare carrier sense come in Ethernet classica;</li>
+<li>i dati di ONU diverse possono <b>collidere</b> nello splitter/combiner.</li>
+</ul>
+</li>
+<li>Soluzioni:<ul>
+<li><b>TDMA</b> (<i>Time Division Multiple Access</i>): ogni ONU trasmette in istanti diversi;</li>
+<li><b>WDMA</b> (<i>Wavelength Division Multiple Access</i>): ogni ONU trasmette su una <span class="arithmatex">\(\lambda\)</span> diversa.</li>
+</ul>
+</li>
+</ul>
+<h3 id="tdm-pon-vs-wdm-pon">TDM-PON vs WDM-PON<a class="headerlink" href="#tdm-pon-vs-wdm-pon" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>TDM-PON</th>
+<th>WDM-PON</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Stato</td>
+<td>Standardizzate</td>
+<td>Proposte in letteratura / dimostrate</td>
+</tr>
+<tr>
+<td>Lunghezze d'onda</td>
+<td>Poche (2 o 3)</td>
+<td>Una (o due) per ONU</td>
+</tr>
+<tr>
+<td>Componenti</td>
+<td>Economici e maturi (splitter, laser)</td>
+<td>Dispositivi WDM (es. AWG)</td>
+</tr>
+<tr>
+<td>Power budget</td>
+<td>Limitato: max 20 km, split ratio max 64</td>
+<td>Lunga portata e più banda</td>
+</tr>
+<tr>
+<td>Traffico</td>
+<td>Broadcast in discesa, TDMA in salita</td>
+<td>Canale dedicato per ONU</td>
+</tr>
+<tr>
+<td>Esempi</td>
+<td>APON/BPON, EPON, GPON</td>
+<td>CPON, LARNET, RITENET, SUCCESS-DWA</td>
+</tr>
+</tbody>
+</table>
+<h3 id="downstream-scheduling-tdm">Downstream: scheduling TDM<a class="headerlink" href="#downstream-scheduling-tdm" title="Permanent link">&para;</a></h3>
+<ul>
+<li>L'OLT mette il traffico di ogni ONU in <b>time slot</b> (multiplazione TDM).</li>
+<li>Lo splitter copia <b>tutto</b> il flusso su tutte le uscite: ogni ONU riceve tutto (A B C B) e tiene solo i suoi slot.</li>
+<li>Gli slot vanno da circa <b>µs a ms</b>.</li>
+<li>Conseguenza per la sicurezza (<i>complemento</i>): ogni ONU "vede" fisicamente il traffico degli altri, per questo gli standard PON cifrano il downstream.</li>
+</ul>
+<h3 id="upstream-scheduling-tdma">Upstream: scheduling TDMA<a class="headerlink" href="#upstream-scheduling-tdma" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Tutte le ONU condividono lo <b>stesso canale</b> upstream; collisioni possibili nello splitter.</li>
+<li>Gli standard PON usano <b>TDMA</b>: il tempo in salita viene diviso in slot e assegnato alle ONU, così i burst arrivano all'OLT uno dopo l'altro senza sovrapporsi (A, B, C, B).</li>
+<li>Per farlo, l'OLT deve conoscere la distanza di ogni ONU e compensare i diversi ritardi di propagazione (<i>ranging</i>, <i>complemento</i>).</li>
+</ul>
+<h3 id="ricezione-dei-burst-upstream">Ricezione dei burst upstream<a class="headerlink" href="#ricezione-dei-burst-upstream" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Le ONU sono a distanze diverse (es. 1, 3, 7 km), quindi i loro burst arrivano all'OLT con potenze diverse. Il ricevitore deve riadattarsi a ogni burst: è un ricevitore "burst mode".</p>
+</div>
+<ul>
+<li>I frame arrivano all'OLT con <b>potenze diverse</b> (una ONU a 7 km arriva più debole di una a 1 km).</li>
+<li>È difficile recuperare il <b>sincronismo</b> (<i>clock and data recovery</i>, CDR) e decidere cosa è 0 e cosa è 1.</li>
+<li>Serve un <b>burst mode receiver</b> (complesso) nell'OLT: con un <b>AGC</b> (<i>Automatic Gain Control</i>) reimposta la <b>soglia 0/1</b> all'inizio di ogni burst.</li>
+</ul>
+<h2 id="7-gli-standard-pon">7. Gli standard PON<a class="headerlink" href="#7-gli-standard-pon" title="Permanent link">&para;</a></h2>
+<h3 id="evoluzione">Evoluzione<a class="headerlink" href="#evoluzione" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Standard</th>
+<th>Periodo</th>
+<th>Velocità</th>
+<th>Ente / trasporto</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>APON</td>
+<td>circa 1990–1996</td>
+<td>54 Mbit/s</td>
+<td>FSAN/ITU, celle ATM</td>
+</tr>
+<tr>
+<td>APON</td>
+<td>circa 1997–2000</td>
+<td>155 Mbit/s</td>
+<td>FSAN/ITU, celle ATM</td>
+</tr>
+<tr>
+<td>BPON (Broadband PON)</td>
+<td>circa 2001–2004</td>
+<td>622 Mbit/s</td>
+<td>ITU G.983, ATM</td>
+</tr>
+<tr>
+<td>EPON (Ethernet PON)</td>
+<td>circa 2004–2006</td>
+<td>1,25 Gbit/s</td>
+<td>IEEE 802.3ah, Ethernet</td>
+</tr>
+<tr>
+<td>GPON (Gigabit PON)</td>
+<td>circa 2005–2008</td>
+<td>2,5 Gbit/s</td>
+<td>ITU G.984, GEM (Ethernet, ATM, TDM)</td>
+</tr>
+<tr>
+<td>10G EPON</td>
+<td>dopo</td>
+<td>10 Gbit/s</td>
+<td>IEEE 802.3av</td>
+</tr>
+</tbody>
+</table>
+<p>(Ente e numero di raccomandazione per BPON/GPON/10G EPON sono un <i>complemento</i>.)</p>
+<h3 id="epon-ethernet-pon">EPON (Ethernet PON)<a class="headerlink" href="#epon-ethernet-pon" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>EPON porta la PON nel mondo Ethernet: tutto viaggia in normali trame Ethernet, il che la rende semplice ed economica.</p>
+</div>
+<ul>
+<li>Standardizzata da <b>IEEE 802.3ah EFM</b> (<i>Ethernet in the First Mile</i>), lavori dal 2001, ratificata nel <b>2004</b>.</li>
+<li>Si colloca nella famiglia IEEE 802: livello 1 e MAC di <b>802.3 (Ethernet)</b>, sotto 802.1 (bridging) e 802.2 (LLC). È un nuovo livello fisico Ethernet accanto a 10 Mb/s, 100 Mb/s, 1 Gb/s e 10 Gb/s.</li>
+<li>Tutti i pacchetti sono <b>incapsulati in trame Ethernet</b>: supporta pacchetti di <b>lunghezza variabile</b> (niente celle fisse come ATM).</li>
+<li>Piano di lunghezze d'onda simile a BPON.</li>
+<li>Bit rate massimo <b>1 Gbit/s MAC-MAC</b> (1,25 Gbit/s a livello fisico per la codifica <b>8b/10b</b>: ogni 8 bit se ne trasmettono 10, quindi <span class="arithmatex">\(1 \times 10/8 = 1{,}25\)</span>).</li>
+<li>Split minimo: <b>16</b>.</li>
+<li>Portata massima:<ul>
+<li><b>10 km</b> con laser <b>FP</b> nelle ONU (limitata dalla dispersione in G.652);</li>
+<li><b>20 km</b> con laser <b>DFB</b> nelle ONU.</li>
+</ul>
+</li>
+<li>Configurazioni ammesse: <b>albero</b>, <b>anello</b>, <b>albero con trunk ridondante</b> (doppia fibra OLT-splitter), <b>bus</b>.</li>
+</ul>
+<p><b>Downstream EPON</b>:</p>
+<ul>
+<li>Come una rete a <b>mezzo condiviso</b>: l'OLT trasmette in broadcast trame 802.3 (header, payload, FCS); ogni ONU tiene solo quelle destinate a lei e le passa al suo utente.</li>
+</ul>
+<p><b>Upstream EPON</b>:</p>
+<ul>
+<li>Le ONU sono <b>sincronizzate</b> su un riferimento temporale comune.</li>
+<li><b>Arbitraggio centralizzato</b> nell'OLT: l'OLT concede (<i>grant</i>) a ogni ONU un <b>time slot</b>.</li>
+<li>Ogni ONU accumula le trame dei suoi utenti in un <b>buffer</b> e, nel suo slot, ne trasmette <b>diverse</b> di fila.</li>
+<li>(Il protocollo che gestisce richieste e concessioni è <b>MPCP</b>, <i>Multi-Point Control Protocol</i>, con messaggi REPORT e GATE; <i>complemento</i>.)</li>
+</ul>
+<h3 id="overhead-dei-burst-bpon-gpon-epon">Overhead dei burst: BPON, GPON, EPON<a class="headerlink" href="#overhead-dei-burst-bpon-gpon-epon" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Ogni burst upstream ha un "preambolo" che serve al ricevitore per agganciarsi. EPON lo fa in modo semplice e lento (tempi lunghi, componenti economici); BPON e GPON con tempi molto più stretti.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Standard</th>
+<th>Guard</th>
+<th>Preamble</th>
+<th>Delimiter</th>
+<th>Totale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BPON</td>
+<td>min 4 bit</td>
+<td>tip. 12 bit</td>
+<td>tip. 8 bit</td>
+<td>24 bit</td>
+</tr>
+<tr>
+<td>GPON</td>
+<td>min 25,6 ns</td>
+<td>tip. 35,2 ns</td>
+<td>tip. 16,0 ns</td>
+<td>min 76,8 ns</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><b>Guard</b>: tempo di silenzio tra un burst e l'altro, per evitare sovrapposizioni.</li>
+<li><b>Preamble</b>: sequenza nota che serve a regolare guadagno e clock.</li>
+<li><b>Delimiter</b>: segnala l'inizio dei dati.</li>
+</ul>
+<p><b>EPON</b>: tempi molto più larghi, fino a <b>400 ns</b> di accensione laser + <b>400 ns</b> per AGC e CDR + <b>400 ns</b> di spegnimento laser. L'accensione di un burst può sovrapporsi allo spegnimento del precedente.</p>
+<p><b>Trade-off</b>: EPON spreca più tempo per burst ma accetta componenti lenti e quindi economici: secondo la slide costa circa il <b>10%</b> di BPON/GPON.</p>
+<h3 id="meccanismi-di-protezione">Meccanismi di protezione<a class="headerlink" href="#meccanismi-di-protezione" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Per non lasciare senza servizio tutti gli utenti di una PON se si rompe qualcosa, si duplicano parti della rete (protezione 1+1: un percorso di lavoro e uno di riserva).</p>
+</div>
+<ul>
+<li><b>Tipo B, 1+1 dell'OLT</b>: due transceiver nell'OLT e due fibre feeder fino allo splitter (con 2 ingressi). Le ONU non sono duplicate.<ul>
+<li>Economico; protegge <b>feeder</b> e <b>transceiver OLT</b>, la parte condivisa da tutti.</li>
+</ul>
+</li>
+<li><b>Tipo C, 1+1 dell'intera PON</b>: due transceiver nell'OLT, due splitter, due fibre di discesa e due transceiver in ogni ONU.<ul>
+<li>Il più sicuro e il più costoso; protegge feeder, drop e transceiver.</li>
+</ul>
+</li>
+</ul>
+<h3 id="carrier-ethernet-per-epon">Carrier Ethernet per EPON<a class="headerlink" href="#carrier-ethernet-per-epon" title="Permanent link">&para;</a></h3>
+<ul>
+<li>L'idea: trattare il traffico a <b>livello 2</b> (Ethernet) invece che a livello 3 (IP), creando <b>percorsi specifici</b> per garantire la <b>QoS</b> dall'utente attraverso la rete.</li>
+<li>Tecnologie: <b>VLAN tag</b>, <b>VPLS</b> (<i>Virtual Private LAN Service</i>), <b>Q-in-Q</b> (doppio tag VLAN, 802.1ad), <b>MAC-in-MAC</b> (802.1ah), <b>PBT</b> (<i>Provider Backbone Transport</i>).</li>
+</ul>
+<h2 id="8-il-futuro-wdm-pon">8. Il futuro: WDM-PON<a class="headerlink" href="#8-il-futuro-wdm-pon" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Invece di dividere la luce in potenza (splitter) si divide per colore. Ogni ONU ha la sua lunghezza d'onda: è come avere una fibra dedicata, ma su un'unica fibra fisica.</p>
+</div>
+<ul>
+<li>Al posto dello splitter c'è un <b>AWG 1×N</b> (<i>Arrayed Waveguide Grating</i>): un <b>filtro</b> che fa da <b>router ottico</b>, mandando ogni <span class="arithmatex">\(\lambda\)</span> su un'uscita diversa.</li>
+<li>L'OLT ha una <b>sorgente modulata WDM</b> che trasmette <span class="arithmatex">\(\lambda_1 \dots \lambda_N\)</span> in discesa e un <b>array di ricevitori / demux ottico</b> per <span class="arithmatex">\(\lambda_{N+1} \dots \lambda_{2N}\)</span> in salita.</li>
+<li>L'ONU <span class="arithmatex">\(i\)</span> riceve su <span class="arithmatex">\(\lambda_i\)</span> e trasmette su <span class="arithmatex">\(\lambda_{N+i}\)</span>.</li>
+<li>Caratteristiche:<ul>
+<li>numero di ONU <b>limitato dal numero di </b><span class="arithmatex">\(\lambda\)</span>;</li>
+<li>topologia logica <b>punto-punto</b> (nessuna condivisione, nessuna collisione, niente broadcast);</li>
+<li><b>lunga portata</b>, quasi come un collegamento punto-punto: l'AWG perde molto meno di uno splitter con molte uscite.</li>
+</ul>
+</li>
+</ul>
+<h3 id="evoluzione-della-fotonica">Evoluzione della fotonica<a class="headerlink" href="#evoluzione-della-fotonica" title="Permanent link">&para;</a></h3>
+<p>Tabella distanza vs tempo dal grafico:</p>
+<ul>
+<li><b>Accesso</b> (fino a 1 km): ADSL2+ (2008) → VDSL/2 e FTTP → VDSL2 e FTTB (2010) → FTTH → FTTH con <b>WDM</b> (2015).</li>
+<li><b>Metro/core</b> (1 km – 1000+ km): da GbE ed SDH con MPLS e VPLS, verso T-MPLS e Provider Backbone Transport, poi OTN, conversione di lunghezza d'onda, <b>optical burst switching</b> e <b>optical packet switching</b>: la commutazione scende progressivamente dal livello 3 al livello 2 al livello 1 (ottico).</li>
+</ul>
+<h2 id="9-mercato-e-costi">9. Mercato e costi<a class="headerlink" href="#9-mercato-e-costi" title="Permanent link">&para;</a></h2>
+<h3 id="situazione-internazionale-exfo-2007">Situazione internazionale (EXFO, 2007)<a class="headerlink" href="#situazione-internazionale-exfo-2007" title="Permanent link">&para;</a></h3>
+<ul>
+<li><b>USA</b>: cavi in media lunghi (il DSL rende meno); grandi investimenti degli operatori via cavo, che hanno una quota rilevante della banda larga; <b>nessun obbligo di unbundling</b> per le nuove infrastrutture in fibra (incentiva gli investimenti).</li>
+<li><b>Brasile, Colombia, Argentina, Cile</b>: meno di 300.000 utenti FTTH.</li>
+<li><b>Australia, Nuova Zelanda, Kuwait, Russia, EAU, Pakistan</b>: meno di 2 milioni di utenti FTTH.</li>
+</ul>
+<p><b>Unbundling</b> (<i>unbundling del local loop</i>): obbligo per l'operatore storico di affittare la propria rete d'accesso ai concorrenti, che vi collegano i loro apparati (vedi i CLEC e la collocation della lezione 1).</p>
+<h3 id="costi-fttx-capex-relativo-tim">Costi FTTx (CAPEX relativo, TIM)<a class="headerlink" href="#costi-fttx-capex-relativo-tim" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Più la fibra si avvicina all'utente, più costa, e quasi tutto il costo è infrastruttura (scavi, posa), non elettronica.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Architettura</th>
+<th>Rame residuo</th>
+<th>CAPEX relativo (FTTE = 1)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FTTE</td>
+<td>300–3000 m</td>
+<td>circa 1</td>
+</tr>
+<tr>
+<td>FTTCab</td>
+<td>100–700 m</td>
+<td>circa 5–6</td>
+</tr>
+<tr>
+<td>FTTB</td>
+<td>20–150 m</td>
+<td>circa 10</td>
+</tr>
+<tr>
+<td>FTTH</td>
+<td>0</td>
+<td>circa 17–18</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Il CAPEX è diviso in <b>elettronica</b>, <b>infrastruttura</b> e <b>CPE</b> (apparati del cliente): in FTTB e FTTH la parte dominante è l'<b>infrastruttura</b>.</li>
+<li><b>CAPEX</b> = <i>Capital Expenditure</i>, spese di investimento (costruire la rete), contrapposte all'OPEX (spese operative di esercizio).</li>
+</ul>
+<h2 id="domande-di-ripasso">Domande di ripasso<a class="headerlink" href="#domande-di-ripasso" title="Permanent link">&para;</a></h2>
+<details class="note">
+<summary>Calcola la perdita di uno splitter 1x64</summary>
+<p>Ideale: <span class="arithmatex">\(3 \times \log_2 64 = 3 \times 6 = 18\)</span> dB. Con splitter 1x2 reali da 3,7 dB: <span class="arithmatex">\(6 \times 3{,}7 \approx 22\)</span> dB, già oltre i 22 dB di budget downstream: ecco perché 64 è il massimo split ratio per le TDM-PON.</p>
+</details>
+<details class="note">
+<summary>Perché nell'OLT si usano DFB e APD e nelle ONU FP e PIN?</summary>
+<p>L'OLT è uno e condiviso tra tante ONU, quindi può permettersi componenti costosi: DFB (spettro stretto, poca dispersione) e APD (sensibilità −30 dBm). Le ONU sono tante (una per utente), quindi devono costare poco: FP e PIN. Il budget upstream (30 dB) viene dalla sensibilità dell'APD.</p>
+</details>
+<details class="note">
+<summary>Perché in upstream serve TDMA e in downstream no?</summary>
+<p>In downstream trasmette solo l'OLT (punto-multipunto): basta il broadcast, ogni ONU prende i suoi dati. In upstream trasmettono molte ONU verso una (multipunto-punto); i segnali si sommano nello splitter, le ONU non si sentono a vicenda e quindi collidono se non si alternano in slot assegnati dall'OLT.</p>
+</details>
+<details class="note">
+<summary>Cos'è un burst mode receiver e perché serve?</summary>
+<p>Un ricevitore che a ogni burst ricalcola guadagno (AGC) e soglia 0/1 e recupera il clock (CDR). Serve perché le ONU sono a distanze diverse e i loro burst arrivano all'OLT con potenze diverse.</p>
+</details>
+<details class="note">
+<summary>Perché EPON a 1 Gbit/s trasmette a 1,25 Gbit/s?</summary>
+<p>Per la codifica 8b/10b: ogni 8 bit di dati diventano 10 bit sulla linea (per bilanciare 0 e 1 e aiutare il recupero del clock), quindi <span class="arithmatex">\(1 \times 10/8 = 1{,}25\)</span> Gbit/s.</p>
+</details>
+<details class="note">
+<summary>Differenza tra splitter (TDM-PON) e AWG (WDM-PON)</summary>
+<p>Lo splitter divide la potenza: ogni uscita riceve tutte le lunghezze d'onda ma con potenza ridotta di circa 3 dB per divisione. L'AWG instrada per lunghezza d'onda: ogni uscita riceve solo la sua <span class="arithmatex">\(\lambda\)</span> con poca perdita, così ogni ONU ha un canale dedicato e la portata aumenta.</p>
+</details>
+<details class="note">
+<summary>Protezione tipo B vs tipo C</summary>
+<p>B: duplica solo transceiver OLT e fibra feeder (la parte comune a tutti), economico. C: duplica tutto, anche splitter, drop e transceiver delle ONU: massima affidabilità, costo massimo.</p>
+</details>
+<h2 id="riepilogo">Riepilogo<a class="headerlink" href="#riepilogo" title="Permanent link">&para;</a></h2>
+<ul>
+<li><b>Perché FTTx</b>: il rame perde banda con la distanza; solo la fibra copre velocità fino a 10 Gbit/s su qualunque distanza.</li>
+<li><b>Fibra</b>: SMF G.652, finestre a 850/1310/1550 nm, water peak 1360–1480 nm (eliminato dalla ZWP); la dispersione allarga gli impulsi.</li>
+<li><b>Componenti</b>: laser FP (economico, 1310 nm) vs DFB (spettro stretto, 1550 nm); fotodiodi PIN (−22 dBm) vs APD (−30 dBm); splitter: circa 3 dB per divisione, <span class="arithmatex">\(3 \log_2 N\)</span> dB.</li>
+<li><b>Power budget</b> = <span class="arithmatex">\(P_{TX} - S_{RX}\)</span>: 30 dB upstream, 22 dB downstream.</li>
+<li><b>FTTE → FTTCab → FTTC → FTTB → FTTH</b>: più velocità, molto più costo (FTTH circa 17 volte FTTE, quasi tutto in scavi). Microtrincea circa 30–40 k€/km.</li>
+<li><b>PON</b>: OLT + splitter passivo + ONT; downstream broadcast a 1490 nm, upstream TDMA a burst a 1310 nm; OLT con burst mode receiver.</li>
+<li><b>Standard</b>: APON → BPON (622 Mbit/s) → EPON (1,25 Gbit/s, IEEE 802.3ah, trame Ethernet, max 20 km) → GPON (2,5 Gbit/s) → 10G EPON.</li>
+<li><b>Protezione</b>: tipo B (OLT + feeder) e tipo C (tutto).</li>
+<li><b>WDM-PON</b>: AWG al posto dello splitter, una <span class="arithmatex">\(\lambda\)</span> per ONU, punto-punto logico e lunga portata.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Torna su
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Piede" >
+        
+          
+          <a href="../lezione-2/" class="md-footer__link md-footer__link--prev" aria-label="Precedente: Lezione 2 – xDSL e PPP">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Precedente
+              </span>
+              <div class="md-ellipsis">
+                Lezione 2 – xDSL e PPP
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../kathara/" class="md-footer__link md-footer__link--next" aria-label="Successivo: Kathará">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Successivo
+              </span>
+              <div class="md-ellipsis">
+                Kathará
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.indexes", "navigation.top", "navigation.footer", "toc.follow", "search.highlight", "search.suggest", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiato", "clipboard.copy": "Copia", "search.result.more.one": "1 altro in questa pagina", "search.result.more.other": "# altri in questa pagina", "search.result.none": "Nessun documento trovato", "search.result.one": "1 documento trovato", "search.result.other": "# documenti trovati", "search.result.placeholder": "Scrivi per iniziare a cercare", "search.result.term.missing": "Non presente", "select.version": "Seleziona la versione"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="../../javascripts/mathjax/tex-mml-chtml.js"></script>
+      
+        <script src="../../javascripts/mermaid/mermaid.min.js"></script>
+      
+    
+  </body>
+</html>

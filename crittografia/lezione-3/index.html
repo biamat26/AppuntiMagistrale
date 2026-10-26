@@ -1,0 +1,2224 @@
+
+<!doctype html>
+<html lang="it" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Appunti della magistrale in Cybersecurity (Sapienza)">
+      
+      
+      
+        <link rel="canonical" href="https://biamat26.github.io/AppuntiMagistrale/crittografia/lezione-3/">
+      
+      
+        <link rel="prev" href="../lezione-2/">
+      
+      
+        <link rel="next" href="../lezione-4/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Lezione 3 – Hash ed estrattori - Appunti di Luiggi</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#lezione-3-mac-da-hash-ed-estrazione-di-casualita" class="md-skip">
+          Vai al contenuto
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Intestazione">
+    <a href="../.." title="Appunti di Luiggi" class="md-header__button md-logo" aria-label="Appunti di Luiggi" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 4v6l-2-2-2 2V4H9v16h10V4zM3 7V5h2V4a2 2 0 0 1 2-2h12c1.05 0 2 .95 2 2v16c0 1.05-.95 2-2 2H7c-1.05 0-2-.95-2-2v-1H3v-2h2v-4H3v-2h2V7zm2-2v2h2V5zm0 14h2v-2H5zm0-6h2v-2H5z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Appunti di Luiggi
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Lezione 3 – Hash ed estrattori
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Tema scuro"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Tema scuro" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Tema chiaro"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Tema chiaro" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Cerca" placeholder="Cerca" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Cerca">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Cancella" aria-label="Cancella" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Inizializza la ricerca
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/biamat26/AppuntiMagistrale" title="Apri repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    AppuntiMagistrale
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Crittografia
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../sistemi-distribuiti/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Distributed Systems
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../network-infrastructures/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Network Infrastructures
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigazione" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Appunti di Luiggi" class="md-nav__button md-logo" aria-label="Appunti di Luiggi" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 4v6l-2-2-2 2V4H9v16h10V4zM3 7V5h2V4a2 2 0 0 1 2-2h12c1.05 0 2 .95 2 2v16c0 1.05-.95 2-2 2H7c-1.05 0-2-.95-2-2v-1H3v-2h2v-4H3v-2h2V7zm2-2v2h2V5zm0 14h2v-2H5zm0-6h2v-2H5z"/></svg>
+
+    </a>
+    Appunti di Luiggi
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/biamat26/AppuntiMagistrale" title="Apri repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    AppuntiMagistrale
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Crittografia
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Crittografia
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ripasso-probabilita/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ripasso probabilità
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lezione-1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 1 – Segretezza perfetta
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lezione-2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 2 – Shannon e MAC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 3 – Hash ed estrattori
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 3 – Hash ed estrattori
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Indice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Indice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#esempio-di-famiglia-pairwise-independent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Esempio di famiglia pairwise independent
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Esempio di famiglia pairwise independent">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#lemma" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lemma
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dimostrazione" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dimostrazione
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mac-da-hash-pairwise-independent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MAC da hash pairwise independent
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="MAC da hash pairwise independent">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#teorema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Teorema
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dimostrazione_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dimostrazione
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#da-dove-vengono-questi-numeri" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Da dove vengono questi numeri
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bad-news" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bad news
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#randomness-extraction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Randomness extraction
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Randomness extraction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#un-estrattore-in-pratica-trucco-di-von-neumann" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Un estrattore in pratica (trucco di von Neumann)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#definizione-min-entropia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Definizione: min-entropia
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a-cosa-serve-la-min-entropia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A cosa serve la min-entropia
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#come-si-calcola" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Come si calcola
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#teorema-estrattori-deterministici-impossibili" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Teorema: estrattori deterministici impossibili
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dimostrazione_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dimostrazione
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#takeaway" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Takeaway
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#seeded-extraction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Seeded extraction
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Seeded extraction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#definizione-estrattore-con-seed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Definizione: estrattore con seed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#distanza-statistica" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Distanza statistica
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leftover-hash-lemma-lhl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Leftover Hash Lemma (LHL)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Leftover Hash Lemma (LHL)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#teorema_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Teorema
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#collision-probability-e-lemma" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Collision probability e lemma
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dimostrazione-del-lhl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dimostrazione del LHL
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#riepilogo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Riepilogo
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lezione-4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 4 – Sicurezza computazionale e OWF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lezione-5/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 5 – PRG e hard-core bit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lezione-6/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 6 – Goldreich-Levin e cifratura computazionale
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../sistemi-distribuiti/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Distributed Systems
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Distributed Systems
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sistemi-distribuiti/lezione-2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 2 – Modelli, astrazioni e link
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sistemi-distribuiti/lezione-3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 3 – Tempo (I): orologi fisici
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sistemi-distribuiti/lezione-4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 4 – Tempo (II): tempo logico
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sistemi-distribuiti/lezione-5/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 5 – Failure detector e leader election
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../network-infrastructures/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Network Infrastructures
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Network Infrastructures
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../network-infrastructures/lezione-1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 1 – Aree funzionali della rete
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../network-infrastructures/lezione-2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 2 – xDSL e PPP
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../network-infrastructures/lezione-3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 3 – FTTx e PON
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../network-infrastructures/kathara/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Kathará
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Indice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Indice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#esempio-di-famiglia-pairwise-independent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Esempio di famiglia pairwise independent
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Esempio di famiglia pairwise independent">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#lemma" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lemma
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dimostrazione" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dimostrazione
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mac-da-hash-pairwise-independent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MAC da hash pairwise independent
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="MAC da hash pairwise independent">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#teorema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Teorema
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dimostrazione_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dimostrazione
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#da-dove-vengono-questi-numeri" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Da dove vengono questi numeri
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bad-news" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bad news
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#randomness-extraction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Randomness extraction
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Randomness extraction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#un-estrattore-in-pratica-trucco-di-von-neumann" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Un estrattore in pratica (trucco di von Neumann)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#definizione-min-entropia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Definizione: min-entropia
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a-cosa-serve-la-min-entropia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A cosa serve la min-entropia
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#come-si-calcola" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Come si calcola
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#teorema-estrattori-deterministici-impossibili" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Teorema: estrattori deterministici impossibili
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dimostrazione_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dimostrazione
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#takeaway" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Takeaway
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#seeded-extraction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Seeded extraction
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Seeded extraction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#definizione-estrattore-con-seed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Definizione: estrattore con seed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#distanza-statistica" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Distanza statistica
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leftover-hash-lemma-lhl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Leftover Hash Lemma (LHL)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Leftover Hash Lemma (LHL)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#teorema_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Teorema
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#collision-probability-e-lemma" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Collision probability e lemma
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dimostrazione-del-lhl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dimostrazione del LHL
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#riepilogo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Riepilogo
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="lezione-3-mac-da-hash-ed-estrazione-di-casualita">Lezione 3 – MAC da hash ed estrazione di casualità<a class="headerlink" href="#lezione-3-mac-da-hash-ed-estrazione-di-casualita" title="Permanent link">&para;</a></h1>
+<h2 id="esempio-di-famiglia-pairwise-independent">Esempio di famiglia pairwise independent<a class="headerlink" href="#esempio-di-famiglia-pairwise-independent" title="Permanent link">&para;</a></h2>
+<div class="arithmatex">\[
+h_{a,b}(m) = a \cdot m + b \bmod p
+\]</div>
+<ul>
+<li><span class="arithmatex">\(p\)</span> è un <b>primo grande</b> (di <span class="arithmatex">\(\lambda\)</span> bit)</li>
+<li>Chiave: <span class="arithmatex">\((a, b) \in \mathbb{Z}_p^2 = \mathcal{K}\)</span></li>
+<li>Messaggi e tag: <span class="arithmatex">\(m \in \mathbb{Z}_p = \mathcal{M} = \mathcal{T}\)</span></li>
+</ul>
+<h3 id="lemma">Lemma<a class="headerlink" href="#lemma" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Dimostriamo che <span class="arithmatex">\(a \cdot m + b \bmod p\)</span> è pairwise independent, cioè che i tag di due messaggi diversi si comportano come due numeri casuali indipendenti.</p>
+</div>
+<p>La famiglia <span class="arithmatex">\(\mathcal{H} = \{h_{a,b}\}\)</span> qui sopra è <b>pairwise independent</b>.</p>
+<h3 id="dimostrazione">Dimostrazione<a class="headerlink" href="#dimostrazione" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Si contano le chiavi <span class="arithmatex">\((a, b)\)</span> che danno una certa coppia di tag. È un sistema di 2 equazioni in 2 incognite, quindi c'è una sola chiave: ogni coppia di tag ha probabilità <span class="arithmatex">\(1/p^2\)</span>.</p>
+</div>
+<p>Fissiamo <span class="arithmatex">\(m, m' \in \mathbb{Z}_p\)</span> con <span class="arithmatex">\(m \ne m'\)</span> e <span class="arithmatex">\(\tau, \tau' \in \mathbb{Z}_p\)</span>. Vogliamo calcolare</p>
+<div class="arithmatex">\[
+\Pr_{a,b}[h_{a,b}(m) = \tau \wedge h_{a,b}(m') = \tau']
+\]</div>
+<p>Le due condizioni <span class="arithmatex">\(a m + b = \tau\)</span> e <span class="arithmatex">\(a m' + b = \tau'\)</span> formano un <b>sistema lineare</b> nelle incognite <span class="arithmatex">\(a, b\)</span>. In forma matriciale:</p>
+<div class="arithmatex">\[
+\Pr_{a,b}\left[ \begin{pmatrix} m &amp; 1 \\ m' &amp; 1 \end{pmatrix} \begin{pmatrix} a \\ b \end{pmatrix} = \begin{pmatrix} \tau \\ \tau' \end{pmatrix} \right] = \Pr_{a,b}\left[ \begin{pmatrix} a \\ b \end{pmatrix} = \begin{pmatrix} m &amp; 1 \\ m' &amp; 1 \end{pmatrix}^{-1} \begin{pmatrix} \tau \\ \tau' \end{pmatrix} \right] = \frac{1}{p^2}
+\]</div>
+<ul>
+<li><b>L'inversa esiste</b> perché <span class="arithmatex">\(m \ne m'\)</span>: il determinante è <span class="arithmatex">\(m - m' \ne 0 \bmod p\)</span>, e modulo un primo ogni numero non nullo è invertibile.</li>
+<li>Quindi c'è <b>una sola</b> coppia <span class="arithmatex">\((a, b)\)</span> che soddisfa il sistema. Siccome <span class="arithmatex">\((a, b)\)</span> è uniforme su <span class="arithmatex">\(p^2\)</span> coppie, la probabilità di beccarla è <span class="arithmatex">\(1/p^2\)</span>. ∎</li>
+</ul>
+<p><b>Intuizione</b>: ogni coppia di tag <span class="arithmatex">\((\tau, \tau')\)</span> corrisponde a esattamente una chiave, quindi la coppia di tag è uniforme su <span class="arithmatex">\(\mathbb{Z}_p^2\)</span>.</p>
+<h2 id="mac-da-hash-pairwise-independent">MAC da hash pairwise independent<a class="headerlink" href="#mac-da-hash-pairwise-independent" title="Permanent link">&para;</a></h2>
+<h3 id="teorema">Teorema<a class="headerlink" href="#teorema" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Se come tag usi una hash pairwise independent, Eve, anche dopo aver visto un messaggio con il suo tag, ha probabilità al massimo <span class="arithmatex">\(1/|\mathcal{T}|\)</span> di produrre il tag giusto per un altro messaggio.
+Eve conosce l'<b>insieme dei tag possibili</b> <span class="arithmatex">\(\mathcal{T}\)</span> (fa parte dello schema, che è pubblico: es. "i numeri da 0 a <span class="arithmatex">\(p-1\)</span>"), ma non sa <b>quale</b> di questi è il tag giusto per il suo messaggio <span class="arithmatex">\(m'\)</span>, perché dipende dalla chiave. Può usare qualunque strategia (riciclare <span class="arithmatex">\(\tau\)</span>, fare calcoli, …), ma nessuna funziona meglio che sceglierne uno a caso tra i <span class="arithmatex">\(|\mathcal{T}|\)</span> possibili.</p>
+</div>
+<p>Ogni famiglia pairwise independent <span class="arithmatex">\(\mathcal{H} = \{h_k : \mathcal{M} \to \mathcal{T}\}\)</span> definisce un MAC <b>ε-statisticamente sicuro</b> con</p>
+<div class="arithmatex">\[
+\varepsilon = \frac{1}{|\mathcal{T}|}
+\]</div>
+<h3 id="dimostrazione_1">Dimostrazione<a class="headerlink" href="#dimostrazione_1" title="Permanent link">&para;</a></h3>
+<p>Per ogni <span class="arithmatex">\(m \ne m'\)</span> e ogni <span class="arithmatex">\(\tau, \tau'\)</span>, per definizione di probabilità condizionata:</p>
+<div class="arithmatex">\[
+\Pr[\tau' = h_K(m') \mid \tau = h_K(m)] = \frac{\Pr[\tau' = h_K(m') \wedge \tau = h_K(m)]}{\Pr[h_K(m) = \tau]} = \frac{1/|\mathcal{T}|^2}{1/|\mathcal{T}|} = \frac{1}{|\mathcal{T}|}
+\]</div>
+<ul>
+<li><b>Numeratore</b>: per pairwise independence la coppia <span class="arithmatex">\((h_K(m), h_K(m'))\)</span> è uniforme su <span class="arithmatex">\(\mathcal{T}^2\)</span>, quindi ogni coppia ha probabilità <span class="arithmatex">\(1/|\mathcal{T}|^2\)</span>.</li>
+<li><b>Denominatore</b>: sommando il numeratore su tutti i <span class="arithmatex">\(|\mathcal{T}|\)</span> possibili <span class="arithmatex">\(\tau'\)</span> si ottiene <span class="arithmatex">\(|\mathcal{T}| \cdot 1/|\mathcal{T}|^2 = 1/|\mathcal{T}|\)</span>. ∎</li>
+</ul>
+<p>Per l'esercizio 1 della lezione 2, <span class="arithmatex">\(1/|\mathcal{T}|\)</span> è il <b>miglior</b> <span class="arithmatex">\(\varepsilon\)</span> possibile.</p>
+<div class="admonition note">
+<p>Con l'esempio <span class="arithmatex">\(h_{a,b}\)</span>: <span class="arithmatex">\(|\mathcal{T}| = p \approx 2^\lambda\)</span>, quindi <span class="arithmatex">\(\varepsilon \approx 2^{-\lambda}\)</span>, con una chiave di <span class="arithmatex">\(2\lambda\)</span> bit.</p>
+</div>
+<h3 id="da-dove-vengono-questi-numeri">Da dove vengono questi numeri<a class="headerlink" href="#da-dove-vengono-questi-numeri" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Con una chiave di <span class="arithmatex">\(2\lambda\)</span> bit, la costruzione <span class="arithmatex">\(h_{a,b}\)</span> dà sicurezza <span class="arithmatex">\(2^{-\lambda}\)</span>. Sono quattro piccoli conti, a partire dal fatto che <b>λ è il numero di bit di</b> <span class="arithmatex">\(p\)</span> (il prof sceglie un primo "di λ bit").</p>
+</div>
+<p><b>1. Perché</b> <span class="arithmatex">\(p \approx 2^\lambda\)</span>. Un numero di λ bit sta tra <span class="arithmatex">\(2^{\lambda-1}\)</span> e <span class="arithmatex">\(2^\lambda\)</span>. Per esempio, i numeri da 3 bit vanno da <span class="arithmatex">\(100 = 4\)</span> a <span class="arithmatex">\(111 = 7\)</span>, tutti vicini a <span class="arithmatex">\(2^3 = 8\)</span>. Quindi un primo di λ bit vale circa <span class="arithmatex">\(2^\lambda\)</span>.</p>
+<p><b>2. Perché</b> <span class="arithmatex">\(|\mathcal{T}| = p\)</span>. Il tag è <span class="arithmatex">\((a \cdot m + b) \bmod p\)</span>: il "mod p" si applica a <b>tutta</b> l'espressione (prima si calcola <span class="arithmatex">\(a \cdot m + b\)</span>, poi si prende il resto della divisione per <span class="arithmatex">\(p\)</span>). Il resto di una divisione per <span class="arithmatex">\(p\)</span> sta sempre tra <span class="arithmatex">\(0\)</span> e <span class="arithmatex">\(p-1\)</span>, quindi i tag possibili sono <span class="arithmatex">\(0, 1, \dots, p-1\)</span>: sono <span class="arithmatex">\(p\)</span> valori, e <span class="arithmatex">\(|\mathcal{T}| = p \approx 2^\lambda\)</span>.</p>
+<div class="admonition example">
+<p><b>Esempio</b> con <span class="arithmatex">\(p = 7\)</span>, <span class="arithmatex">\(a = 3\)</span>, <span class="arithmatex">\(m = 2\)</span>, <span class="arithmatex">\(b = 5\)</span>: <span class="arithmatex">\(a \cdot m + b = 11\)</span>, e <span class="arithmatex">\(11 \bmod 7 = 4\)</span>. Qualunque calcolo si faccia, il tag è sempre uno tra 0, 1, …, 6.</p>
+</div>
+<p><b>3. Perché</b> <span class="arithmatex">\(\varepsilon \approx 2^{-\lambda}\)</span>. Dal teorema, <span class="arithmatex">\(\varepsilon = 1/|\mathcal{T}| = 1/p \approx 1/2^\lambda = 2^{-\lambda}\)</span>.</p>
+<p><b>4. Perché la chiave è di</b> <span class="arithmatex">\(2\lambda\)</span> <b>bit.</b> La chiave è la coppia <span class="arithmatex">\((a, b)\)</span>, e <span class="arithmatex">\(a\)</span> e <span class="arithmatex">\(b\)</span> sono numeri mod <span class="arithmatex">\(p\)</span>, cioè tra <span class="arithmatex">\(0\)</span> e <span class="arithmatex">\(p-1\)</span>. Per scrivere in binario qualunque numero fino a <span class="arithmatex">\(p-1\)</span> bastano λ bit, quindi <span class="arithmatex">\(a\)</span> e <span class="arithmatex">\(b\)</span> occupano λ bit ciascuno: in totale <span class="arithmatex">\(\lambda + \lambda = 2\lambda\)</span> bit.</p>
+<div class="admonition example">
+<p><b>Esempio con λ = 3</b>:</p>
+<ul>
+<li><span class="arithmatex">\(p = 7\)</span> (in binario <span class="arithmatex">\(111\)</span>, cioè 3 bit), e <span class="arithmatex">\(7 \approx 2^3 = 8\)</span></li>
+<li>tag possibili: <span class="arithmatex">\(0, \dots, 6\)</span>, cioè 7 valori</li>
+<li><span class="arithmatex">\(\varepsilon = 1/7 \approx 1/8 = 2^{-3}\)</span></li>
+<li><span class="arithmatex">\(a\)</span> e <span class="arithmatex">\(b\)</span> valgono da 0 a 6, cioè da <span class="arithmatex">\(000\)</span> a <span class="arithmatex">\(110\)</span> in binario: 3 bit ciascuno, chiave di <span class="arithmatex">\(3 + 3 = 6 = 2 \cdot 3\)</span> bit</li>
+</ul>
+</div>
+<div class="admonition example">
+<p><b>Esempio reale con λ = 128</b>: <span class="arithmatex">\(p\)</span> è un primo di 128 bit, <span class="arithmatex">\(\varepsilon \approx 2^{-128}\)</span> (Eve non falsifica praticamente mai), chiave di 256 bit.</p>
+</div>
+<p><b>Il messaggio</b>: con una chiave di <span class="arithmatex">\(2\lambda\)</span> bit si ottiene sicurezza <span class="arithmatex">\(2^{-\lambda}\)</span>. È proprio il minimo previsto dalla "bad news" qui sotto con <span class="arithmatex">\(t = 1\)</span>: <span class="arithmatex">\((1 + 1) \cdot \lambda = 2\lambda\)</span>.</p>
+<h3 id="bad-news">Bad news<a class="headerlink" href="#bad-news" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Con la sicurezza statistica la chiave del MAC deve crescere con il numero di messaggi da autenticare. Lo stesso problema dell'OTP.</p>
+</div>
+<p><b>Teorema</b>: ogni MAC <b>t-time</b> <span class="arithmatex">\(2^{-\lambda}\)</span>-sicuro ha una chiave di dimensione (almeno) <span class="arithmatex">\((t+1) \cdot \lambda\)</span>.</p>
+<p><i>t-time</i> = sicuro anche se Eve vede <span class="arithmatex">\(t\)</span> coppie valide. Quindi, come per la segretezza perfetta, con la sicurezza statistica la chiave <b>cresce</b> con il numero di messaggi da autenticare. Con <span class="arithmatex">\(t = 1\)</span> servono <span class="arithmatex">\(2\lambda\)</span> bit, esattamente quelli di <span class="arithmatex">\(h_{a,b}\)</span>.</p>
+<h2 id="randomness-extraction">Randomness extraction<a class="headerlink" href="#randomness-extraction" title="Permanent link">&para;</a></h2>
+<p><b>Definizione</b>: la <i>randomness extraction</i> (estrazione di casualità) è il processo che, partendo da una sorgente di casualità <b>imperfetta</b> (in cui alcuni valori escono più spesso di altri), produce bit <b>perfettamente casuali</b>, cioè uniformi. La funzione che lo fa si chiama <b>estrattore</b> (<span class="arithmatex">\(\text{Ext}\)</span>).</p>
+<div class="admonition example">
+<p><b>Esempio</b>: hai solo una moneta truccata che fa testa il 70% delle volte. Se la usi così com'è per creare una chiave, Eve sa che i bit valgono più spesso 1 che 0: la chiave non è uniforme e i teoremi visti (OTP, MAC) non valgono più. L'estrattore prende i lanci della moneta truccata e tira fuori bit come quelli di una moneta onesta.</p>
+<p>Le sorgenti reali sono di questo tipo: un computer è deterministico, quindi la casualità la prende da misure fisiche (movimenti del mouse, tempi tra un tasto e l'altro, rumore elettrico), che sono imprevedibili solo in parte.</p>
+</div>
+<h3 id="un-estrattore-in-pratica-trucco-di-von-neumann">Un estrattore in pratica (trucco di von Neumann)<a class="headerlink" href="#un-estrattore-in-pratica-trucco-di-von-neumann" title="Permanent link">&para;</a></h3>
+<p><i>(Non negli appunti del prof: esempio per capire cosa fa un estrattore.)</i></p>
+<p>Hai una moneta piegata che fa testa il 60% delle volte e ti servono bit perfettamente 50/50. Lanci la moneta <b>due volte</b> e guardi la coppia:</p>
+<ul>
+<li><b>Testa poi Croce</b> → scrivi <b>0</b></li>
+<li><b>Croce poi Testa</b> → scrivi <b>1</b></li>
+<li><b>Testa Testa</b> oppure <b>Croce Croce</b> → butti via e rilanci</li>
+</ul>
+<p><b>Perché funziona</b>: <span class="arithmatex">\(\Pr[\text{TC}] = 0{,}6 \times 0{,}4 = 0{,}24\)</span> e <span class="arithmatex">\(\Pr[\text{CT}] = 0{,}4 \times 0{,}6 = 0{,}24\)</span>. Le due probabilità sono identiche, quindi 0 e 1 escono esattamente al 50%, anche se la moneta è truccata.</p>
+<p>È questo che fa un estrattore: <b>entra roba sbilanciata, esce roba perfettamente bilanciata</b>. Il prezzo è che si butta via una parte dei lanci: si ottengono <b>meno bit</b> di quanti se ne sono raccolti.</p>
+<div class="admonition note">
+<p>Questo trucco funziona solo se i lanci sono indipendenti tra loro. L'estrattore del corso (hash + seme) funziona con fonti molto più generali, ma l'idea è la stessa.</p>
+</div>
+<p>Come fanno Alice e Bob a ottenere <b>bit casuali</b>? È cruciale in crittografia:</p>
+<ul>
+<li>le <b>chiavi</b> devono essere <b>uniformi</b></li>
+<li>la casualità servirà anche più avanti per la sicurezza (es. sicurezza <b>CPA</b>)</li>
+</ul>
+<p>Si può pensare come un processo a più passi:</p>
+<ol>
+<li><b>Randomness extraction</b>: partendo da una sorgente di casualità <b>imperfetta</b>, generare casualità "pura" (uniforme).</li>
+<li><b>Espansione</b>: espandere in modo <b>deterministico</b> quello che si è estratto, quanto serve (<b>pseudocasualità</b>).</li>
+<li>In più, un modo per <b>rinfrescare</b> la casualità, da poter espandere di nuovo.</li>
+</ol>
+<p>Oggi ci occupiamo del passo 1.</p>
+<p><b>La domanda</b>: abbiamo una sorgente <span class="arithmatex">\(X\)</span> e vogliamo progettare una funzione <b>deterministica</b> <span class="arithmatex">\(\text{Ext}\)</span> tale che <span class="arithmatex">\(\text{Ext}(X)\)</span> sia <b>uniforme</b>.</p>
+<p>È <b>impossibile in generale</b>: se <span class="arithmatex">\(X\)</span> è costante, anche <span class="arithmatex">\(\text{Ext}(X)\)</span> lo è. Serve che <span class="arithmatex">\(X\)</span> sia <b>imprevedibile</b> almeno in parte.</p>
+<h3 id="definizione-min-entropia">Definizione: min-entropia<a class="headerlink" href="#definizione-min-entropia" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>La min-entropia misura quanto è imprevedibile una fonte, in bit. Min-entropia <span class="arithmatex">\(k\)</span> vuol dire che la fonte è difficile da indovinare quanto <span class="arithmatex">\(k\)</span> lanci di una moneta onesta, e quindi che se ne possono estrarre circa <span class="arithmatex">\(k\)</span> bit casuali.</p>
+</div>
+<p>La <b>min-entropia</b> di <span class="arithmatex">\(X\)</span> è</p>
+<div class="arithmatex">\[
+H_\infty(X) = -\log \max_x \Pr[X = x]
+\]</div>
+<p>(logaritmo in base 2)</p>
+<p><b>Intuizione</b>: <span class="arithmatex">\(\max_x \Pr[X = x]\)</span> è la probabilità di indovinare <span class="arithmatex">\(X\)</span> al primo colpo puntando sul valore più probabile. La min-entropia misura quanto è difficile questo "miglior tentativo": se <span class="arithmatex">\(H_\infty(X) = k\)</span>, il miglior tentativo riesce con probabilità <span class="arithmatex">\(2^{-k}\)</span>. Più min-entropia c'è, meglio è.</p>
+<div class="admonition example">
+<p><b>Esempi</b>:</p>
+<ul>
+<li>
+<p><span class="arithmatex">\(X = 0^n\)</span> (costante): <span class="arithmatex">\(\max \Pr = 1\)</span>, quindi <span class="arithmatex">\(H_\infty(X) = -\log 1 = 0\)</span></p>
+</li>
+<li>
+<p><span class="arithmatex">\(X \equiv U_n\)</span>, cioè <span class="arithmatex">\(X \leftarrow \{0,1\}^n\)</span> uniforme: <span class="arithmatex">\(\max \Pr = 2^{-n}\)</span>, quindi <span class="arithmatex">\(H_\infty(X) = n\)</span></p>
+</li>
+<li>
+<p><i>(non negli appunti del prof)</i> <span class="arithmatex">\(X\)</span> su 2 bit con <span class="arithmatex">\(\Pr[00] = 1/2\)</span> e gli altri tre valori a <span class="arithmatex">\(1/6\)</span>: <span class="arithmatex">\(H_\infty(X) = -\log(1/2) = 1\)</span>. Due bit di lunghezza, ma solo 1 bit di min-entropia, perché la sorgente è sbilanciata verso 00.</p>
+</li>
+</ul>
+</div>
+<h3 id="a-cosa-serve-la-min-entropia">A cosa serve la min-entropia<a class="headerlink" href="#a-cosa-serve-la-min-entropia" title="Permanent link">&para;</a></h3>
+<p>L'estrattore butta via una parte dei bit. La domanda naturale è: <b>quanti bit puliti si possono ottenere, al massimo?</b></p>
+<p>La min-entropia risponde proprio a questo: misura <b>quanti "bit puliti" ci sono nascosti dentro la fonte sporca</b>. Da una fonte con min-entropia <span class="arithmatex">\(k\)</span> si possono estrarre al massimo circa <span class="arithmatex">\(k\)</span> bit perfetti.</p>
+<ul>
+<li><b>Moneta onesta</b>: ogni lancio vale 1 bit pulito. Min-entropia <b>1</b>.</li>
+<li><b>Moneta piegata (testa al 60%)</b>: ogni lancio vale <b>meno</b> di un bit pulito, perché è un po' prevedibile. Min-entropia circa <b>0,74</b>.</li>
+<li><b>Moneta che fa sempre testa</b>: ogni lancio vale <b>0</b> bit puliti. Non c'è niente da estrarre.</li>
+</ul>
+<p>Quindi la min-entropia è il <b>"contenuto di casualità vera"</b> della fonte, e dice quanta roba l'estrattore può tirarne fuori.</p>
+<h3 id="come-si-calcola">Come si calcola<a class="headerlink" href="#come-si-calcola" title="Permanent link">&para;</a></h3>
+<p>La formula <span class="arithmatex">\(-\log_2(p)\)</span> si può riscrivere in un modo più comodo:</p>
+<div class="arithmatex">\[
+H_\infty(X) = \log_2\!\left(\frac{1}{p}\right) \qquad p = \text{probabilità del risultato più probabile}
+\]</div>
+<p>Cioè: si fa 1 diviso la probabilità, e poi ci si chiede "2 elevato a quanto fa questo numero?" (è proprio quello che fa <span class="arithmatex">\(\log_2\)</span>: ad esempio <span class="arithmatex">\(\log_2 8 = 3\)</span> perché <span class="arithmatex">\(2^3 = 8\)</span>).</p>
+<div class="admonition example">
+<p><b>Esempi</b>:</p>
+<ul>
+<li><b>Moneta onesta</b>, <span class="arithmatex">\(p = 1/2\)</span>: <span class="arithmatex">\(1/p = 2\)</span>, e <span class="arithmatex">\(2^1 = 2\)</span>, quindi min-entropia <b>1</b>.</li>
+<li><b>Due monete oneste</b>, <span class="arithmatex">\(p = 1/4\)</span>: <span class="arithmatex">\(1/p = 4\)</span>, e <span class="arithmatex">\(2^2 = 4\)</span>, quindi min-entropia <b>2</b>.</li>
+<li><b>Moneta piegata</b>, <span class="arithmatex">\(p = 0{,}6\)</span>: <span class="arithmatex">\(1/p \approx 1{,}67\)</span>. Siccome <span class="arithmatex">\(2^0 = 1\)</span> e <span class="arithmatex">\(2^1 = 2\)</span>, la risposta sta tra 0 e 1; il conto preciso dà <b>0,74</b> (infatti <span class="arithmatex">\(2^{0{,}74} \approx 1{,}67\)</span>).</li>
+</ul>
+</div>
+<p><b>Con la calcolatrice</b> (che di solito ha solo <span class="arithmatex">\(\ln\)</span>): <span class="arithmatex">\(\log_2(x) = \ln(x) / \ln(2)\)</span>. Per la moneta piegata: <span class="arithmatex">\(\ln(1{,}67) / \ln(2) \approx 0{,}511 / 0{,}693 \approx 0{,}74\)</span>.</p>
+<p><b>Tipicamente</b> si sa solo che <span class="arithmatex">\(H_\infty(X) \ge k\)</span> per qualche <span class="arithmatex">\(k &lt; n\)</span>, e si vuole estrarre quanta più casualità possibile.</p>
+<h3 id="teorema-estrattori-deterministici-impossibili">Teorema: estrattori deterministici impossibili<a class="headerlink" href="#teorema-estrattori-deterministici-impossibili" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Un estrattore fissato in anticipo può sempre essere fregato da una fonte costruita apposta contro di lui, anche se quella fonte è quasi perfettamente casuale.</p>
+</div>
+<div class="admonition note">
+<p><b>Notazione: cosa è cosa</b></p>
+<ul>
+<li><span class="arithmatex">\(\{0,1\}\)</span> = l'insieme dei due bit possibili, 0 oppure 1: cioè <b>un singolo bit</b>.</li>
+<li><span class="arithmatex">\(\{0,1\}^n\)</span> = le <b>stringhe di</b> <span class="arithmatex">\(n\)</span> <b>bit</b>. Es. <span class="arithmatex">\(\{0,1\}^3\)</span> contiene 000, 001, …, 111 (8 stringhe). L'esponente dice quanti bit; senza esponente è uno solo.</li>
+<li><span class="arithmatex">\(\to\)</span> = "restituisce": a sinistra cosa entra nella funzione, a destra cosa esce.</li>
+<li><span class="arithmatex">\(\times\)</span> = "e": la funzione prende <b>due</b> input insieme.</li>
+</ul>
+<p>Quindi <span class="arithmatex">\(\text{Ext}: \{0,1\}^n \to \{0,1\}\)</span> si legge: <i>"Ext prende una stringa di</i> <span class="arithmatex">\(n\)</span> <i>bit (quella della fonte) e restituisce un solo bit"</i>. Es. con <span class="arithmatex">\(n = 3\)</span> e Ext = "prendi il primo bit": <span class="arithmatex">\(\text{Ext}(101) = 1\)</span>.
+Nella versione con il seme, <span class="arithmatex">\(\text{Ext}: \{0,1\}^d \times \{0,1\}^n \to \{0,1\}^\ell\)</span> si legge: <i>"entra un seme di</i> <span class="arithmatex">\(d\)</span> <i>bit e una stringa della fonte di</i> <span class="arithmatex">\(n\)</span> <i>bit, escono</i> <span class="arithmatex">\(\ell\)</span> <i>bit puliti"</i>.</p>
+</div>
+<p><b>Perché un solo bit in output</b>: si sceglie l'obiettivo più facile possibile. Se non si riesce a estrarre nemmeno 1 bit pulito, a maggior ragione non si riesce con di più: così il risultato negativo è il più forte possibile.</p>
+<p>Non esiste nessun <span class="arithmatex">\(\text{Ext}: \{0,1\}^n \to \{0,1\}\)</span> che funzioni per tutte le sorgenti con <span class="arithmatex">\(H_\infty(X) \ge k\)</span>, <b>nemmeno</b> con <span class="arithmatex">\(k = n - 1\)</span> (e nemmeno per estrarre un solo bit).</p>
+<h3 id="dimostrazione_2">Dimostrazione<a class="headerlink" href="#dimostrazione_2" title="Permanent link">&para;</a></h3>
+<p>Prendiamo un qualunque <span class="arithmatex">\(\text{Ext}: \{0,1\}^n \to \{0,1\}\)</span>.</p>
+<p>Sia <span class="arithmatex">\(b \in \{0,1\}\)</span> il bit che <b>massimizza</b> <span class="arithmatex">\(|\text{Ext}^{-1}(b)|\)</span>, cioè il bit con più preimmagini.</p>
+<div class="highlight"><pre><span></span><code> {0,1}^n
+┌───────────────┐
+│  x  x  x  x  │ ───→  0
+│───────────────│
+│  x  x  x     │ ───→  1
+└───────────────┘
+</code></pre></div>
+<p>Le due preimmagini <span class="arithmatex">\(\text{Ext}^{-1}(0)\)</span> e <span class="arithmatex">\(\text{Ext}^{-1}(1)\)</span> si spartiscono tutte le <span class="arithmatex">\(2^n\)</span> stringhe, quindi la più grande ne contiene almeno metà:</p>
+<div class="arithmatex">\[
+|\text{Ext}^{-1}(b)| \ge 2^{n-1}
+\]</div>
+<p>Sia <span class="arithmatex">\(X_{\text{BAD}}\)</span> uniforme su <span class="arithmatex">\(\text{Ext}^{-1}(b)\)</span>.</p>
+<ul>
+<li>Ogni valore ha probabilità <span class="arithmatex">\(1/|\text{Ext}^{-1}(b)| \le 2^{-(n-1)}\)</span>, quindi <span class="arithmatex">\(H_\infty(X_{\text{BAD}}) \ge n - 1\)</span></li>
+<li><b>ma</b> <span class="arithmatex">\(\text{Ext}(X_{\text{BAD}}) = b\)</span> è <b>costante</b>! ∎</li>
+</ul>
+<p><b>Intuizione</b>: qualunque estrattore fissato ha un "punto debole". Basta una sorgente cattiva che peschi solo dagli input che finiscono nello stesso output.</p>
+<h3 id="takeaway">Takeaway<a class="headerlink" href="#takeaway" title="Permanent link">&para;</a></h3>
+<p>Nessun <span class="arithmatex">\(\text{Ext}\)</span> deterministico può funzionare per <b>tutte</b> le sorgenti con min-entropia. Approcci possibili:</p>
+<ul>
+<li><b>Più sorgenti indipendenti</b>: <i>2-source extractors</i>.</li>
+<li><b>Strumenti crittografici</b> (es. funzioni hash): ma servono ipotesi forti su queste funzioni.</li>
+<li><b>Seeded extraction</b>: è quello che vediamo nel corso.</li>
+</ul>
+<h2 id="seeded-extraction">Seeded extraction<a class="headerlink" href="#seeded-extraction" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Invece di fissare l'estrattore, lo si sceglie a caso tra tantissimi usando un <b>seme</b> pubblico. Così nessuna fonte può essere costruita apposta contro l'estrattore che verrà usato.</p>
+</div>
+<p><b>Idea</b>: invece di un solo estrattore, una <b>famiglia</b> di estrattori, indicizzata da un <b>seed</b> (seme):</p>
+<div class="arithmatex">\[
+\text{Ext}: \underbrace{\{0,1\}^d}_{\text{seed}} \times \underbrace{\{0,1\}^n}_{\text{sorgente}} \to \underbrace{\{0,1\}^\ell}_{\text{output}}
+\]</div>
+<p>Il seed sarà <b>casuale</b>. Perché non è barare (usare casualità per produrre casualità)?</p>
+<ul>
+<li>Il seed è un <b>catalizzatore</b> corto: l'output può essere più lungo.</li>
+<li>Il seed è <b>pubblico</b> (l'avversario lo conosce!) e <b>riutilizzabile</b>.</li>
+</ul>
+<h3 id="definizione-estrattore-con-seed">Definizione: estrattore con seed<a class="headerlink" href="#definizione-estrattore-con-seed" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Un <span class="arithmatex">\((k, \varepsilon)\)</span>-estrattore trasforma <b>ogni</b> fonte con min-entropia almeno <span class="arithmatex">\(k\)</span> in bit che, presi insieme al seme, sono quasi indistinguibili da bit perfettamente casuali (a meno di un errore <span class="arithmatex">\(\varepsilon\)</span>).</p>
+</div>
+<p><span class="arithmatex">\(\text{Ext}: \{0,1\}^d \times \{0,1\}^n \to \{0,1\}^\ell\)</span> è un <span class="arithmatex">\((k, \varepsilon)\)</span><b>-seeded extractor</b> se per ogni <span class="arithmatex">\(X\)</span> con <span class="arithmatex">\(H_\infty(X) \ge k\)</span>:</p>
+<div class="arithmatex">\[
+(S, \text{Ext}(S, X)) \approx_\varepsilon (S, U_\ell) \ \equiv U_{d+\ell}
+\]</div>
+<p>dove <span class="arithmatex">\(S \leftarrow U_d\)</span> (seed uniforme).</p>
+<p><b>Significato di</b> <span class="arithmatex">\(\approx_\varepsilon\)</span>: ogni avversario <span class="arithmatex">\(A\)</span>, anche con <b>potenza illimitata</b>, distingue <span class="arithmatex">\((S, \text{Ext}(S, X))\)</span> da <span class="arithmatex">\(U_{d+\ell}\)</span> con probabilità (vantaggio) al più <span class="arithmatex">\(\varepsilon\)</span>.</p>
+<p><b>Nota</b>: il seed <span class="arithmatex">\(S\)</span> compare <b>insieme</b> all'output. È questo che formalizza "il seed è pubblico": l'output deve sembrare uniforme anche a chi conosce il seed.</p>
+<h3 id="distanza-statistica">Distanza statistica<a class="headerlink" href="#distanza-statistica" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>La distanza statistica è un numero tra 0 e 1 che dice quanto due distribuzioni sono diverse. È il massimo vantaggio con cui chiunque, anche con potenza infinita, riesce a distinguerle.</p>
+</div>
+<div class="arithmatex">\[
+X \approx_\varepsilon Y \iff \text{SD}(X; Y) \le \varepsilon
+\]</div>
+<div class="arithmatex">\[
+\text{SD}(X; Y) = \frac{1}{2} \sum_z \Big| \Pr[X = z] - \Pr[Y = z] \Big|
+\]</div>
+<div class="admonition note">
+<p><b>Cosa sono le variabili</b></p>
+<ul>
+<li><span class="arithmatex">\(X\)</span>, <span class="arithmatex">\(Y\)</span> = due <b>distribuzioni</b>, cioè due modi di generare valori a caso (es. due monete).</li>
+<li><span class="arithmatex">\(z\)</span> = <b>un valore possibile</b> (per una moneta: 1 o 0).</li>
+<li><span class="arithmatex">\(\Pr[X = z]\)</span> = la probabilità che <span class="arithmatex">\(X\)</span> dia il valore <span class="arithmatex">\(z\)</span>; idem <span class="arithmatex">\(\Pr[Y = z]\)</span>.</li>
+<li><span class="arithmatex">\(|\dots - \dots|\)</span> = di quanto differiscono le due probabilità su quel valore (sempre positivo).</li>
+<li><span class="arithmatex">\(\sum_z\)</span> = "somma su tutti i valori <span class="arithmatex">\(z\)</span> possibili": si fa il conto per ogni valore e si sommano i risultati.</li>
+<li><span class="arithmatex">\(\frac{1}{2}\)</span> = si divide per 2, perché quello che una distribuzione ha in più su un valore lo ha in meno su un altro (le probabilità sommano sempre a 1): senza il ½ la stessa differenza verrebbe contata due volte. Così la SD sta sempre tra 0 e 1.</li>
+<li><span class="arithmatex">\(\text{SD}(X; Y)\)</span> = la <b>distanza statistica</b>, il numero che esce dalla formula.</li>
+<li><span class="arithmatex">\(\varepsilon\)</span> = l'errore massimo che si accetta (un numero piccolo).</li>
+<li><span class="arithmatex">\(X \approx_\varepsilon Y\)</span> = "X e Y sono quasi uguali, con errore al massimo <span class="arithmatex">\(\varepsilon\)</span>".</li>
+<li><span class="arithmatex">\(\iff\)</span> = "se e solo se", cioè "è la stessa cosa di". La prima formula è quindi solo la definizione del simbolo <span class="arithmatex">\(\approx_\varepsilon\)</span>.</li>
+</ul>
+</div>
+<p><b>Intuizione</b>: misura quanto due distribuzioni sono diverse. Vale 0 se sono identiche, 1 se non hanno valori in comune.</p>
+<div class="admonition example">
+<p><b>Esempio</b> <i>(non negli appunti del prof)</i>: moneta truccata <span class="arithmatex">\(X\)</span> con <span class="arithmatex">\(\Pr[1] = 0{,}6\)</span> contro moneta onesta <span class="arithmatex">\(Y\)</span>:
+<span class="arithmatex">\(\text{SD} = \frac{1}{2}(|0{,}6 - 0{,}5| + |0{,}4 - 0{,}5|) = 0{,}1\)</span></p>
+</div>
+<h2 id="leftover-hash-lemma-lhl">Leftover Hash Lemma (LHL)<a class="headerlink" href="#leftover-hash-lemma-lhl" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Il <b>Leftover Hash Lemma</b> è il teorema che risponde alla domanda "come si costruisce un estrattore con seme?". La risposta: basta una famiglia di hash pairwise independent. Il seme sceglie la hash, la si applica alla fonte e si ottengono bit quasi perfettamente casuali, purché la fonte abbia un po' più min-entropia dei bit che si vogliono estrarre. Il nome viene da <i>leftover</i> (avanzo): la casualità che "avanza" in una fonte imperfetta si trasforma con una hash in bit puliti.</p>
+</div>
+<h3 id="teorema_1">Teorema<a class="headerlink" href="#teorema_1" title="Permanent link">&para;</a></h3>
+<p>Sia <span class="arithmatex">\(\mathcal{H} = \{h_s : \{0,1\}^n \to \{0,1\}^\ell\}_{s \in \{0,1\}^d}\)</span> <b>pairwise independent</b>. Allora</p>
+<div class="arithmatex">\[
+\text{Ext}(s, x) = h_s(x)
+\]</div>
+<p>è un <span class="arithmatex">\((k, \varepsilon)\)</span>-seeded extractor per</p>
+<div class="arithmatex">\[
+k \ge \ell + \underbrace{2\log(1/\varepsilon) - 2}_{\text{min-entropy gap}}
+\]</div>
+<p><b>Cosa vuol dire</b> <span class="arithmatex">\(\text{Ext}(s, x) = h_s(x)\)</span>: il seme <span class="arithmatex">\(s\)</span> sceglie quale funzione hash usare, e la si applica al valore <span class="arithmatex">\(x\)</span> della fonte. L'output della hash sono i bit puliti.</p>
+<div class="admonition example">
+<p><b>Esempio</b> con <span class="arithmatex">\(h(x) = a \cdot x + b \bmod 7\)</span>: il seme è la coppia <span class="arithmatex">\(s = (a, b)\)</span>, per esempio <span class="arithmatex">\((3, 5)\)</span>. Se la fonte dà <span class="arithmatex">\(x = 2\)</span>, l'output è <span class="arithmatex">\(3 \cdot 2 + 5 = 11 \bmod 7 = 4\)</span>. Nei MAC la coppia <span class="arithmatex">\((a, b)\)</span> era la <b>chiave segreta</b>, qui è il <b>seme pubblico</b>: stesse funzioni, ruolo diverso.</p>
+</div>
+<p><b>Intuizione</b>: per estrarre <span class="arithmatex">\(\ell\)</span> bit quasi uniformi servono un po' più di <span class="arithmatex">\(\ell\)</span> bit di min-entropia. Il "prezzo" è il <b>min-entropy gap</b>, che cresce se vogliamo <span class="arithmatex">\(\varepsilon\)</span> più piccolo.</p>
+<div class="admonition example">
+<p><b>Esempio</b> <i>(non negli appunti del prof)</i>: per estrarre <span class="arithmatex">\(\ell = 128\)</span> bit con <span class="arithmatex">\(\varepsilon = 2^{-64}\)</span> serve <span class="arithmatex">\(k \ge 128 + 128 - 2 = 254\)</span> bit di min-entropia.</p>
+</div>
+<h3 id="collision-probability-e-lemma">Collision probability e lemma<a class="headerlink" href="#collision-probability-e-lemma" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>La collision probability è la probabilità che due estrazioni indipendenti diano lo stesso valore. L'uniforme è la distribuzione che collide di meno, e il lemma dice che se una distribuzione collide quasi quanto l'uniforme, allora è quasi uniforme.</p>
+</div>
+<p>La dimostrazione usa la <b>probabilità di collisione</b> di una variabile aleatoria <span class="arithmatex">\(Y\)</span> su un insieme <span class="arithmatex">\(\mathcal{Y}\)</span>:</p>
+<div class="arithmatex">\[
+\text{Col}(Y) = \sum_{y \in \mathcal{Y}} \Pr[Y = y]^2 = \Pr[Y = Y']
+\]</div>
+<p>dove <span class="arithmatex">\(Y'\)</span> è una <b>copia indipendente</b> di <span class="arithmatex">\(Y\)</span>: è la probabilità che due estrazioni indipendenti diano lo stesso valore. La distribuzione uniforme ha la collision probability più bassa possibile, <span class="arithmatex">\(1/|\mathcal{Y}|\)</span>.</p>
+<p><b>Lemma</b>: se</p>
+<div class="arithmatex">\[
+\text{Col}(Y) \le \frac{1}{|\mathcal{Y}|}(1 + 4\varepsilon^2)
+\]</div>
+<p>allora <span class="arithmatex">\(\text{SD}(Y; U) \le \varepsilon\)</span>, con <span class="arithmatex">\(U\)</span> uniforme su <span class="arithmatex">\(\mathcal{Y}\)</span>.</p>
+<p><b>Intuizione</b>: se la collision probability è quasi quella dell'uniforme, allora <span class="arithmatex">\(Y\)</span> è quasi uniforme.</p>
+<details class="note">
+<summary>Dimostrazione del lemma (il prof la fa all'inizio della Lezione 4: lì c'è la versione completa, passo per passo)</summary>
+<p>Sia <span class="arithmatex">\(N = |\mathcal{Y}|\)</span> e <span class="arithmatex">\(p_y = \Pr[Y = y]\)</span>. Per Cauchy-Schwarz (<span class="arithmatex">\(\sum |a_y| \le \sqrt{N \sum a_y^2}\)</span>):</p>
+<p><span class="arithmatex">\(\text{SD}(Y; U) = \frac{1}{2}\sum_y |p_y - 1/N| \le \frac{1}{2}\sqrt{N \sum_y (p_y - 1/N)^2}\)</span></p>
+<p>Sviluppando il quadrato: <span class="arithmatex">\(\sum_y (p_y - 1/N)^2 = \sum_y p_y^2 - \frac{2}{N}\sum_y p_y + \frac{1}{N} = \text{Col}(Y) - \frac{1}{N} \le \frac{4\varepsilon^2}{N}\)</span></p>
+<p>Quindi <span class="arithmatex">\(\text{SD}(Y; U) \le \frac{1}{2}\sqrt{N \cdot 4\varepsilon^2 / N} = \varepsilon\)</span>. ∎</p>
+</details>
+<h3 id="dimostrazione-del-lhl">Dimostrazione del LHL<a class="headerlink" href="#dimostrazione-del-lhl" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Si contano le collisioni dell'output. Ci sono quelle "per caso", che ci sono anche nell'uniforme, e quelle dovute alla fonte che ripete lo stesso valore, che sono poche grazie alla min-entropia. Quindi l'output collide quasi quanto l'uniforme e, per il lemma, è quasi uniforme.</p>
+</div>
+<p>Poniamo <span class="arithmatex">\(Y = (S, h(S, X))\)</span>, e sia <span class="arithmatex">\(Y' = (S', h(S', X'))\)</span> una copia indipendente. Calcoliamo la collision probability:</p>
+<div class="arithmatex">\[
+\begin{aligned}
+\text{Col}(Y) &amp;= \Pr[Y = Y'] \\
+&amp;= \Pr[S = S' \wedge h(S, X) = h(S', X')] \\
+&amp;= \Pr[S = S' \wedge h(S, X) = h(S, X')] \\
+&amp;= \underbrace{\Pr[S = S']}_{\text{Col}(S) \,=\, 2^{-d}} \cdot \Pr[h(S, X) = h(S, X')]
+\end{aligned}
+\]</div>
+<ul>
+<li><b>3° passaggio</b>: se <span class="arithmatex">\(S = S'\)</span>, possiamo sostituire <span class="arithmatex">\(S'\)</span> con <span class="arithmatex">\(S\)</span>.</li>
+<li><b>4° passaggio</b>: i seed sono indipendenti dalle sorgenti, quindi le due probabilità si separano. <span class="arithmatex">\(S\)</span> è uniforme su <span class="arithmatex">\(2^d\)</span> valori, quindi <span class="arithmatex">\(\text{Col}(S) = 2^{-d}\)</span>.</li>
+</ul>
+<p>Ora spezziamo in due casi, <span class="arithmatex">\(X = X'\)</span> oppure <span class="arithmatex">\(X \ne X'\)</span>:</p>
+<div class="arithmatex">\[
+\begin{aligned}
+&amp;= 2^{-d} \Big( \Pr[X = X'] \cdot 1 + \Pr[h(S, X) = h(S, X') \wedge X \ne X'] \Big) \\
+&amp;\le 2^{-d} \Big( 2^{-k} + \Pr[h(S, X) = h(S, X') \wedge X \ne X'] \Big) \\
+&amp;\le 2^{-d} \Big( 2^{-k} + 2^{-\ell} \Big)
+\end{aligned}
+\]</div>
+<ul>
+<li><b>Primo termine</b>: se <span class="arithmatex">\(X = X'\)</span> gli hash coincidono sicuramente (probabilità 1). E <span class="arithmatex">\(\Pr[X = X'] = \sum_x \Pr[X = x]^2 \le \max_x \Pr[X = x] \cdot \sum_x \Pr[X = x] \le 2^{-k}\)</span>, perché <span class="arithmatex">\(H_\infty(X) \ge k\)</span>.</li>
+<li><b>Secondo termine</b>: per input diversi <span class="arithmatex">\(x \ne x'\)</span>, per pairwise independence <span class="arithmatex">\(\Pr_S[h_S(x) = h_S(x')] = 2^\ell \cdot 2^{-2\ell} = 2^{-\ell}\)</span> (le coppie <span class="arithmatex">\((t, t)\)</span> con valori uguali sono <span class="arithmatex">\(2^\ell\)</span>, ognuna con probabilità <span class="arithmatex">\(2^{-2\ell}\)</span>).</li>
+</ul>
+<p>Raccogliendo <span class="arithmatex">\(2^{-\ell}\)</span>:</p>
+<div class="arithmatex">\[
+\begin{aligned}
+&amp;= \frac{1}{2^{d+\ell}} \Big( 2^{\ell - k} + 1 \Big) \\
+&amp;\le \frac{1}{|\mathcal{Y}|} \Big( 2^{2 - 2\log(1/\varepsilon)} + 1 \Big) \\
+&amp;= \frac{1}{|\mathcal{Y}|} \Big( 1 + 4\varepsilon^2 \Big)
+\end{aligned}
+\]</div>
+<ul>
+<li><span class="arithmatex">\(|\mathcal{Y}| = 2^{d+\ell}\)</span> perché <span class="arithmatex">\(Y\)</span> è una stringa di <span class="arithmatex">\(d + \ell\)</span> bit.</li>
+<li>Dall'ipotesi <span class="arithmatex">\(k \ge \ell + 2\log(1/\varepsilon) - 2\)</span> segue <span class="arithmatex">\(\ell - k \le 2 - 2\log(1/\varepsilon)\)</span>.</li>
+<li><span class="arithmatex">\(2^{2 - 2\log(1/\varepsilon)} = 4 \cdot (2^{\log(1/\varepsilon)})^{-2} = 4\varepsilon^2\)</span>.</li>
+</ul>
+<p>Per il lemma: <span class="arithmatex">\(\text{SD}(Y; U) \le \varepsilon\)</span>, cioè <span class="arithmatex">\((S, h(S, X)) \approx_\varepsilon U_{d+\ell}\)</span>. ∎</p>
+<h2 id="riepilogo">Riepilogo<a class="headerlink" href="#riepilogo" title="Permanent link">&para;</a></h2>
+<ul>
+<li><span class="arithmatex">\(h_{a,b}(m) = am + b \bmod p\)</span> è pairwise independent: il sistema lineare ha una sola soluzione perché <span class="arithmatex">\(m \ne m'\)</span></li>
+<li>Ogni famiglia pairwise independent dà un MAC ε-sicuro con <span class="arithmatex">\(\varepsilon = 1/|\mathcal{T}|\)</span> (ottimo)</li>
+<li><b>Bad news</b>: un MAC t-time <span class="arithmatex">\(2^{-\lambda}\)</span>-sicuro richiede chiavi di <span class="arithmatex">\((t+1)\lambda\)</span> bit</li>
+<li><b>Min-entropia</b> <span class="arithmatex">\(H_\infty(X) = -\log \max_x \Pr[X = x]\)</span>: quanto è difficile indovinare <span class="arithmatex">\(X\)</span> al primo colpo</li>
+<li>Nessun estrattore <b>deterministico</b> funziona per tutte le sorgenti, nemmeno con <span class="arithmatex">\(k = n - 1\)</span> e un solo bit di output</li>
+<li><b>Seeded extractor</b>: con un seed casuale, corto e <b>pubblico</b>, <span class="arithmatex">\((S, \text{Ext}(S, X)) \approx_\varepsilon U_{d+\ell}\)</span></li>
+<li><b>Distanza statistica</b> <span class="arithmatex">\(\text{SD}\)</span>: misura quanto due distribuzioni differiscono</li>
+<li><b>Leftover Hash Lemma</b>: hash pairwise independent sono estrattori, se <span class="arithmatex">\(k \ge \ell + 2\log(1/\varepsilon) - 2\)</span></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Torna su
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Piede" >
+        
+          
+          <a href="../lezione-2/" class="md-footer__link md-footer__link--prev" aria-label="Precedente: Lezione 2 – Shannon e MAC">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Precedente
+              </span>
+              <div class="md-ellipsis">
+                Lezione 2 – Shannon e MAC
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../lezione-4/" class="md-footer__link md-footer__link--next" aria-label="Successivo: Lezione 4 – Sicurezza computazionale e OWF">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Successivo
+              </span>
+              <div class="md-ellipsis">
+                Lezione 4 – Sicurezza computazionale e OWF
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.indexes", "navigation.top", "navigation.footer", "toc.follow", "search.highlight", "search.suggest", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiato", "clipboard.copy": "Copia", "search.result.more.one": "1 altro in questa pagina", "search.result.more.other": "# altri in questa pagina", "search.result.none": "Nessun documento trovato", "search.result.one": "1 documento trovato", "search.result.other": "# documenti trovati", "search.result.placeholder": "Scrivi per iniziare a cercare", "search.result.term.missing": "Non presente", "select.version": "Seleziona la versione"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="../../javascripts/mathjax/tex-mml-chtml.js"></script>
+      
+        <script src="../../javascripts/mermaid/mermaid.min.js"></script>
+      
+    
+  </body>
+</html>

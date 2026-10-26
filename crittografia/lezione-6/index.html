@@ -1,0 +1,1914 @@
+
+<!doctype html>
+<html lang="it" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Appunti della magistrale in Cybersecurity (Sapienza)">
+      
+      
+      
+        <link rel="canonical" href="https://biamat26.github.io/AppuntiMagistrale/crittografia/lezione-6/">
+      
+      
+        <link rel="prev" href="../lezione-5/">
+      
+      
+        <link rel="next" href="../../sistemi-distribuiti/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Lezione 6 – Goldreich-Levin e cifratura computazionale - Appunti di Luiggi</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#lezione-6-goldreich-levin-e-cifratura-computazionale" class="md-skip">
+          Vai al contenuto
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Intestazione">
+    <a href="../.." title="Appunti di Luiggi" class="md-header__button md-logo" aria-label="Appunti di Luiggi" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 4v6l-2-2-2 2V4H9v16h10V4zM3 7V5h2V4a2 2 0 0 1 2-2h12c1.05 0 2 .95 2 2v16c0 1.05-.95 2-2 2H7c-1.05 0-2-.95-2-2v-1H3v-2h2v-4H3v-2h2V7zm2-2v2h2V5zm0 14h2v-2H5zm0-6h2v-2H5z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Appunti di Luiggi
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Lezione 6 – Goldreich-Levin e cifratura computazionale
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Tema scuro"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Tema scuro" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Tema chiaro"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Tema chiaro" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Cerca" placeholder="Cerca" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Cerca">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Cancella" aria-label="Cancella" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Inizializza la ricerca
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/biamat26/AppuntiMagistrale" title="Apri repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    AppuntiMagistrale
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Crittografia
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../sistemi-distribuiti/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Distributed Systems
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../network-infrastructures/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Network Infrastructures
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigazione" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Appunti di Luiggi" class="md-nav__button md-logo" aria-label="Appunti di Luiggi" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 4v6l-2-2-2 2V4H9v16h10V4zM3 7V5h2V4a2 2 0 0 1 2-2h12c1.05 0 2 .95 2 2v16c0 1.05-.95 2-2 2H7c-1.05 0-2-.95-2-2v-1H3v-2h2v-4H3v-2h2V7zm2-2v2h2V5zm0 14h2v-2H5zm0-6h2v-2H5z"/></svg>
+
+    </a>
+    Appunti di Luiggi
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/biamat26/AppuntiMagistrale" title="Apri repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    AppuntiMagistrale
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Crittografia
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Crittografia
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ripasso-probabilita/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ripasso probabilità
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lezione-1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 1 – Segretezza perfetta
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lezione-2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 2 – Shannon e MAC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lezione-3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 3 – Hash ed estrattori
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lezione-4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 4 – Sicurezza computazionale e OWF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lezione-5/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 5 – PRG e hard-core bit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 6 – Goldreich-Levin e cifratura computazionale
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 6 – Goldreich-Levin e cifratura computazionale
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Indice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Indice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#fine-lezione-5-perche-f_bad-e-comunque-una-owf" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fine lezione 5: perché f_BAD è comunque una OWF
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#teorema-di-goldreich-levin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Teorema di Goldreich-Levin
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Teorema di Goldreich-Levin">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prodotto-scalare-modulo-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prodotto scalare modulo 2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enunciato-del-prof" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enunciato (del prof)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#intuizione-del-prof" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Intuizione (del prof)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usare-i-prg-per-battere-shannon" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usare i PRG per battere Shannon
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Usare i PRG per battere Shannon">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#lo-schema-del-prof" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lo schema (del prof)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#e-ancora-one-time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        È ancora one-time
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sicurezza-computazionale-per-la-cifratura" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sicurezza computazionale per la cifratura
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Sicurezza computazionale per la cifratura">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#definizione-sicurezza-computazionale-one-time-del-prof" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Definizione: sicurezza computazionale one-time (del prof)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sanity-checks-del-prof" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sanity checks (del prof)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#teorema-il-prg-da-cifratura-one-time-sicura" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Teorema: il PRG dà cifratura one-time sicura
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Teorema: il PRG dà cifratura one-time sicura">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#enunciato-del-prof_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enunciato (del prof)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#game-hopping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Game hopping
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#il-piano" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Il piano
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#la-riduzione-g_b-c-h_b" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        La riduzione: G_b ≈c H_b
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#riepilogo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Riepilogo
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../sistemi-distribuiti/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Distributed Systems
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Distributed Systems
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sistemi-distribuiti/lezione-2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 2 – Modelli, astrazioni e link
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sistemi-distribuiti/lezione-3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 3 – Tempo (I): orologi fisici
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sistemi-distribuiti/lezione-4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 4 – Tempo (II): tempo logico
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sistemi-distribuiti/lezione-5/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 5 – Failure detector e leader election
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../network-infrastructures/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Network Infrastructures
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Network Infrastructures
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../network-infrastructures/lezione-1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 1 – Aree funzionali della rete
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../network-infrastructures/lezione-2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 2 – xDSL e PPP
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../network-infrastructures/lezione-3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 3 – FTTx e PON
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../network-infrastructures/kathara/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Kathará
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Indice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Indice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#fine-lezione-5-perche-f_bad-e-comunque-una-owf" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fine lezione 5: perché f_BAD è comunque una OWF
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#teorema-di-goldreich-levin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Teorema di Goldreich-Levin
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Teorema di Goldreich-Levin">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prodotto-scalare-modulo-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prodotto scalare modulo 2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enunciato-del-prof" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enunciato (del prof)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#intuizione-del-prof" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Intuizione (del prof)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usare-i-prg-per-battere-shannon" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usare i PRG per battere Shannon
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Usare i PRG per battere Shannon">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#lo-schema-del-prof" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lo schema (del prof)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#e-ancora-one-time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        È ancora one-time
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sicurezza-computazionale-per-la-cifratura" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sicurezza computazionale per la cifratura
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Sicurezza computazionale per la cifratura">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#definizione-sicurezza-computazionale-one-time-del-prof" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Definizione: sicurezza computazionale one-time (del prof)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sanity-checks-del-prof" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sanity checks (del prof)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#teorema-il-prg-da-cifratura-one-time-sicura" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Teorema: il PRG dà cifratura one-time sicura
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Teorema: il PRG dà cifratura one-time sicura">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#enunciato-del-prof_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enunciato (del prof)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#game-hopping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Game hopping
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#il-piano" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Il piano
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#la-riduzione-g_b-c-h_b" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        La riduzione: G_b ≈c H_b
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#riepilogo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Riepilogo
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="lezione-6-goldreich-levin-e-cifratura-computazionale">Lezione 6 – Goldreich-Levin e cifratura computazionale<a class="headerlink" href="#lezione-6-goldreich-levin-e-cifratura-computazionale" title="Permanent link">&para;</a></h1>
+<p><em>Segue gli appunti del prof. Le parti aggiunte per capire meglio sono segnate "non negli appunti del prof". Usa i concetti della <a href="../lezione-4/">Lezione 4</a> (OWF, trascurabile) e della <a href="../lezione-5/">Lezione 5</a> (PRG, hard-core bit, riduzioni, ≈c).</em></p>
+<h2 id="fine-lezione-5-perche-f_bad-e-comunque-una-owf">Fine lezione 5: perché f_BAD è comunque una OWF<a class="headerlink" href="#fine-lezione-5-perche-f_bad-e-comunque-una-owf" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Nella lezione 5 abbiamo costruito <span class="arithmatex">\(f_{\text{BAD}}(x) = f(x) \,\|\, h(x)\)</span>, che scrive in chiaro il bit <span class="arithmatex">\(h(x)\)</span>: quindi <span class="arithmatex">\(h\)</span> non è hard-core per <span class="arithmatex">\(f_{\text{BAD}}\)</span>. Qui il prof dimostra che <span class="arithmatex">\(f_{\text{BAD}}\)</span> resta comunque <b>one-way</b>, con una riduzione: chi inverte <span class="arithmatex">\(f_{\text{BAD}}\)</span> sa invertire anche <span class="arithmatex">\(f\)</span>.</p>
+</div>
+<p><b>Il problema</b>: <span class="arithmatex">\(h(\cdot)\)</span> chiaramente <b>non</b> è hard-core per <span class="arithmatex">\(f_{\text{BAD}}\)</span>, perché è scritto nell'output. Perché <span class="arithmatex">\(f_{\text{BAD}}\)</span> è ancora una OWF?</p>
+<p><b>Supponiamo di no</b>: esiste un PPT <span class="arithmatex">\(A\)</span> che vince <span class="arithmatex">\(\text{GAME}^{\text{owf}}_{f_{\text{BAD}}}(\lambda)\)</span> con probabilità <span class="arithmatex">\(\ge 1/\text{poly}(\lambda)\)</span>, cioè non trascurabile. Costruiamo un PPT <span class="arithmatex">\(B\)</span> che <b>rompe</b> <span class="arithmatex">\(f\)</span>.</p>
+<div class="highlight"><pre><span></span><code>A                              B                              C
+                                                              x ← U_n
+                               ←────────── y = f(x) ──────────
+                               b̃ ← U_1   (bit tirato a caso)
+  ←──────── y ‖ b̃ ─────────
+  ────────── x' ───────────→
+                               ────────────── x' ────────────→
+</code></pre></div>
+<ol>
+<li><span class="arithmatex">\(B\)</span> riceve dal challenger <span class="arithmatex">\(y = f(x)\)</span>, con <span class="arithmatex">\(x\)</span> casuale.</li>
+<li>Ad <span class="arithmatex">\(A\)</span> serve una stringa della forma <span class="arithmatex">\(f(x) \,\|\, h(x)\)</span>, ma <span class="arithmatex">\(B\)</span> non conosce <span class="arithmatex">\(x\)</span> e quindi non sa calcolare <span class="arithmatex">\(h(x)\)</span>. Allora <b>tira a indovinare</b>: sceglie un bit casuale <span class="arithmatex">\(\tilde{b}\)</span> e dà ad <span class="arithmatex">\(A\)</span> la stringa <span class="arithmatex">\(y \,\|\, \tilde{b}\)</span>.</li>
+<li><span class="arithmatex">\(A\)</span> risponde con un <span class="arithmatex">\(x'\)</span>, e <span class="arithmatex">\(B\)</span> lo inoltra al challenger.</li>
+</ol>
+<p><b>Perché funziona</b> <em>(spiegazione non negli appunti del prof)</em>:</p>
+<ul>
+<li>Con probabilità <span class="arithmatex">\(1/2\)</span> il bit indovinato è giusto: <span class="arithmatex">\(\tilde{b} = h(x)\)</span>. In quel caso <span class="arithmatex">\(A\)</span> riceve esattamente <span class="arithmatex">\(f_{\text{BAD}}(x)\)</span>, cioè la stessa cosa che riceverebbe nel suo gioco, quindi vince con la sua solita probabilità.</li>
+<li>Se <span class="arithmatex">\(A\)</span> vince, ha trovato un <span class="arithmatex">\(x'\)</span> con <span class="arithmatex">\(f(x') \,\|\, h(x') = y \,\|\, \tilde{b}\)</span>. Guardando solo i primi bit: <span class="arithmatex">\(f(x') = y\)</span>. Quindi <span class="arithmatex">\(x'\)</span> è una controimmagine di <span class="arithmatex">\(y\)</span> e anche <span class="arithmatex">\(B\)</span> vince.</li>
+</ul>
+<div class="arithmatex">\[
+\Pr[B \text{ vince}] \ \ge\ \frac{1}{2} \cdot \Pr[A \text{ vince}] \ \ge\ \frac{1}{2} \cdot \frac{1}{\text{poly}(\lambda)} = \frac{1}{\text{poly}(\lambda)}
+\]</div>
+<p>Quindi <span class="arithmatex">\(B\)</span> inverte <span class="arithmatex">\(f\)</span> con probabilità non trascurabile, ma <span class="arithmatex">\(f\)</span> è una OWF: <b>contraddizione</b>. ∎</p>
+<div class="admonition note">
+<p><b>Il trucco da ricordare</b> <em>(non negli appunti del prof)</em>: quando la riduzione non sa calcolare un pezzo dell'input dell'avversario, può <b>tirare a indovinare</b>. Se indovina con probabilità <span class="arithmatex">\(1/2\)</span> (o <span class="arithmatex">\(1/\text{poly}\)</span>), perde solo un fattore polinomiale, e poly · (1/poly) resta 1/poly.</p>
+</div>
+<h2 id="teorema-di-goldreich-levin">Teorema di Goldreich-Levin<a class="headerlink" href="#teorema-di-goldreich-levin" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Abbiamo visto che nessun <span class="arithmatex">\(h\)</span> fissato è hard-core per <b>tutte</b> le OWF. La cosa migliore che si può avere è il contrario: <b>per ogni</b> OWF <span class="arithmatex">\(f\)</span> esiste un hard-core bit. Il teorema lo costruisce: si aggiunge all'input una stringa casuale <span class="arithmatex">\(r\)</span>, la si pubblica, e l'hard-core bit è il <b>prodotto scalare modulo 2</b> tra <span class="arithmatex">\(x\)</span> e <span class="arithmatex">\(r\)</span>.</p>
+</div>
+<p><em>(Il nome "Goldreich-Levin" non è negli appunti del prof, che lo chiama solo THM.)</em></p>
+<p><b>La cosa migliore possibile</b>: non "<span class="arithmatex">\(\exists h\ \forall f\)</span>" (impossibile, per <span class="arithmatex">\(f_{\text{BAD}}\)</span>), ma "<span class="arithmatex">\(\forall f\ \exists h\)</span>".</p>
+<h3 id="prodotto-scalare-modulo-2">Prodotto scalare modulo 2<a class="headerlink" href="#prodotto-scalare-modulo-2" title="Permanent link">&para;</a></h3>
+<p><em>(Definizione non negli appunti del prof.)</em></p>
+<p>Per due stringhe di bit <span class="arithmatex">\(x = (x_1, \dots, x_n)\)</span> e <span class="arithmatex">\(r = (r_1, \dots, r_n)\)</span>:</p>
+<div class="arithmatex">\[
+\langle x, r \rangle = \sum_{i=1}^{n} x_i r_i \bmod 2
+\]</div>
+<p>Si moltiplicano i bit a coppie (cioè si fa l'AND) e si guarda se il numero di 1 ottenuti è pari (risultato 0) o dispari (risultato 1). In pratica: è lo <b>XOR dei bit di</b> <span class="arithmatex">\(x\)</span> <b>nelle posizioni in cui</b> <span class="arithmatex">\(r\)</span> <b>vale 1</b>.</p>
+<div class="admonition example">
+<p><b>Esempio</b>: <span class="arithmatex">\(x = 1011\)</span>, <span class="arithmatex">\(r = 0110\)</span>.</p>
+<ul>
+<li>posizione 1: <span class="arithmatex">\(1 \cdot 0 = 0\)</span></li>
+<li>posizione 2: <span class="arithmatex">\(0 \cdot 1 = 0\)</span></li>
+<li>posizione 3: <span class="arithmatex">\(1 \cdot 1 = 1\)</span></li>
+<li>posizione 4: <span class="arithmatex">\(1 \cdot 0 = 0\)</span></li>
+</ul>
+<p>Somma <span class="arithmatex">\(= 1\)</span>, quindi <span class="arithmatex">\(\langle x, r \rangle = 1\)</span>. Detto in altro modo: <span class="arithmatex">\(r\)</span> "seleziona" le posizioni 2 e 3 di <span class="arithmatex">\(x\)</span>, cioè i bit 0 e 1, e <span class="arithmatex">\(0 \oplus 1 = 1\)</span>.</p>
+</div>
+<h3 id="enunciato-del-prof">Enunciato (del prof)<a class="headerlink" href="#enunciato-del-prof" title="Permanent link">&para;</a></h3>
+<p>Sia <span class="arithmatex">\(f : \{0,1\}^n \to \{0,1\}^n\)</span> una OWF. Consideriamo</p>
+<div class="arithmatex">\[
+g : \{0,1\}^{2n} \to \{0,1\}^{2n} \qquad g(x, r) = f(x) \,\|\, r \qquad \forall\, x, r \in \{0,1\}^n
+\]</div>
+<p>Allora <span class="arithmatex">\(g\)</span> è una OWF e</p>
+<div class="arithmatex">\[
+h(x, r) = \langle x, r \rangle = \sum_{i=1}^{n} x_i r_i \bmod 2
+\]</div>
+<p>è <b>hard-core</b> per <span class="arithmatex">\(g\)</span>.</p>
+<div class="admonition note">
+<p><b>Cosa sono le cose</b></p>
+<ul>
+<li><span class="arithmatex">\(x\)</span> = l'input segreto della OWF <span class="arithmatex">\(f\)</span>; <span class="arithmatex">\(r\)</span> = una stringa casuale in più, della stessa lunghezza.</li>
+<li><span class="arithmatex">\(g(x, r) = f(x) \,\|\, r\)</span>: calcola <span class="arithmatex">\(f(x)\)</span> e poi scrive <span class="arithmatex">\(r\)</span> <b>in chiaro</b>. Quindi chi vede l'output di <span class="arithmatex">\(g\)</span> conosce <span class="arithmatex">\(r\)</span> ma non <span class="arithmatex">\(x\)</span>.</li>
+<li><span class="arithmatex">\(h(x, r) = \langle x, r \rangle\)</span>: lo XOR di un <b>sottoinsieme casuale</b> dei bit di <span class="arithmatex">\(x\)</span>, quello scelto da <span class="arithmatex">\(r\)</span>.</li>
+<li>In parole: anche conoscendo <span class="arithmatex">\(f(x)\)</span> e <span class="arithmatex">\(r\)</span>, il bit <span class="arithmatex">\(\langle x, r \rangle\)</span> sembra completamente casuale.</li>
+</ul>
+</div>
+<p><b>Perché</b> <span class="arithmatex">\(g\)</span> <b>è una OWF</b> <em>(non negli appunti del prof)</em>: invertire <span class="arithmatex">\(g\)</span> vuol dire, dato <span class="arithmatex">\(f(x) \,\|\, r\)</span>, trovare <span class="arithmatex">\((x', r')\)</span> con <span class="arithmatex">\(f(x') \,\|\, r' = f(x) \,\|\, r\)</span>. In particolare <span class="arithmatex">\(f(x') = f(x)\)</span>: chi inverte <span class="arithmatex">\(g\)</span> inverte anche <span class="arithmatex">\(f\)</span>. È la stessa riduzione di <span class="arithmatex">\(f_{\text{BAD}}\)</span>, ma senza nemmeno dover indovinare (<span class="arithmatex">\(r\)</span> è già dato).</p>
+<h3 id="intuizione-del-prof">Intuizione (del prof)<a class="headerlink" href="#intuizione-del-prof" title="Permanent link">&para;</a></h3>
+<p>Supponiamo che esista un avversario <b>bravissimo</b> che, dato <span class="arithmatex">\(g(x, r)\)</span>, calcola <b>sempre</b> <span class="arithmatex">\(h(x, r)\)</span>, per ogni <span class="arithmatex">\(r\)</span>. Allora si ricava facilmente tutto <span class="arithmatex">\(x\)</span>, scegliendo come <span class="arithmatex">\(r\)</span> le stringhe con un solo 1 (<span class="arithmatex">\(e_i\)</span> = tutti 0 tranne un 1 in posizione <span class="arithmatex">\(i\)</span>):</p>
+<div class="arithmatex">\[
+h(x, e_1) = \langle x, 10\cdots0 \rangle = x_1 \qquad \cdots \qquad h(x, e_n) = \langle x, 0\cdots01 \rangle = x_n
+\]</div>
+<p>Con <span class="arithmatex">\(r = e_i\)</span> il prodotto scalare "seleziona" solo il bit <span class="arithmatex">\(i\)</span> di <span class="arithmatex">\(x\)</span>. Facendo <span class="arithmatex">\(n\)</span> domande si ricostruisce <span class="arithmatex">\(x\)</span> bit per bit, cioè si inverte <span class="arithmatex">\(f\)</span>: impossibile, perché <span class="arithmatex">\(f\)</span> è one-way.</p>
+<div class="admonition example">
+<p><b>Esempio</b> <em>(non negli appunti del prof)</em>: <span class="arithmatex">\(x = 101\)</span>. <span class="arithmatex">\(\langle x, 100 \rangle = 1\)</span>, <span class="arithmatex">\(\langle x, 010 \rangle = 0\)</span>, <span class="arithmatex">\(\langle x, 001 \rangle = 1\)</span>: si legge <span class="arithmatex">\(x = 101\)</span>.</p>
+</div>
+<p><b>Perché la dimostrazione vera è più difficile</b>: un avversario reale indovina <span class="arithmatex">\(h(x, r)\)</span> solo con probabilità <span class="arithmatex">\(\frac{1}{2} + \frac{1}{\text{poly}}\)</span>, e solo <b>in media su</b> <span class="arithmatex">\(r\)</span> <b>casuale</b>. Sulle stringhe speciali <span class="arithmatex">\(e_i\)</span> potrebbe sbagliare sempre. La dimostrazione completa deve "amplificare" questo piccolo vantaggio, e il prof non la fa.</p>
+<h2 id="usare-i-prg-per-battere-shannon">Usare i PRG per battere Shannon<a class="headerlink" href="#usare-i-prg-per-battere-shannon" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Shannon dice che con la segretezza perfetta la chiave deve essere lunga quanto il messaggio. Con un PRG si aggira il limite: si usa una chiave <b>corta</b>, la si allunga con il PRG e si usa il risultato come un One-Time Pad.</p>
+</div>
+<h3 id="lo-schema-del-prof">Lo schema (del prof)<a class="headerlink" href="#lo-schema-del-prof" title="Permanent link">&para;</a></h3>
+<p>Con un PRG <span class="arithmatex">\(G : \{0,1\}^n \to \{0,1\}^{2n}\)</span>, chiave <span class="arithmatex">\(k \in \{0,1\}^n\)</span> e messaggi <span class="arithmatex">\(m, c \in \{0,1\}^{2n}\)</span>:</p>
+<div class="arithmatex">\[
+\text{Enc}(k, m) = G(k) \oplus m \qquad \text{Dec}(k, c) = G(k) \oplus c
+\]</div>
+<p>È un OTP in cui la chiave <span class="arithmatex">\(G(k)\)</span> non è davvero casuale, ma <b>pseudocasuale</b>. La correttezza è la stessa dell'OTP: <span class="arithmatex">\(G(k) \oplus (G(k) \oplus m) = m\)</span>.</p>
+<p><b>La chiave è corta</b>: <span class="arithmatex">\(n\)</span> bit per un messaggio di <span class="arithmatex">\(2n\)</span> bit, quindi <b>più corta del messaggio</b>! Shannon non viene contraddetto, perché lo schema non è perfettamente segreto: è sicuro solo contro avversari efficienti.</p>
+<div class="admonition example">
+<p><b>Esempio</b> <em>(valori di</em> <span class="arithmatex">\(G\)</span> <em>inventati, non negli appunti del prof)</em>: <span class="arithmatex">\(n = 3\)</span>, <span class="arithmatex">\(k = 101\)</span>, e supponiamo <span class="arithmatex">\(G(101) = 110010\)</span>. Per cifrare <span class="arithmatex">\(m = 011011\)</span>: <span class="arithmatex">\(c = 110010 \oplus 011011 = 101001\)</span>. Bob, che conosce <span class="arithmatex">\(k\)</span>, ricalcola <span class="arithmatex">\(G(101) = 110010\)</span> e fa <span class="arithmatex">\(101001 \oplus 110010 = 011011 = m\)</span>. Si è usata una chiave di 3 bit per un messaggio di 6.</p>
+</div>
+<h3 id="e-ancora-one-time">È ancora one-time<a class="headerlink" href="#e-ancora-one-time" title="Permanent link">&para;</a></h3>
+<p>Come l'OTP, questo schema si può usare <b>una sola volta</b>. Dati <span class="arithmatex">\(c_1 = G(k) \oplus m_1\)</span> e <span class="arithmatex">\(c_2 = G(k) \oplus m_2\)</span>:</p>
+<div class="arithmatex">\[
+c_1 \oplus c_2 = m_1 \oplus m_2
+\]</div>
+<p>perché <span class="arithmatex">\(G(k) \oplus G(k) = 0\)</span>: la chiave sparisce, esattamente come nella Lezione 1.</p>
+<h2 id="sicurezza-computazionale-per-la-cifratura">Sicurezza computazionale per la cifratura<a class="headerlink" href="#sicurezza-computazionale-per-la-cifratura" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>La segretezza perfetta chiede che i cifrati di due messaggi qualunque siano <b>identici</b> come distribuzione: nessuno, nemmeno con potenza infinita, li distingue. La versione computazionale chiede solo che siano <b>indistinguibili per avversari efficienti</b> (<span class="arithmatex">\(\approx_c\)</span>).</p>
+</div>
+<p><b>Ripasso (segretezza perfetta)</b>: per ogni <span class="arithmatex">\(m_0, m_1\)</span>,</p>
+<div class="arithmatex">\[
+\text{Enc}(K, m_0) \equiv \text{Enc}(K, m_1)
+\]</div>
+<p>quindi nemmeno un avversario <b>illimitato</b> riesce a distinguerli.</p>
+<h3 id="definizione-sicurezza-computazionale-one-time-del-prof">Definizione: sicurezza computazionale one-time (del prof)<a class="headerlink" href="#definizione-sicurezza-computazionale-one-time-del-prof" title="Permanent link">&para;</a></h3>
+<p>Uno SKE <span class="arithmatex">\(\Pi = (\text{Enc}, \text{Dec})\)</span> è <b>one-time computazionalmente sicuro</b> se</p>
+<div class="arithmatex">\[
+\text{GAME}^{\text{one-time}}_{\Pi, A}(\lambda, 0) \ \approx_c\ \text{GAME}^{\text{one-time}}_{\Pi, A}(\lambda, 1)
+\]</div>
+<p>dove <span class="arithmatex">\(\text{GAME}^{\text{one-time}}_{\Pi, A}(\lambda, b)\)</span>, con <span class="arithmatex">\(b \in \{0, 1\}\)</span>, è:</p>
+<div class="highlight"><pre><span></span><code>A                                    C
+  ────────── m0, m1 ∈ M ──────────→
+                                     k ← K
+                                     c = Enc(k, m_b)
+  ←─────────────── c ──────────────
+  ─────────────── b' ─────────────→
+</code></pre></div>
+<ol>
+<li><span class="arithmatex">\(A\)</span> sceglie <b>due messaggi</b> <span class="arithmatex">\(m_0, m_1\)</span> e li manda al challenger.</li>
+<li>Il challenger sceglie una chiave <span class="arithmatex">\(k\)</span> a caso e cifra <span class="arithmatex">\(m_b\)</span>: <span class="arithmatex">\(c = \text{Enc}(k, m_b)\)</span>.</li>
+<li><span class="arithmatex">\(A\)</span> vede <span class="arithmatex">\(c\)</span> e risponde <span class="arithmatex">\(b'\)</span>, il suo tentativo di indovinare quale dei due è stato cifrato.</li>
+</ol>
+<p>In parole: <b>nessun avversario PPT</b> si comporta in modo (non trascurabilmente) diverso a seconda che sia stato cifrato <span class="arithmatex">\(m_0\)</span> o <span class="arithmatex">\(m_1\)</span>.</p>
+<div class="admonition note">
+<p><b>Differenze con il gioco della Lezione 2</b> <em>(non negli appunti del prof)</em>:</p>
+<ul>
+<li>lì l'avversario poteva essere <b>illimitato</b> e la differenza doveva essere <b>esattamente 0</b>; qui l'avversario è <b>PPT</b> e la differenza deve essere <b>trascurabile</b>;</li>
+<li>qui è l'avversario a <b>scegliere</b> <span class="arithmatex">\(m_0\)</span> e <span class="arithmatex">\(m_1\)</span>: la definizione deve reggere anche per i messaggi più comodi per lui.</li>
+</ul>
+</div>
+<h3 id="sanity-checks-del-prof">Sanity checks (del prof)<a class="headerlink" href="#sanity-checks-del-prof" title="Permanent link">&para;</a></h3>
+<p>Una buona definizione deve implicare le cose che ci aspettiamo da un cifrario. Questa le implica:</p>
+<ul>
+<li><b>È difficile calcolare la chiave</b> <span class="arithmatex">\(k\)</span>.<ul>
+<li><b>Attenzione</b>: non basta! <span class="arithmatex">\(\text{Enc}(k, m) = m\)</span> (non cifrare proprio) soddisfa anche lui la proprietà che <span class="arithmatex">\(k\)</span> è difficile da calcolare, perché il cifrato non dice niente della chiave. Ma è ovviamente insicuro.</li>
+</ul>
+</li>
+<li><b>È difficile calcolare il messaggio</b> <span class="arithmatex">\(m\)</span>.</li>
+<li><b>Ma anche</b> il primo bit di <span class="arithmatex">\(m\)</span>, il secondo bit, … : nessuna informazione parziale sul messaggio.</li>
+</ul>
+<p><em>Perché la definizione implica tutto questo (non negli appunti del prof)</em>: se un avversario sapesse calcolare <span class="arithmatex">\(k\)</span> (o <span class="arithmatex">\(m\)</span>, o il primo bit di <span class="arithmatex">\(m\)</span>), vincerebbe il gioco. Basta scegliere <span class="arithmatex">\(m_0\)</span> e <span class="arithmatex">\(m_1\)</span> che differiscono proprio in quello che sa calcolare (es. <span class="arithmatex">\(m_0\)</span> che inizia con 0 e <span class="arithmatex">\(m_1\)</span> che inizia con 1), calcolarlo dal cifrato e rispondere di conseguenza.</p>
+<h2 id="teorema-il-prg-da-cifratura-one-time-sicura">Teorema: il PRG dà cifratura one-time sicura<a class="headerlink" href="#teorema-il-prg-da-cifratura-one-time-sicura" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Se <span class="arithmatex">\(G\)</span> è un PRG, lo schema <span class="arithmatex">\(\text{Enc}(k, m) = G(k) \oplus m\)</span> è one-time computazionalmente sicuro. La dimostrazione usa il <b>game hopping</b>: si passa dal gioco con <span class="arithmatex">\(b = 0\)</span> a quello con <span class="arithmatex">\(b = 1\)</span> attraverso giochi intermedi, mostrando che ogni salto è invisibile.</p>
+</div>
+<h3 id="enunciato-del-prof_1">Enunciato (del prof)<a class="headerlink" href="#enunciato-del-prof_1" title="Permanent link">&para;</a></h3>
+<p>Assumendo che <span class="arithmatex">\(G\)</span> sia un PRG, lo SKE definito sopra è <b>one-time computazionalmente sicuro</b>.</p>
+<h3 id="game-hopping">Game hopping<a class="headerlink" href="#game-hopping" title="Permanent link">&para;</a></h3>
+<p><b>Game hopping</b> (tecnica di dimostrazione molto comune): si parte dai due giochi da confrontare,</p>
+<div class="arithmatex">\[
+G_0 \equiv \text{GAME}^{\text{one-time}}_{\Pi, A}(\lambda, 0) \qquad G_1 \equiv \text{GAME}^{\text{one-time}}_{\Pi, A}(\lambda, 1)
+\]</div>
+<p>e bisogna mostrare <span class="arithmatex">\(G_0 \approx_c G_1\)</span>. Si introducono <b>due giochi in più</b>, <span class="arithmatex">\(H_0\)</span> e <span class="arithmatex">\(H_1\)</span>:</p>
+<div class="highlight"><pre><span></span><code>                 G_b  /  H_b
+A                                    C
+  ────────── m0, m1 ──────────────→
+                                     k ← {0,1}^n ;   z ← U_2n
+                                     G_b:  c_b = G(k) ⊕ m_b
+                                     H_b:  c_b = z ⊕ m_b
+  ←─────────────── c ──────────────
+  ─────────────── b' ─────────────→
+</code></pre></div>
+<ul>
+<li>In <span class="arithmatex">\(G_b\)</span> si cifra con il PRG: <span class="arithmatex">\(c = G(k) \oplus m_b\)</span> (lo schema vero).</li>
+<li>In <span class="arithmatex">\(H_b\)</span> si cifra con una stringa <b>davvero casuale</b> <span class="arithmatex">\(z\)</span> di <span class="arithmatex">\(2n\)</span> bit: <span class="arithmatex">\(c = z \oplus m_b\)</span>. È un vero OTP.</li>
+</ul>
+<p>È la stessa idea dell'argomento ibrido della Lezione 5 <em>(collegamento non negli appunti del prof)</em>: si sostituisce il pezzo pseudocasuale con uno davvero casuale.</p>
+<h3 id="il-piano">Il piano<a class="headerlink" href="#il-piano" title="Permanent link">&para;</a></h3>
+<ol>
+<li><span class="arithmatex">\(H_0 \equiv H_1\)</span>: segue dalla <b>segretezza perfetta dell'OTP</b> (Lezione 1). Con <span class="arithmatex">\(z\)</span> uniforme, <span class="arithmatex">\(z \oplus m_0\)</span> e <span class="arithmatex">\(z \oplus m_1\)</span> hanno la stessa distribuzione, quindi <span class="arithmatex">\(A\)</span> si comporta in modo identico.</li>
+<li>Resta da mostrare <span class="arithmatex">\(G_b \approx_c H_b\)</span> (per ogni <span class="arithmatex">\(b\)</span>). Allora:</li>
+</ol>
+<div class="arithmatex">\[
+G_0 \ \approx_c\ H_0 \ \equiv\ H_1 \ \approx_c\ G_1
+\]</div>
+<p><em>Perché la catena basta (non negli appunti del prof)</em>: il vantaggio di <span class="arithmatex">\(A\)</span> tra <span class="arithmatex">\(G_0\)</span> e <span class="arithmatex">\(G_1\)</span> è al più la somma dei vantaggi sui singoli passi (disuguaglianza triangolare): <span class="arithmatex">\(\text{negl} + 0 + \text{negl} = \text{negl}\)</span>.</p>
+<h3 id="la-riduzione-g_b-c-h_b">La riduzione: G_b ≈c H_b<a class="headerlink" href="#la-riduzione-g_b-c-h_b" title="Permanent link">&para;</a></h3>
+<p><b>Supponiamo di no</b>: esiste un PPT <span class="arithmatex">\(A\)</span> che distingue <span class="arithmatex">\(G_b\)</span> da <span class="arithmatex">\(H_b\)</span> (per qualche <span class="arithmatex">\(b \in \{0, 1\}\)</span>) con probabilità <span class="arithmatex">\(\ge 1/\text{poly}\)</span>. Costruiamo <span class="arithmatex">\(B\)</span> che rompe il PRG:</p>
+<div class="highlight"><pre><span></span><code>A                         B                              C
+                                                         z = G(k), k ← U_n
+                                                         oppure  z ← U_2n
+                          ←──────────── z ─────────────
+  ←────── "START" ──────
+  ─────── m0, m1 ───────→
+  ←──── c = m_b ⊕ z ─────
+  ────────── b' ────────→
+                          ──────────── b' ─────────────→
+</code></pre></div>
+<ol>
+<li><span class="arithmatex">\(B\)</span> riceve dal challenger del PRG una stringa <span class="arithmatex">\(z\)</span> di <span class="arithmatex">\(2n\)</span> bit: o <span class="arithmatex">\(z = G(k)\)</span> con <span class="arithmatex">\(k\)</span> casuale, o <span class="arithmatex">\(z\)</span> davvero casuale.</li>
+<li><span class="arithmatex">\(B\)</span> fa partire <span class="arithmatex">\(A\)</span> ("START") e riceve i suoi due messaggi <span class="arithmatex">\(m_0, m_1\)</span>.</li>
+<li><span class="arithmatex">\(B\)</span> risponde con <span class="arithmatex">\(c = m_b \oplus z\)</span> (usa <span class="arithmatex">\(z\)</span> come se fosse la chiave dell'OTP).</li>
+<li>Quando <span class="arithmatex">\(A\)</span> risponde <span class="arithmatex">\(b'\)</span>, <span class="arithmatex">\(B\)</span> inoltra <span class="arithmatex">\(b'\)</span> al challenger.</li>
+</ol>
+<p><b>Riduzione perfetta</b>: <span class="arithmatex">\(B\)</span> simula esattamente uno dei due giochi.</p>
+<div class="arithmatex">\[
+\Pr[B \Rightarrow 1 : z = G(k)] = \Pr[A \Rightarrow 1 : \text{in } G_b]
+\]</div>
+<div class="arithmatex">\[
+\Pr[B \Rightarrow 1 : z \leftarrow U_{2n}] = \Pr[A \Rightarrow 1 : \text{in } H_b]
+\]</div>
+<ul>
+<li>Se <span class="arithmatex">\(z = G(k)\)</span>, allora <span class="arithmatex">\(c = G(k) \oplus m_b\)</span>: è esattamente <span class="arithmatex">\(G_b\)</span>.</li>
+<li>Se <span class="arithmatex">\(z\)</span> è casuale, allora <span class="arithmatex">\(c = z \oplus m_b\)</span>: è esattamente <span class="arithmatex">\(H_b\)</span>.</li>
+</ul>
+<p>Quindi il vantaggio di <span class="arithmatex">\(B\)</span> contro il PRG è uguale a quello di <span class="arithmatex">\(A\)</span> tra <span class="arithmatex">\(G_b\)</span> e <span class="arithmatex">\(H_b\)</span>, cioè <span class="arithmatex">\(\ge 1/\text{poly}\)</span>: <span class="arithmatex">\(B\)</span> rompe <span class="arithmatex">\(G\)</span>. Ma <span class="arithmatex">\(G\)</span> è un PRG: <b>contraddizione</b>. Inoltre <span class="arithmatex">\(B\)</span> è PPT, perché fa solo uno XOR in più rispetto ad <span class="arithmatex">\(A\)</span>. ∎</p>
+<h2 id="riepilogo">Riepilogo<a class="headerlink" href="#riepilogo" title="Permanent link">&para;</a></h2>
+<ul>
+<li><b>f_BAD è una OWF</b>: la riduzione <span class="arithmatex">\(B\)</span> non conosce <span class="arithmatex">\(h(x)\)</span> e lo <b>indovina</b> con un bit casuale; <span class="arithmatex">\(\Pr[B \text{ vince}] \ge \frac{1}{2} \Pr[A \text{ vince}]\)</span></li>
+<li>Nessun <span class="arithmatex">\(h\)</span> va bene per tutte le <span class="arithmatex">\(f\)</span>, ma <b>per ogni</b> <span class="arithmatex">\(f\)</span> <b>esiste</b> un <span class="arithmatex">\(h\)</span> (<b>Goldreich-Levin</b>): <span class="arithmatex">\(g(x, r) = f(x) \,\|\, r\)</span> è una OWF e <span class="arithmatex">\(h(x, r) = \langle x, r \rangle = \sum x_i r_i \bmod 2\)</span> è hard-core per <span class="arithmatex">\(g\)</span></li>
+<li>Intuizione: un avversario perfetto con <span class="arithmatex">\(r = e_i\)</span> ricaverebbe <span class="arithmatex">\(x\)</span> bit per bit; la dimostrazione vera è difficile perché l'avversario ha solo un vantaggio <span class="arithmatex">\(1/\text{poly}\)</span> su <span class="arithmatex">\(r\)</span> casuale</li>
+<li><b>Battere Shannon con un PRG</b>: <span class="arithmatex">\(\text{Enc}(k, m) = G(k) \oplus m\)</span> con <span class="arithmatex">\(G : \{0,1\}^n \to \{0,1\}^{2n}\)</span>: chiave più corta del messaggio; ma è ancora <b>one-time</b> (<span class="arithmatex">\(c_1 \oplus c_2 = m_1 \oplus m_2\)</span>)</li>
+<li><b>Sicurezza one-time computazionale</b>: <span class="arithmatex">\(A\)</span> sceglie <span class="arithmatex">\(m_0, m_1\)</span>, riceve <span class="arithmatex">\(\text{Enc}(k, m_b)\)</span>; <span class="arithmatex">\(\text{GAME}(\lambda, 0) \approx_c \text{GAME}(\lambda, 1)\)</span>. Implica che <span class="arithmatex">\(k\)</span>, <span class="arithmatex">\(m\)</span> e ogni bit di <span class="arithmatex">\(m\)</span> sono difficili da calcolare ("<span class="arithmatex">\(k\)</span> difficile" da solo non basta: vedi <span class="arithmatex">\(\text{Enc}(k, m) = m\)</span>)</li>
+<li><b>Teorema</b>: <span class="arithmatex">\(G\)</span> PRG ⇒ lo schema è one-time computazionalmente sicuro. Prova con <b>game hopping</b>: <span class="arithmatex">\(G_0 \approx_c H_0 \equiv H_1 \approx_c G_1\)</span>, dove <span class="arithmatex">\(H_b\)</span> usa un <span class="arithmatex">\(z\)</span> davvero casuale (OTP) e <span class="arithmatex">\(G_b \approx_c H_b\)</span> per riduzione perfetta al PRG</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Torna su
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Piede" >
+        
+          
+          <a href="../lezione-5/" class="md-footer__link md-footer__link--prev" aria-label="Precedente: Lezione 5 – PRG e hard-core bit">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Precedente
+              </span>
+              <div class="md-ellipsis">
+                Lezione 5 – PRG e hard-core bit
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../../sistemi-distribuiti/" class="md-footer__link md-footer__link--next" aria-label="Successivo: Distributed Systems">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Successivo
+              </span>
+              <div class="md-ellipsis">
+                Distributed Systems
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.indexes", "navigation.top", "navigation.footer", "toc.follow", "search.highlight", "search.suggest", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiato", "clipboard.copy": "Copia", "search.result.more.one": "1 altro in questa pagina", "search.result.more.other": "# altri in questa pagina", "search.result.none": "Nessun documento trovato", "search.result.one": "1 documento trovato", "search.result.other": "# documenti trovati", "search.result.placeholder": "Scrivi per iniziare a cercare", "search.result.term.missing": "Non presente", "select.version": "Seleziona la versione"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="../../javascripts/mathjax/tex-mml-chtml.js"></script>
+      
+        <script src="../../javascripts/mermaid/mermaid.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,3609 @@
+
+<!doctype html>
+<html lang="it" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Appunti della magistrale in Cybersecurity (Sapienza)">
+      
+      
+      
+        <link rel="canonical" href="https://biamat26.github.io/AppuntiMagistrale/network-infrastructures/lezione-2/">
+      
+      
+        <link rel="prev" href="../lezione-1/">
+      
+      
+        <link rel="next" href="../lezione-3/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Lezione 2 – xDSL e PPP - Appunti di Luiggi</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#lezione-2-xdsl-adsl-vdsl-e-ppp" class="md-skip">
+          Vai al contenuto
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Intestazione">
+    <a href="../.." title="Appunti di Luiggi" class="md-header__button md-logo" aria-label="Appunti di Luiggi" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 4v6l-2-2-2 2V4H9v16h10V4zM3 7V5h2V4a2 2 0 0 1 2-2h12c1.05 0 2 .95 2 2v16c0 1.05-.95 2-2 2H7c-1.05 0-2-.95-2-2v-1H3v-2h2v-4H3v-2h2V7zm2-2v2h2V5zm0 14h2v-2H5zm0-6h2v-2H5z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Appunti di Luiggi
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Lezione 2 – xDSL e PPP
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Tema scuro"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Tema scuro" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Tema chiaro"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Tema chiaro" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Cerca" placeholder="Cerca" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Cerca">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Cancella" aria-label="Cancella" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Inizializza la ricerca
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/biamat26/AppuntiMagistrale" title="Apri repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    AppuntiMagistrale
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../crittografia/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Crittografia
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../sistemi-distribuiti/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Distributed Systems
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Network Infrastructures
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigazione" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Appunti di Luiggi" class="md-nav__button md-logo" aria-label="Appunti di Luiggi" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 4v6l-2-2-2 2V4H9v16h10V4zM3 7V5h2V4a2 2 0 0 1 2-2h12c1.05 0 2 .95 2 2v16c0 1.05-.95 2-2 2H7c-1.05 0-2-.95-2-2v-1H3v-2h2v-4H3v-2h2V7zm2-2v2h2V5zm0 14h2v-2H5zm0-6h2v-2H5z"/></svg>
+
+    </a>
+    Appunti di Luiggi
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/biamat26/AppuntiMagistrale" title="Apri repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    AppuntiMagistrale
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../crittografia/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Crittografia
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Crittografia
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../crittografia/ripasso-probabilita/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ripasso probabilità
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../crittografia/lezione-1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 1 – Segretezza perfetta
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../crittografia/lezione-2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 2 – Shannon e MAC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../crittografia/lezione-3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 3 – Hash ed estrattori
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../crittografia/lezione-4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 4 – Sicurezza computazionale e OWF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../crittografia/lezione-5/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 5 – PRG e hard-core bit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../crittografia/lezione-6/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 6 – Goldreich-Levin e cifratura computazionale
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../sistemi-distribuiti/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Distributed Systems
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Distributed Systems
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sistemi-distribuiti/lezione-2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 2 – Modelli, astrazioni e link
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sistemi-distribuiti/lezione-3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 3 – Tempo (I): orologi fisici
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sistemi-distribuiti/lezione-4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 4 – Tempo (II): tempo logico
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sistemi-distribuiti/lezione-5/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 5 – Failure detector e leader election
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Network Infrastructures
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Network Infrastructures
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lezione-1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 1 – Aree funzionali della rete
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 2 – xDSL e PPP
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 2 – xDSL e PPP
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Indice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Indice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#di-cosa-parliamo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Di cosa parliamo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-cose-xdsl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Cos'è xDSL
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Cos&#39;è xDSL">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#spiegato-semplice" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Spiegato semplice
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#perche-ha-avuto-successo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Perché ha avuto successo
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#esempio-la-rete-in-rame-di-telecom-italia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Esempio: la rete in rame di Telecom Italia
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#un-po-di-storia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Un po' di storia
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-il-doppino-e-i-suoi-limiti" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Il doppino e i suoi limiti
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Il doppino e i suoi limiti">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#la-rete-daccesso-prima-del-dsl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        La rete d'accesso prima del DSL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#il-modem-analogico-v90-e-il-limite-di-shannon" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Il modem analogico (V.90) e il limite di Shannon
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#limiti-della-rete-telefonica-per-i-dati" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limiti della rete telefonica per i dati
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#banda-in-funzione-della-distanza" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Banda in funzione della distanza
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cosa-cambia-tra-le-varianti-xdsl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cosa cambia tra le varianti xDSL
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-hdsl-high-data-rate-dsl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. HDSL (High data rate DSL)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-adsl-asymmetric-dsl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. ADSL (Asymmetric DSL)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. ADSL (Asymmetric DSL)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#caratteristiche" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Caratteristiche
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#velocita" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Velocità
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bande-di-frequenza" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bande di frequenza
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fdd-vs-echo-cancellation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FDD vs Echo cancellation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-crosstalk-diafonia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Crosstalk (diafonia)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Crosstalk (diafonia)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fext-far-end-crosstalk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FEXT (Far-End Crosstalk)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#next-near-end-crosstalk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NEXT (Near-End Crosstalk)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#andamento-in-frequenza" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Andamento in frequenza
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-modulazione-cap-e-dmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Modulazione: CAP e DMT
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Modulazione: CAP e DMT">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#richiamo-qam" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Richiamo: QAM
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cap-carrier-less-amplitudephase" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CAP (Carrier-less Amplitude/Phase)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dmt-discrete-multi-tone" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DMT (Discrete Multi-Tone)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#water-filling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Water filling
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cap-vs-dmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CAP vs DMT
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-architettura-adsl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Architettura ADSL
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Architettura ADSL">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#modello-di-riferimento" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modello di riferimento
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#principi-di-funzionamento" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Principi di funzionamento
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#atu-c-e-atu-r" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ATU-C e ATU-R
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dslam" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DSLAM
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interfacce-verso-il-pc-cpe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interfacce verso il PC (CPE)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#splitter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Splitter
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#negoziazione-e-adattamento-della-velocita" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Negoziazione e adattamento della velocità
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#esempio-pagina-di-stato-di-un-modem-adsl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Esempio: pagina di stato di un modem ADSL
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-stack-protocollare-adsl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Stack protocollare ADSL
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. Stack protocollare ADSL">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#lato-utente-tre-configurazioni" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lato utente: tre configurazioni
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lato-rete" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lato rete
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-vdsl-e-vdsl2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. VDSL e VDSL2
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. VDSL e VDSL2">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#vdsl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        VDSL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#architettura-fibra-rame-corto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architettura: fibra + rame corto
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spettro-vdsl-fdd-vs-tdd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Spettro VDSL: FDD vs TDD
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adsl-vs-vdsl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ADSL vs VDSL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#famiglia-xdsl-standard-itu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Famiglia xDSL: standard ITU
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#evoluzione" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Evoluzione
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-vectoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Vectoring
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-sfide-per-xdsl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Sfide per xDSL
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-appendice-ppp-point-to-point-protocol" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. Appendice: PPP (Point-to-Point Protocol)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="12. Appendice: PPP (Point-to-Point Protocol)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cos'è
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#architettura-lcp-e-ncp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architettura: LCP e NCP
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#formato-della-trama" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Formato della trama
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fasi-del-link" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fasi del link
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#link-establishment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Link establishment
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#autenticazione-pap-vs-chap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Autenticazione: PAP vs CHAP
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#domande-di-ripasso" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Domande di ripasso
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#riepilogo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Riepilogo
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lezione-3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Lezione 3 – FTTx e PON
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../kathara/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Kathará
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Indice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Indice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#di-cosa-parliamo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Di cosa parliamo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-cose-xdsl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Cos'è xDSL
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Cos&#39;è xDSL">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#spiegato-semplice" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Spiegato semplice
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#perche-ha-avuto-successo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Perché ha avuto successo
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#esempio-la-rete-in-rame-di-telecom-italia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Esempio: la rete in rame di Telecom Italia
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#un-po-di-storia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Un po' di storia
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-il-doppino-e-i-suoi-limiti" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Il doppino e i suoi limiti
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Il doppino e i suoi limiti">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#la-rete-daccesso-prima-del-dsl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        La rete d'accesso prima del DSL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#il-modem-analogico-v90-e-il-limite-di-shannon" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Il modem analogico (V.90) e il limite di Shannon
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#limiti-della-rete-telefonica-per-i-dati" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limiti della rete telefonica per i dati
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#banda-in-funzione-della-distanza" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Banda in funzione della distanza
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cosa-cambia-tra-le-varianti-xdsl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cosa cambia tra le varianti xDSL
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-hdsl-high-data-rate-dsl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. HDSL (High data rate DSL)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-adsl-asymmetric-dsl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. ADSL (Asymmetric DSL)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. ADSL (Asymmetric DSL)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#caratteristiche" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Caratteristiche
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#velocita" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Velocità
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bande-di-frequenza" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bande di frequenza
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fdd-vs-echo-cancellation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FDD vs Echo cancellation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-crosstalk-diafonia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Crosstalk (diafonia)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Crosstalk (diafonia)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fext-far-end-crosstalk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FEXT (Far-End Crosstalk)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#next-near-end-crosstalk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NEXT (Near-End Crosstalk)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#andamento-in-frequenza" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Andamento in frequenza
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-modulazione-cap-e-dmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Modulazione: CAP e DMT
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Modulazione: CAP e DMT">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#richiamo-qam" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Richiamo: QAM
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cap-carrier-less-amplitudephase" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CAP (Carrier-less Amplitude/Phase)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dmt-discrete-multi-tone" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DMT (Discrete Multi-Tone)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#water-filling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Water filling
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cap-vs-dmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CAP vs DMT
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-architettura-adsl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Architettura ADSL
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Architettura ADSL">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#modello-di-riferimento" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Modello di riferimento
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#principi-di-funzionamento" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Principi di funzionamento
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#atu-c-e-atu-r" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ATU-C e ATU-R
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dslam" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DSLAM
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interfacce-verso-il-pc-cpe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interfacce verso il PC (CPE)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#splitter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Splitter
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#negoziazione-e-adattamento-della-velocita" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Negoziazione e adattamento della velocità
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#esempio-pagina-di-stato-di-un-modem-adsl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Esempio: pagina di stato di un modem ADSL
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-stack-protocollare-adsl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Stack protocollare ADSL
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. Stack protocollare ADSL">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#lato-utente-tre-configurazioni" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lato utente: tre configurazioni
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lato-rete" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lato rete
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-vdsl-e-vdsl2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. VDSL e VDSL2
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. VDSL e VDSL2">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#vdsl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        VDSL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#architettura-fibra-rame-corto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architettura: fibra + rame corto
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spettro-vdsl-fdd-vs-tdd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Spettro VDSL: FDD vs TDD
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adsl-vs-vdsl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ADSL vs VDSL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#famiglia-xdsl-standard-itu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Famiglia xDSL: standard ITU
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#evoluzione" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Evoluzione
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-vectoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Vectoring
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-sfide-per-xdsl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Sfide per xDSL
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-appendice-ppp-point-to-point-protocol" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. Appendice: PPP (Point-to-Point Protocol)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="12. Appendice: PPP (Point-to-Point Protocol)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cos'è
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#architettura-lcp-e-ncp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architettura: LCP e NCP
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#formato-della-trama" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Formato della trama
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fasi-del-link" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fasi del link
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#link-establishment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Link establishment
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#autenticazione-pap-vs-chap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Autenticazione: PAP vs CHAP
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#domande-di-ripasso" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Domande di ripasso
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#riepilogo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Riepilogo
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="lezione-2-xdsl-adsl-vdsl-e-ppp">Lezione 2 – xDSL (ADSL, VDSL) e PPP<a class="headerlink" href="#lezione-2-xdsl-adsl-vdsl-e-ppp" title="Permanent link">&para;</a></h1>
+<h2 id="di-cosa-parliamo">Di cosa parliamo<a class="headerlink" href="#di-cosa-parliamo" title="Permanent link">&para;</a></h2>
+<p>La <b>rete d'accesso</b> è l'ultimo tratto di rete, quello che collega casa tua alla centrale dell'operatore. In Italia (e nel mondo) per decenni questo tratto è stato un <b>doppino di rame</b> pensato solo per la voce.</p>
+<p>La famiglia <b>xDSL</b> è l'insieme di tecnologie che riusano quel doppino per trasportare dati digitali ad alta velocità, senza rifare i cavi. La lezione spiega: perché il doppino ha dei limiti, come ADSL e VDSL li aggirano (bande di frequenza, modulazione DMT, gestione del crosstalk), com'è fatta l'architettura (modem, splitter, DSLAM) e quali protocolli girano sopra (ATM, PPP).</p>
+<h2 id="1-cose-xdsl">1. Cos'è xDSL<a class="headerlink" href="#1-cose-xdsl" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>DSL = usare il normale filo del telefono per mandare dati digitali, sfruttando frequenze molto più alte di quelle della voce. La "x" sta per "una delle tante varianti".</p>
+</div>
+<ul>
+<li><b>DSL</b> = <i>Digital Subscriber Loop</i> (in origine) o <i>Digital Subscriber Line</i> (nome più commerciale). Il <b>subscriber loop</b> (o <i>local loop</i>) è il doppino che va dalla centrale all'abbonato.</li>
+<li><b>xDSL</b> = la famiglia: la x indica la variante.</li>
+</ul>
+<h3 id="spiegato-semplice">Spiegato semplice<a class="headerlink" href="#spiegato-semplice" title="Permanent link">&para;</a></h3>
+<p>DSL è la tecnologia che permette di avere <b>Internet sul normale filo del telefono di casa</b>. L'"ADSL" che quasi tutti avevano in casa negli anni 2000–2010 è una delle sue versioni.</p>
+<p><b>L'idea di base</b></p>
+<ul>
+<li>Ogni casa è collegata alla centrale con un <b>doppino di rame</b>: due fili intrecciati, nati più di cento anni fa solo per il telefono.</li>
+<li>La voce al telefono usa solo le frequenze <b>basse</b> (da 0 a circa 4 kHz). Il filo però riesce a trasportare frequenze molto più alte, fino a qualche MHz, che per il telefono restavano <b>inutilizzate</b>.</li>
+<li>La DSL sfrutta quelle frequenze alte per i dati. Sullo stesso filo viaggiano due cose insieme senza disturbarsi: <b>in basso la voce</b>, <b>in alto i dati di Internet</b>.</li>
+</ul>
+<p><b>Analogia</b>: è come una strada con più corsie. Prima si usava solo la corsia lenta (la voce); la DSL apre le corsie veloci, che c'erano già ma nessuno usava.</p>
+<p><b>Cosa serve per farla funzionare</b></p>
+<ul>
+<li><b>A casa</b>: il <b>modem DSL</b> (il router dell'operatore), che trasforma i dati del PC in segnali ad alta frequenza e viceversa, più dei <b>filtri</b> (splitter o microfiltri) sulle prese del telefono che separano voce e dati.</li>
+<li><b>In centrale</b>: il <b>DSLAM</b>, il "modem dall'altra parte" per centinaia di utenti, che manda il loro traffico verso Internet.</li>
+</ul>
+<p><b>Perché è stata un successo</b>: il doppino arrivava <b>già in tutte le case</b>. Niente scavi né cavi nuovi: bastavano un modem a casa e un DSLAM in centrale.</p>
+<p><b>Il suo limite</b>: le frequenze alte si "consumano" lungo il filo. Più sei lontano dalla centrale, più il segnale arriva debole e più la velocità scende.</p>
+<ul>
+<li><b>ADSL</b>: circa 8–20 Mbit/s se sei vicino alla centrale.</li>
+<li><b>VDSL</b>: 50–100 Mbit/s, ma solo con pochi metri di rame. Per questo si porta la fibra fino all'armadio stradale vicino a casa ("fibra misto rame", <b>FTTCab</b>) e il rame si usa solo per l'ultimo tratto.</li>
+</ul>
+<p>Il resto della lezione spiega come tutto questo funziona nel dettaglio: bande di frequenza, modulazione DMT, crosstalk.</p>
+<table>
+<thead>
+<tr>
+<th>Sigla</th>
+<th>Nome</th>
+<th>Idea chiave</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>IDSL</td>
+<td>ISDN DSL</td>
+<td>DSL sulla linea ISDN</td>
+</tr>
+<tr>
+<td>HDSL</td>
+<td>High data rate DSL</td>
+<td>Simmetrica, nata per sostituire le linee T1</td>
+</tr>
+<tr>
+<td>SDSL / SHDSL</td>
+<td>Symmetric DSL</td>
+<td>Versione standardizzata di HDSL</td>
+</tr>
+<tr>
+<td>ADSL</td>
+<td>Asymmetric DSL</td>
+<td>Download molto più veloce dell'upload</td>
+</tr>
+<tr>
+<td>ADSL lite (G.lite)</td>
+<td>–</td>
+<td>ADSL ridotta, senza splitter</td>
+</tr>
+<tr>
+<td>RADSL</td>
+<td>Rate-Adaptive DSL</td>
+<td>Adatta la velocità alla qualità della linea</td>
+</tr>
+<tr>
+<td>VDSL / VDSL2</td>
+<td>Very high speed DSL</td>
+<td>Molto veloce ma solo su tratte di rame corte</td>
+</tr>
+</tbody>
+</table>
+<h3 id="perche-ha-avuto-successo">Perché ha avuto successo<a class="headerlink" href="#perche-ha-avuto-successo" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Esistono <b>oltre 600 milioni</b> di doppini nel mondo: l'infrastruttura c'è già, rifarla costa enormemente.</li>
+<li>Domanda crescente di trasmissione dati (soprattutto accesso a Internet/IP).</li>
+<li><b>Concorrenza</b> e <b>deregolamentazione</b> del mercato telecom.</li>
+<li>Domanda di telefonia base (POTS) nei paesi in via di sviluppo.</li>
+</ul>
+<p><b>POTS</b> = <i>Plain Old Telephone Service</i>, il telefono analogico tradizionale.</p>
+<h3 id="esempio-la-rete-in-rame-di-telecom-italia">Esempio: la rete in rame di Telecom Italia<a class="headerlink" href="#esempio-la-rete-in-rame-di-telecom-italia" title="Permanent link">&para;</a></h3>
+<ul>
+<li>33.576.600 terminazioni di rete (linee)</li>
+<li>11.000 centrali (<b>CO</b>, <i>Central Office</i>)</li>
+<li>150.000 armadi stradali (<b>cabinet</b>)</li>
+<li>oltre 105,7 milioni di km-coppia di cavo</li>
+<li>distanza media centrale-utente: <b>1,5 km</b> (1,2 km in città)</li>
+</ul>
+<p>Quest'ultimo numero conta molto: come vedremo, la velocità DSL crolla con la distanza.</p>
+<h3 id="un-po-di-storia">Un po' di storia<a class="headerlink" href="#un-po-di-storia" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Anni '80: nasce l'idea di una linea digitale d'abbonato per l'accesso <b>ISDN</b> (rete digitale integrata), a 160 kbit/s. Poi si punta a velocità vicine al <b>T1</b> (1,544 Mbit/s): progetto <b>HDSL</b>.</li>
+<li>Poi interesse per l'<b>asimmetria</b>, pensando al Video on Demand.</li>
+<li><b>1988</b>: Joe Lechleider (Bellcore) inventa l'<b>ADSL</b>: mette il segnale dati a larga banda <b>sopra</b> la banda della voce analogica, sullo stesso doppino. Voce e dati convivono.</li>
+</ul>
+<h2 id="2-il-doppino-e-i-suoi-limiti">2. Il doppino e i suoi limiti<a class="headerlink" href="#2-il-doppino-e-i-suoi-limiti" title="Permanent link">&para;</a></h2>
+<h3 id="la-rete-daccesso-prima-del-dsl">La rete d'accesso prima del DSL<a class="headerlink" href="#la-rete-daccesso-prima-del-dsl" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Dalla centrale escono tantissimi doppini, raggruppati in grossi cavi, che passano per armadi stradali e arrivano alle case. Dentro la centrale c'era solo lo switch telefonico.</p>
+</div>
+<pre class="mermaid"><code>flowchart LR
+  PSTN(("PSTN&lt;br&gt;rete telefonica")) --- SW["CO switch&lt;br&gt;Central Office"]
+  SW ---|"doppini UTP"| C1["Cabinet"]
+  C1 ---|"binder group"| C2["Cabinet"]
+  C2 --- T1["Telefono"]
+  C2 --- T2["Telefono"]</code></pre>
+<ul>
+<li><b>UTP</b> (<i>Unshielded Twisted Pair</i>): coppia di fili di rame intrecciati, non schermati.</li>
+<li><b>Binder group</b>: fascio di doppini raggruppati nello stesso cavo. Doppini vicini si disturbano tra loro (→ crosstalk, sezione 5).</li>
+<li><b>PSTN</b>: <i>Public Switched Telephone Network</i>, la rete telefonica a commutazione di circuito.</li>
+</ul>
+<h3 id="il-modem-analogico-v90-e-il-limite-di-shannon">Il modem analogico (V.90) e il limite di Shannon<a class="headerlink" href="#il-modem-analogico-v90-e-il-limite-di-shannon" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Il vecchio modem trasforma i bit in suoni e li manda dentro la normale chiamata telefonica. Ma la chiamata ha solo 3,4 kHz di banda, e Shannon dice che lì dentro non ci stanno più di circa 45 kbit/s.</p>
+</div>
+<p>Il modem passa per lo switch telefonico come una chiamata qualunque, quindi è limitato al <b>canale vocale</b>: circa <span class="arithmatex">\(W = 3{,}4\)</span> kHz (la centrale filtra tutto il resto).</p>
+<p><b>Capacità di Shannon</b> (massimo bit rate teorico su un canale con banda <span class="arithmatex">\(W\)</span> e rapporto segnale/rumore SNR):</p>
+<div class="arithmatex">\[
+C = W \log_2(1 + \text{SNR})
+\]</div>
+<p>Con <span class="arithmatex">\(W = 3400\)</span> Hz e <span class="arithmatex">\(\text{SNR} = 10000\)</span> (cioè <span class="arithmatex">\(10\log_{10} 10000 = 40\)</span> dB):</p>
+<div class="arithmatex">\[
+C = 3400 \cdot \log_2(10001) \approx 44{,}8 \text{ kbit/s}
+\]</div>
+<p>Promemoria: <span class="arithmatex">\(\log_2 x = \ln x / \ln 2 = \log_{10} x / \log_{10} 2\)</span>.</p>
+<p><b>Idea chiave del DSL</b>: il limite non è il <b>rame</b>, è il <b>filtro</b> a 3,4 kHz della centrale. Il doppino da solo trasporta frequenze fino a qualche MHz (su tratte corte anche decine di MHz). Se si collega il doppino a un apparato dati invece che allo switch voce, la banda <span class="arithmatex">\(W\)</span> diventa enormemente più grande.</p>
+<table>
+<thead>
+<tr>
+<th>Servizio sul doppino</th>
+<th>Banda massima usata</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Voce</td>
+<td>3400 Hz</td>
+</tr>
+<tr>
+<td>ISDN (USA)</td>
+<td>80 kHz</td>
+</tr>
+<tr>
+<td>ISDN (Germania)</td>
+<td>120 kHz</td>
+</tr>
+<tr>
+<td>T1 con codifica 2B1Q</td>
+<td>400 kHz</td>
+</tr>
+<tr>
+<td>ADSL</td>
+<td>circa 1 MHz</td>
+</tr>
+</tbody>
+</table>
+<h3 id="limiti-della-rete-telefonica-per-i-dati">Limiti della rete telefonica per i dati<a class="headerlink" href="#limiti-della-rete-telefonica-per-i-dati" title="Permanent link">&para;</a></h3>
+<ul>
+<li><b>Spazio</b> limitato nelle centrali per nuovi apparati.</li>
+<li><b>Distanza</b> utente-centrale.</li>
+<li>POTS e ISDN passano dallo <b>switch voce</b>, che non è fatto per i dati (commutazione di circuito, banda fissa).</li>
+<li>Soluzione: far gestire i dati da <b>apparati dati</b> dedicati (il DSLAM, sezione 7), separando i dati dalla voce già in centrale.</li>
+</ul>
+<h3 id="banda-in-funzione-della-distanza">Banda in funzione della distanza<a class="headerlink" href="#banda-in-funzione-della-distanza" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Più il doppino è lungo, più il segnale si attenua (soprattutto alle alte frequenze), e meno bit al secondo riesci a far passare.</p>
+</div>
+<p>Grafico per UTP categoria 3 (valori letti dal grafico, approssimati):</p>
+<table>
+<thead>
+<tr>
+<th>Lunghezza</th>
+<th>circa 100 m</th>
+<th>900 m</th>
+<th>1,4 km</th>
+<th>2,7 km</th>
+<th>3,7 km</th>
+<th>5 km</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mbit/s</td>
+<td>50</td>
+<td>25</td>
+<td>13</td>
+<td>8</td>
+<td>6</td>
+<td>1,5</td>
+</tr>
+</tbody>
+</table>
+<p>Il crollo nel primo chilometro è il motivo per cui VDSL porta la fibra vicino alle case (sezione 9).</p>
+<h3 id="cosa-cambia-tra-le-varianti-xdsl">Cosa cambia tra le varianti xDSL<a class="headerlink" href="#cosa-cambia-tra-le-varianti-xdsl" title="Permanent link">&para;</a></h3>
+<p>Le varianti si distinguono per:</p>
+<ul>
+<li><b>velocità e distanza</b> raggiungibili;</li>
+<li><b>simmetria</b> (upload = download?);</li>
+<li><b>supporto al POTS</b> (la voce analogica continua a funzionare sullo stesso filo?);</li>
+<li><b>posizione degli apparati</b> (in centrale, nell'armadio, ...).</li>
+</ul>
+<h2 id="3-hdsl-high-data-rate-dsl">3. HDSL (High data rate DSL)<a class="headerlink" href="#3-hdsl-high-data-rate-dsl" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>La prima DSL di successo, simmetrica, usata dalle aziende e dagli operatori come sostituto economico delle linee dedicate T1. Non lascia spazio al telefono.</p>
+</div>
+<ul>
+<li>È stata la forma di DSL più diffusa, nata per fornire servizio <b>T1 su linea dedicata</b> (<i>leased line</i>).</li>
+<li>Usa <b>equalizzazione adattiva</b> e la codifica <b>2B1Q</b> (<i>2 binary, 1 quaternary</i>): 2 bit codificati in un simbolo a 4 livelli di tensione.</li>
+<li>Molto usata per collegare le stazioni radio base della telefonia cellulare.</li>
+<li><b>Svantaggi</b>:<ul>
+<li><b>non</b> supporta la voce analogica sullo stesso filo;</li>
+<li>essendo simmetrica, trasmette nella stessa banda in entrambe le direzioni → crosstalk a <b>entrambe</b> le estremità.</li>
+</ul>
+</li>
+<li>Usava 2 o 4 doppini; <b>HDSL-2</b> fa lo stesso con <b>un solo</b> doppino.</li>
+</ul>
+<h2 id="4-adsl-asymmetric-dsl">4. ADSL (Asymmetric DSL)<a class="headerlink" href="#4-adsl-asymmetric-dsl" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>L'ADSL è la DSL "di casa": voce e Internet sullo stesso doppino, con il download molto più veloce dell'upload, perché l'utente tipico scarica molto e carica poco.</p>
+</div>
+<h3 id="caratteristiche">Caratteristiche<a class="headerlink" href="#caratteristiche" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Pensata per il <b>Video on Demand</b> (obiettivo fallito), ha poi conquistato l'accesso a Internet.</li>
+<li>Il local loop è <b>dedicato</b> all'abbonato: nessuna contesa di banda sul doppino (a differenza del cavo coassiale condiviso).</li>
+<li>Trasporta <b>passivamente</b> la voce analogica: il telefono funziona anche se il modem è spento.</li>
+<li><b>Asimmetria</b>: più capacità in downstream che in upstream. L'utente è un consumatore "passivo" che scarica, non un server che deve inviare molto.</li>
+<li><b>Downstream</b> = dalla centrale all'utente; <b>upstream</b> = dall'utente alla centrale.</li>
+</ul>
+<h3 id="velocita">Velocità<a class="headerlink" href="#velocita" title="Permanent link">&para;</a></h3>
+<ul>
+<li>ADSL classica: <b>8 Mbit/s</b> in download su circa <b>2 km</b> di doppino.</li>
+<li><b>ADSL2+</b>: fino a <b>24 Mbit/s</b>, a seconda della distanza dalla centrale.</li>
+</ul>
+<h3 id="bande-di-frequenza">Bande di frequenza<a class="headerlink" href="#bande-di-frequenza" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Lo spettro del doppino viene diviso in tre fette: la voce in basso, poi una fetta piccola per l'upload, poi una fetta grande per il download.</p>
+</div>
+<p>ADSL standard:</p>
+<table>
+<thead>
+<tr>
+<th>Uso</th>
+<th>Banda</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>POTS (voce)</td>
+<td>0 – 4 kHz</td>
+</tr>
+<tr>
+<td>Banda di guardia</td>
+<td>4 – 25,875 kHz</td>
+</tr>
+<tr>
+<td>Upstream</td>
+<td>25,875 – 138 kHz</td>
+</tr>
+<tr>
+<td>Downstream</td>
+<td>138 – 1104 kHz</td>
+</tr>
+</tbody>
+</table>
+<p>La banda di guardia serve perché i filtri non sono ideali: lo spettro della voce ha una coda (<i>rolloff</i>) che si spegne verso i 20 kHz.</p>
+<h3 id="fdd-vs-echo-cancellation">FDD vs Echo cancellation<a class="headerlink" href="#fdd-vs-echo-cancellation" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Per far parlare le due direzioni sullo stesso filo ci sono due strade. <b>FDD</b>: ognuno parla nella sua banda. <b>Echo cancellation</b>: si sovrappongono le bande e ogni modem "sottrae" la propria eco dal segnale che riceve.</p>
+</div>
+<p><b>FDD</b> (<i>Frequency Division Duplexing</i>, o FDM):</p>
+<ul>
+<li>upstream e downstream in bande <b>separate</b> (circa 25–200 kHz up, 200/250–1000 kHz down nello schema del prof; 25–138 / 138–1104 kHz nello standard).</li>
+<li>Semplice. Ed elimina il NEXT (sezione 5): chi riceve il downstream non "sente" l'upstream dei vicini, perché è su un'altra banda.</li>
+</ul>
+<p><b>Echo cancellation (EC)</b>:</p>
+<ul>
+<li>il downstream parte anch'esso da 25 kHz e si <b>sovrappone</b> all'upstream;</li>
+<li>il modem trasmette e riceve contemporaneamente nella stessa banda e cancella l'eco del proprio segnale con elaborazione numerica;</li>
+<li>usa la banda <b>in modo più efficiente</b> (il downstream guadagna le frequenze basse, che si attenuano meno), ma è <b>più complesso e costoso</b>;</li>
+<li><b>problema</b>: nella zona sovrapposta il ricevitore downstream subisce il <b>NEXT</b> dagli upstream degli altri doppini (che può eliminare solo per la propria eco, non per quella degli altri).</li>
+</ul>
+<h2 id="5-crosstalk-diafonia">5. Crosstalk (diafonia)<a class="headerlink" href="#5-crosstalk-diafonia" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>I doppini dello stesso cavo si comportano come piccole antenne: il segnale di uno "si sente" un po' sugli altri. Questo disturbo si chiama crosstalk ed è il nemico numero uno della DSL veloce.</p>
+</div>
+<p>Il crosstalk dipende da:</p>
+<ul>
+<li>la <b>densità spettrale di potenza</b> (PSD) del segnale che disturba;</li>
+<li>il <b>numero di doppini</b> nello stesso cavo;</li>
+<li>quanto le <b>bande si sovrappongono</b> tra segnale utile e segnali disturbanti.</li>
+</ul>
+<p>Cresce con la <b>frequenza</b> → è un problema serio proprio per le DSL veloci, che usano frequenze alte.</p>
+<p>Se nello stesso binder convivono tecnologie diverse (POTS, ISDN, HDSL, ADSL, VDSL), ognuna disturba le altre nella zona di spettro che condividono.</p>
+<h3 id="fext-far-end-crosstalk">FEXT (Far-End Crosstalk)<a class="headerlink" href="#fext-far-end-crosstalk" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Un trasmettitore disturba un ricevitore che sta <b>all'altro capo</b> del cavo.</p>
+</div>
+<ul>
+<li>TX e RX disturbato sono su lati <b>opposti</b> del cavo.</li>
+<li>Il disturbo percorre tutta la linea, quindi arriva <b>attenuato</b> quanto il segnale utile.</li>
+<li>Per ADSL i cavi sono "corti", quindi l'attenuazione non basta a renderlo trascurabile. Per limitarlo, un cavo di distribuzione di solito non contiene più di una dozzina di doppini.</li>
+</ul>
+<h3 id="next-near-end-crosstalk">NEXT (Near-End Crosstalk)<a class="headerlink" href="#next-near-end-crosstalk" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Un trasmettitore disturba un ricevitore che sta <b>dallo stesso lato</b>, vicinissimo. È il caso peggiore: il disturbo è forte, il segnale utile è debole.</p>
+</div>
+<ul>
+<li>TX e RX disturbato sono sullo <b>stesso lato</b> del cavo.</li>
+<li>Il segnale utile arriva da lontano ed è attenuato; il disturbo nasce a pochi centimetri ed è fortissimo → il rapporto segnale/rumore crolla.</li>
+<li>Il NEXT è uno dei motivi per cui ADSL separa in frequenza upstream e downstream (<b>FDD</b>): se ricevi in una banda diversa da quella in cui i vicini trasmettono, il NEXT sparisce.</li>
+</ul>
+<h3 id="andamento-in-frequenza">Andamento in frequenza<a class="headerlink" href="#andamento-in-frequenza" title="Permanent link">&para;</a></h3>
+<p>Grafico delle funzioni di accoppiamento medie (loop di 1 km):</p>
+<ul>
+<li><b>NEXT</b>: cresce con la frequenza (circa −60 dB a bassa frequenza, circa −25 dB a 11 MHz). Non dipende dalla lunghezza della linea.</li>
+<li><b>FEXT</b>: scende con la frequenza (da circa −65 a −120 dB), perché viaggia lungo tutta la linea e si attenua come il segnale.</li>
+<li><b>Canale</b> (segnale utile): si attenua molto con la frequenza (da circa −10 dB fino a −110 dB).</li>
+<li>Oltre circa 1,5 MHz il NEXT supera il segnale utile: ricevere in una banda dove i vicini trasmettono diventa impossibile.</li>
+</ul>
+<p>Il grafico <i>Crosstalk on line</i> mostra la PSD del rumore indotto su un doppino da 24 HDSL, 24 ISDN e 5 T1 adiacenti, confrontata con il rumore bianco di fondo (AWGN) a −140 dBm/Hz: ISDN e HDSL disturbano le basse frequenze (sotto i 400 kHz), il T1 le alte. Il crosstalk è ben sopra il rumore termico.</p>
+<h2 id="6-modulazione-cap-e-dmt">6. Modulazione: CAP e DMT<a class="headerlink" href="#6-modulazione-cap-e-dmt" title="Permanent link">&para;</a></h2>
+<h3 id="richiamo-qam">Richiamo: QAM<a class="headerlink" href="#richiamo-qam" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>QAM manda più bit per simbolo variando insieme ampiezza e fase di una portante. Più punti ha la costellazione, più bit per simbolo, ma serve un SNR più alto per non confonderli.</p>
+</div>
+<ul>
+<li>Ogni simbolo è un punto <span class="arithmatex">\((A_k, B_k)\)</span> nel piano: componente in fase e in quadratura.</li>
+<li><b>M-QAM</b> ha <span class="arithmatex">\(M\)</span> punti → <span class="arithmatex">\(\log_2 M\)</span> bit per simbolo. Es. 16-QAM: 16 punti, 4 bit/simbolo; QPSK = 4-QAM, 2 bit/simbolo; QAM64: 6 bit/simbolo.</li>
+<li>Dalla curva BER vs <span class="arithmatex">\(E_b/N_0\)</span>: per un BER di <span class="arithmatex">\(10^{-6}\)</span> servono circa 10,5 dB con M=4, 14,5 con M=16, 19 con M=64, 23,5 con M=256. <b>Ogni raddoppio di bit costa SNR.</b></li>
+</ul>
+<h3 id="cap-carrier-less-amplitudephase">CAP (Carrier-less Amplitude/Phase)<a class="headerlink" href="#cap-carrier-less-amplitudephase" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Una QAM su <b>una sola</b> portante che occupa tutta la banda; la portante stessa non viene trasmessa.</p>
+</div>
+<ul>
+<li>I dati modulano una singola portante (è una QAM).</li>
+<li>La portante viene <b>soppressa</b> prima della trasmissione: non porta informazione e il ricevitore può ricostruirla. Da qui <i>carrier-less</i>.</li>
+<li>Problema: il rumore e l'attenuazione cambiano molto lungo la banda → serve un <b>equalizzatore adattivo</b> complesso.</li>
+</ul>
+<h3 id="dmt-discrete-multi-tone">DMT (Discrete Multi-Tone)<a class="headerlink" href="#dmt-discrete-multi-tone" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Invece di una portante larga, DMT usa centinaia di <b>piccole sottoportanti</b> (toni), ognuna con la sua QAM. Su ogni tono si mettono tanti bit se lì la linea è pulita, pochi o zero se è rumorosa.</p>
+</div>
+<ul>
+<li>La banda ADSL è divisa in <b>256 sottocanali</b> da <b>4,3125 kHz</b>: <span class="arithmatex">\(256 \times 4{,}3125 = 1104\)</span> kHz.</li>
+<li>Ogni tono è al centro del suo sottocanale ed è modulato <b>indipendentemente</b> in QAM: fino a QAM64 sui toni puliti, giù fino a QPSK su quelli rumorosi.</li>
+<li>Schema: un convertitore <b>serie-parallelo</b> divide il flusso di <span class="arithmatex">\(R\)</span> bit/s in <span class="arithmatex">\(n\)</span> flussi da <span class="arithmatex">\(\alpha_i R\)</span> (con <span class="arithmatex">\(0 \le \alpha_i \le 1\)</span>, <span class="arithmatex">\(\sum \alpha_i = 1\)</span>), ognuno modula una portante <span class="arithmatex">\(\cos 2\pi f_i t\)</span>; i segnali vengono sommati.</li>
+<li>I toni troppo disturbati vengono semplicemente <b>spenti</b> (<i>unused tones</i>).</li>
+<li>La velocità si <b>adatta</b> alle condizioni della linea, tono per tono.</li>
+<li>Upstream: toni da circa 32 kHz in su; downstream fino a 1,1 MHz. La potenza tra toni varia al massimo di 3–7 dB.</li>
+</ul>
+<p><b>Capacità teorica massima</b> (max 15 bit/s/Hz per tono, larghezza circa 4 kHz):</p>
+<ul>
+<li>upstream: <span class="arithmatex">\(25 \times 15 \times 4 \text{ kHz} = 1{,}5\)</span> Mbit/s</li>
+<li>downstream: <span class="arithmatex">\(249 \times 15 \times 4 \text{ kHz} \approx 14{,}9\)</span> Mbit/s</li>
+</ul>
+<h3 id="water-filling">Water filling<a class="headerlink" href="#water-filling" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>È la regola per decidere quanta potenza dare a ogni tono. Immagina di versare acqua in un fondale irregolare: dove il fondale è basso (canale buono) l'acqua è profonda (tanta potenza), dove è alto (canale cattivo) poca o nulla.</p>
+</div>
+<ul>
+<li>Il "fondale" è la curva <span class="arithmatex">\((S/N)^{-1}\)</span> in funzione della frequenza: alta dove il canale è cattivo.</li>
+<li>Si "versa" una quantità d'acqua pari alla <b>potenza media di trasmissione</b> totale. L'acqua si livella a un'altezza <span class="arithmatex">\(K\)</span>.</li>
+<li>La <b>profondità</b> <span class="arithmatex">\(p(f_k)\)</span> sopra il tono <span class="arithmatex">\(f_k\)</span> è la potenza assegnata a quel tono. I toni dove il fondale supera <span class="arithmatex">\(K\)</span> ricevono zero potenza (fuori dalla banda utile <span class="arithmatex">\(W\)</span>, tra <span class="arithmatex">\(f_{min}\)</span> e <span class="arithmatex">\(f_{max}\)</span>).</li>
+<li>Nota <span class="arithmatex">\(p(f_k)\)</span>, si ricava il numero di <b>bit per simbolo</b> da usare nella costellazione QAM di quel tono (<i>bit loading</i>).</li>
+</ul>
+<p>In formule (<i>complemento, non nelle slide</i>): con <span class="arithmatex">\(N_k\)</span> = rumore e <span class="arithmatex">\(g_k\)</span> = guadagno del canale sul tono <span class="arithmatex">\(k\)</span>,</p>
+<div class="arithmatex">\[
+p_k = \max\left(0,\ K - \frac{N_k}{g_k}\right), \qquad \sum_k p_k = P_{tot}, \qquad b_k \approx \log_2\left(1 + \frac{p_k\, g_k}{\Gamma N_k}\right)
+\]</div>
+<p>dove <span class="arithmatex">\(\Gamma\)</span> è un margine ("gap") che tiene conto del fatto che le modulazioni reali non raggiungono Shannon.</p>
+<h3 id="cap-vs-dmt">CAP vs DMT<a class="headerlink" href="#cap-vs-dmt" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>CAP</th>
+<th>DMT</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Consumo</td>
+<td>Più basso, meno porte logiche</td>
+<td>Più alto (picco/medio), gap in calo</td>
+</tr>
+<tr>
+<td>Portanti downstream</td>
+<td>1</td>
+<td>256</td>
+</tr>
+<tr>
+<td>Portanti upstream</td>
+<td>1</td>
+<td>32</td>
+</tr>
+<tr>
+<td>Granularità della velocità</td>
+<td>320 kbit/s</td>
+<td>32 kbit/s</td>
+</tr>
+<tr>
+<td>Equalizzatore adattivo</td>
+<td>Necessario</td>
+<td>Non serve</td>
+</tr>
+<tr>
+<td>Standard</td>
+<td>In corso (proprietario Globespan)</td>
+<td>ITU e ANSI</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>DMT è <b>più veloce</b> e si adatta meglio al canale; CAP era più semplice. I progressi dei DSP hanno reso DMT economico: <b>DMT è lo standard</b> (G.992.x) ed è quello usato da ADSL e VDSL.</li>
+</ul>
+<h2 id="7-architettura-adsl">7. Architettura ADSL<a class="headerlink" href="#7-architettura-adsl" title="Permanent link">&para;</a></h2>
+<h3 id="modello-di-riferimento">Modello di riferimento<a class="headerlink" href="#modello-di-riferimento" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>A ogni estremo del doppino c'è uno <b>splitter</b> che separa voce e dati. Lato casa i dati vanno al modem (ATU-R); lato centrale vanno a una scheda del DSLAM (ATU-C), che raccoglie il traffico di tanti utenti e lo manda verso Internet. La voce va allo switch telefonico come sempre.</p>
+</div>
+<pre class="mermaid"><code>flowchart LR
+  PC["PC / CPE"] --- ATUR["ATU-R&lt;br&gt;modem"]
+  TEL["Telefono"] --- SPR
+  ATUR --- SPR["POTS splitter&lt;br&gt;casa"]
+  SPR ===|"doppino UTP&lt;br&gt;voce + ADSL"| SPC["POTS splitter&lt;br&gt;centrale"]
+  SPC --&gt;|"POTS"| SW["CO switch"] --- PSTN(("PSTN"))
+  SPC --&gt;|"dati"| DSLAM["DSLAM&lt;br&gt;contiene gli ATU-C"]
+  DSLAM ---|"WAN / rete ATM"| ISP["Router ISP"] --- NET(("Internet"))</code></pre>
+<ul>
+<li><b>ATU-R</b> (<i>ADSL Transmission/Termination Unit – Remote</i>): il modem ADSL a casa. Detto anche <b>NT ADSL</b> (<i>Network Termination</i>).</li>
+<li><b>ATU-C</b> (<i>ADSL Transmission Unit – Central office</i>): il modem lato centrale, uno per abbonato, su una scheda (<i>line card</i>) del DSLAM.</li>
+<li><b>DSLAM</b> (<i>DSL Access Multiplexer</i>): l'apparato in centrale che raccoglie tanti ATU-C.</li>
+<li><b>POTS splitter</b> (PS): filtro passa-basso/passa-alto che separa voce e dati.</li>
+<li><b>CPE</b> (<i>Customer Premises Equipment</i>): gli apparati dell'utente.</li>
+<li>I fornitori di contenuti arrivano alla centrale tramite le interfacce <b>A4</b> e <b>A9</b> (definite dall'ADSL Forum).</li>
+</ul>
+<h3 id="principi-di-funzionamento">Principi di funzionamento<a class="headerlink" href="#principi-di-funzionamento" title="Permanent link">&para;</a></h3>
+<p>Due servizi sullo stesso filo:</p>
+<ul>
+<li>accesso <b>trasparente</b> alla voce tradizionale: lo splitter manda le frequenze <b>sotto 3400 Hz</b> al cablaggio telefonico di casa;</li>
+<li>servizio dati ad alta velocità: le frequenze <b>sopra</b> la banda vocale vanno all'ATU-R.</li>
+</ul>
+<h3 id="atu-c-e-atu-r">ATU-C e ATU-R<a class="headerlink" href="#atu-c-e-atu-r" title="Permanent link">&para;</a></h3>
+<p>Sono due <b>modem</b> che dialogano a livello fisico. Si occupano di:</p>
+<ul>
+<li><b>allocazione delle frequenze</b>: POTS sotto 3400 Hz, upstream 25–200 kHz, downstream 25 (EC) o 250 (FDM) fino a 1000 kHz;</li>
+<li><b>echo cancellation</b> (se usata): entrambi parlano contemporaneamente, più efficiente di FDM ma più complesso e costoso;</li>
+<li><b>rate adaptation</b>: adattare la velocità alla linea;</li>
+<li><b>gestione</b>: statistiche (SNR a livello fisico, conteggio pacchetti a livello rete), aggiornamenti software, gestione remota da parte dell'operatore.</li>
+</ul>
+<p>L'ATU-R supporta anche una topologia <i>multidrop</i> (più dispositivi in casa).</p>
+<h3 id="dslam">DSLAM<a class="headerlink" href="#dslam" title="Permanent link">&para;</a></h3>
+<p>Funzioni:</p>
+<ul>
+<li>ospitare un insieme di ATU-C;</li>
+<li><b>multiplexare</b> il traffico degli utenti verso la rete (e demultiplexarlo in senso inverso);</li>
+<li><b>negoziare</b> la velocità di linea;</li>
+<li>fare da <b>piattaforma di gestione</b> centrale.</li>
+</ul>
+<p>Può stare in centrale, in un sito vicino, in un terminale remoto (armadio) o presso il cliente. Un DSLAM gestisce fino a qualche centinaio di linee.</p>
+<h3 id="interfacce-verso-il-pc-cpe">Interfacce verso il PC (CPE)<a class="headerlink" href="#interfacce-verso-il-pc-cpe" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Interfaccia</th>
+<th>Velocità</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10BaseT (Ethernet)</td>
+<td>10 Mbit/s su 100 m</td>
+<td>Diffusissima sui PC</td>
+</tr>
+<tr>
+<td>ATM25</td>
+<td>25 Mbit/s su 100 m</td>
+<td>Punto-punto, rara, costosa</td>
+</tr>
+<tr>
+<td>USB</td>
+<td>12 Mbit/s fino a 30 m</td>
+<td>Diffusa sui PC più recenti</td>
+</tr>
+<tr>
+<td>Wi-Fi</td>
+<td>–</td>
+<td>Oggi la più comune</td>
+</tr>
+</tbody>
+</table>
+<h3 id="splitter">Splitter<a class="headerlink" href="#splitter" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Lo splitter è un filtro passivo con due uscite: una passa-basso verso i telefoni, una passa-alto verso il modem.</p>
+</div>
+<ul>
+<li>Deve garantire la voce come <b>servizio salvavita</b> (<i>lifeline</i>): il telefono deve funzionare anche senza corrente → filtro <b>passivo</b>.</li>
+<li>Deve bloccare il <b>rumore impulsivo</b> del telefono (es. lo squillo, che è un segnale ad alta tensione) verso la DSL.</li>
+<li>Non è semplicemente un passa-basso [0, 25 kHz] seguito da un passa-banda [25, 1104 kHz], ma un filtro <b>multibanda</b> (ibrido).</li>
+</ul>
+<p>Configurazioni in casa:</p>
+<ul>
+<li><b>Splittered</b>: un unico splitter all'ingresso della linea; dopo, il cablaggio è separato per telefono e modem.</li>
+<li><b>Distributed splitters (microfiltri)</b>: nessuno splitter centrale; ogni telefono ha il suo <b>filtro passa-basso</b> (PB) sulla presa, e il modem ha il <b>passa-alto</b> (PA) integrato.</li>
+<li><b>Splitterless (G.lite)</b>: nessun filtro; ADSL ridotta, più robusta ai disturbi del telefono.</li>
+</ul>
+<h3 id="negoziazione-e-adattamento-della-velocita">Negoziazione e adattamento della velocità<a class="headerlink" href="#negoziazione-e-adattamento-della-velocita" title="Permanent link">&para;</a></h3>
+<ul>
+<li>All'accensione ATU-R e ATU-C <b>negoziano</b> il bit rate: quattro opzioni iniziali, multipli di <b>32 kbit/s</b>. L'intera fase (<i>training/retraining</i>) dura <b>12–20 s</b>: è il tempo che il modem ci mette ad "agganciare" la portante.</li>
+<li><b>Autoconfigurazione</b>: vengono configurati sull'ATU-R indirizzi IP e filtri software.</li>
+<li><b>Rate adaptation</b>, vantaggi: velocità più alta per chi ha un buon doppino; copertura di distanze maggiori per l'operatore.</li>
+<li>Sfide tecniche: quali metriche e algoritmi usare, accordo tra ATU di produttori diversi, sincronizzazione. Sfide commerciali: come fissare prezzi e garanzie di banda se la velocità dipende dalla linea?</li>
+</ul>
+<h3 id="esempio-pagina-di-stato-di-un-modem-adsl">Esempio: pagina di stato di un modem ADSL<a class="headerlink" href="#esempio-pagina-di-stato-di-un-modem-adsl" title="Permanent link">&para;</a></h3>
+<p>Dallo screenshot del prof (gateway Technicolor):</p>
+<table>
+<thead>
+<tr>
+<th>Parametro</th>
+<th>Valore (up / down)</th>
+<th>Significato</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tipo DSL</td>
+<td>ITU-T G.992.5</td>
+<td>ADSL2+</td>
+</tr>
+<tr>
+<td>Banda</td>
+<td>1.022 / 2.042 kbit/s</td>
+<td>Velocità negoziata (profilo commerciale limitato)</td>
+</tr>
+<tr>
+<td>Potenza di output</td>
+<td>12,0 / 19,2 dBm</td>
+<td>Potenza trasmessa dai due lati</td>
+</tr>
+<tr>
+<td>Attenuazione linea</td>
+<td>19,7 / 35,5 dB</td>
+<td>Più alta in down: usa frequenze più alte, che si attenuano di più. Cresce con la distanza</td>
+</tr>
+<tr>
+<td>Margine SN</td>
+<td>6,9 / 10,3 dB</td>
+<td>SNR di riserva rispetto al minimo necessario: più è alto, più la linea è stabile</td>
+</tr>
+<tr>
+<td>Errori FEC</td>
+<td>0 / 7.703</td>
+<td>Errori corretti dal codice a correzione d'errore</td>
+</tr>
+<tr>
+<td>Errori CRC / HEC</td>
+<td>0 / 0</td>
+<td>Errori non correggibili (nessuno)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="8-stack-protocollare-adsl">8. Stack protocollare ADSL<a class="headerlink" href="#8-stack-protocollare-adsl" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>Sopra il livello fisico ADSL, storicamente i dati viaggiano in celle <b>ATM</b>; dentro ATM c'è una sessione <b>PPP</b> tra utente e operatore, e dentro PPP c'è IP.</p>
+</div>
+<p>Stack tipico dal client verso Internet:</p>
+<div class="highlight"><pre><span></span><code>Client                     Telco CO / DSLAM        BRAS (session mgmt)     Internet
+Upper layers  ─────────────────────────────────────────────────────────────  Upper layers
+IP            ─────────────────────────────────────────────  IP  ──────────  IP
+PPP           ─────────────────────────────────────────────  PPP
+AAL5          ─────────────────────────────────────────────  AAL5
+ATM           ────────────────────  ATM  ──────────────────  ATM
+ADSL          ────────────────────  ADSL
+</code></pre></div>
+<ul>
+<li>Il <b>DSLAM</b> lavora solo fino a ATM: commuta le celle dal doppino verso la rete ATM.</li>
+<li>Il <b>PPP</b> viene terminato più avanti, dal server di gestione delle sessioni dell'ISP (il router che fa autenticazione e assegna l'IP).</li>
+<li><b>AAL5</b>: livello di adattamento ATM che spezza i pacchetti in celle da 53 byte e li ricompone.</li>
+</ul>
+<h3 id="lato-utente-tre-configurazioni">Lato utente: tre configurazioni<a class="headerlink" href="#lato-utente-tre-configurazioni" title="Permanent link">&para;</a></h3>
+<ul>
+<li><b>PC con scheda ATM/ADSL</b>: il PC fa tutto lo stack (TCP/IP → incapsulamento → AAL5/ATM → ADSL).</li>
+<li><b>Modem bridge</b>: il PC parla Ethernet; il modem fa da ponte incapsulando le trame Ethernet in ATM (<b>RFC 1483</b>). Il PC vede la rete come una LAN.</li>
+<li><b>Modem router</b>: il modem fa <b>routing IP</b> (è il classico router di casa): termina lui la sessione verso l'ISP, il PC parla solo Ethernet/Wi-Fi con il router.</li>
+</ul>
+<h3 id="lato-rete">Lato rete<a class="headerlink" href="#lato-rete" title="Permanent link">&para;</a></h3>
+<p>Due varianti (dal Pattavina):</p>
+<ul>
+<li><b>PPP su ATM</b>: ATU-R → DSLAM → rete ATM → router dell'ISP, dove si termina PPP/AAL5 e si passa sulla rete IP.</li>
+<li><b>PPP su Ethernet su ATM</b>: stesso percorso, ma tra AAL5 e PPP ci sono LLC/SNAP e MAC Ethernet; il router si collega poi a una rete Frame Relay (Q.922).</li>
+</ul>
+<h2 id="9-vdsl-e-vdsl2">9. VDSL e VDSL2<a class="headerlink" href="#9-vdsl-e-vdsl2" title="Permanent link">&para;</a></h2>
+<h3 id="vdsl">VDSL<a class="headerlink" href="#vdsl" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>VDSL spinge il doppino al limite usando frequenze fino a decine di MHz. Funziona solo su tratte di rame cortissime, quindi la fibra deve arrivare fino all'armadio vicino casa.</p>
+</div>
+<ul>
+<li>Spinge al limite ciò che si può trasmettere su doppini di rame calibro 24.</li>
+<li><b>Regola d'oro</b>: la velocità massima si ottiene con il rame <b>più corto possibile</b>.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Upstream</th>
+<th>Downstream</th>
+<th>Distanza</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>12,96 Mbit/s</td>
+<td>12,96 Mbit/s</td>
+<td>1000 m</td>
+</tr>
+<tr>
+<td>2 Mbit/s</td>
+<td>25,92 Mbit/s</td>
+<td>1000 m</td>
+</tr>
+<tr>
+<td>25,84 Mbit/s</td>
+<td>25,92 Mbit/s</td>
+<td>300 m</td>
+</tr>
+<tr>
+<td>2 Mbit/s</td>
+<td>51,84 Mbit/s (STS-1)</td>
+<td>300 m</td>
+</tr>
+</tbody>
+</table>
+<p>Nota: VDSL può essere sia <b>simmetrica</b> sia <b>asimmetrica</b>.</p>
+<h3 id="architettura-fibra-rame-corto">Architettura: fibra + rame corto<a class="headerlink" href="#architettura-fibra-rame-corto" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Dalla centrale parte <b>fibra ottica</b> fino a una <b>ONU</b> (<i>Optical Network Unit</i>), che converte da ottico a elettrico.</li>
+<li>Dall'ONU parte il <b>doppino</b> (corto) fino a casa, dove c'è lo splitter (S) e il modem <b>NT VDSL</b>.</li>
+<li>Nella ONU c'è il modem lato rete, detto <b>VTU-O</b> (<i>VDSL Transmission Unit – ONU</i>); a casa il <b>VTU-R</b>.</li>
+</ul>
+<p>Due configurazioni tipiche, a seconda di dove sta l'ONU:</p>
+<ul>
+<li><b>FTTEx</b> (<i>Fiber To The Exchange</i>): ONU nella centrale locale. Il rame parte da lì e passa per il <b>feeder cable</b> (200–2000 coppie).</li>
+<li><b>FTTCab</b> (<i>Fiber To The Cabinet</i>): ONU nell'armadio stradale. Il rame è solo <b>distribution cable</b> (25–50 coppie) + <b>drop cable</b> (2–5 coppie) fino a casa. È la configurazione italiana della "fibra misto rame".</li>
+</ul>
+<p>Nella centrale c'è l'<b>OLT</b> (<i>Optical Line Terminal</i>) dentro l'<b>AN</b> (<i>Access Network</i>): il confine tra rete core e rete d'accesso.</p>
+<h3 id="spettro-vdsl-fdd-vs-tdd">Spettro VDSL: FDD vs TDD<a class="headerlink" href="#spettro-vdsl-fdd-vs-tdd" title="Permanent link">&para;</a></h3>
+<ul>
+<li><b>FDD</b>: bande separate. Dopo POTS e ISDN, upstream da 300–600 kHz, poi downstream, poi un'altra banda upstream (per i sistemi simmetrici), fino a circa 17 MHz.</li>
+<li><b>TDD</b> (<i>Time Division Duplexing</i>): upstream e downstream usano la <b>stessa banda</b> (da 300–600 kHz fino a 11 MHz), ma in <b>istanti diversi</b>: si alternano nel tempo.</li>
+</ul>
+<h3 id="adsl-vs-vdsl">ADSL vs VDSL<a class="headerlink" href="#adsl-vs-vdsl" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Tecnologia</th>
+<th>Banda</th>
+<th>Velocità max</th>
+<th>Portanti DMT</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ADSL</td>
+<td>25 kHz – 1,1 MHz</td>
+<td>0,8 up / 8 down Mbit/s</td>
+<td>256 da 4,3125 kHz</td>
+</tr>
+<tr>
+<td>ADSL2+</td>
+<td>25 kHz – 2,2 MHz</td>
+<td>1 up / 24 down (29 con Amend. 1)</td>
+<td>512 da 4,3125 kHz</td>
+</tr>
+<tr>
+<td>VDSL</td>
+<td>25 kHz – 12 MHz</td>
+<td>15 up / 55 down</td>
+<td>2782 da 4,3125 kHz</td>
+</tr>
+<tr>
+<td>VDSL2</td>
+<td>25 kHz – 30 MHz (profilo 17a: 17,66 MHz)</td>
+<td>100 up / 100 down</td>
+<td>4096 da 4,3125 kHz o 3478 da 8,625 kHz</td>
+</tr>
+</tbody>
+</table>
+<p><b>Schema</b>: la spaziatura dei toni resta 4,3125 kHz; ad allargare la banda si aggiungono toni. ADSL2+ raddoppia la banda di ADSL (512 toni invece di 256), quindi raddoppia circa il downstream sulle linee corte.</p>
+<h3 id="famiglia-xdsl-standard-itu">Famiglia xDSL: standard ITU<a class="headerlink" href="#famiglia-xdsl-standard-itu" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Famiglia</th>
+<th>Racc. ITU</th>
+<th>Nome</th>
+<th>Anno</th>
+<th>Max (Mbit/s)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ADSL</td>
+<td>G.992.1</td>
+<td>G.dmt</td>
+<td>1999</td>
+<td>7 down / 0,8 up</td>
+</tr>
+<tr>
+<td>ADSL2</td>
+<td>G.992.3</td>
+<td>G.dmt.bis</td>
+<td>2002</td>
+<td>8 down / 1 up</td>
+</tr>
+<tr>
+<td>ADSL2+</td>
+<td>G.992.5</td>
+<td>ADSL2plus</td>
+<td>2003</td>
+<td>24 down / 1 up</td>
+</tr>
+<tr>
+<td>ADSL-RE</td>
+<td>G.992.3</td>
+<td>Reach Extended</td>
+<td>2003</td>
+<td>8 down / 1 up</td>
+</tr>
+<tr>
+<td>SHDSL</td>
+<td>G.991.2</td>
+<td>G.SHDSL</td>
+<td>2003</td>
+<td>5,6 simmetrica</td>
+</tr>
+<tr>
+<td>VDSL</td>
+<td>G.993.1</td>
+<td>Very-high-data-rate DSL</td>
+<td>2004</td>
+<td>55 down / 15 up</td>
+</tr>
+<tr>
+<td>VDSL2-LR</td>
+<td>G.993.2</td>
+<td>VDSL2 Long Reach</td>
+<td>2005</td>
+<td>55 down / 30 up</td>
+</tr>
+<tr>
+<td>VDSL2-SR</td>
+<td>G.993.2</td>
+<td>VDSL2 Short Reach</td>
+<td>2005</td>
+<td>100 simmetrica</td>
+</tr>
+</tbody>
+</table>
+<h3 id="evoluzione">Evoluzione<a class="headerlink" href="#evoluzione" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Velocità nel tempo (scala logaritmica): modem in banda vocale da V.26 (circa 2,4 kbit/s, anni '60) a V.90 (56 kbit/s); poi ISDN (160 kbit/s, 1985), HDSL, ADSL (8 Mbit/s, 1995), VDSL, VDSL2 e <b>vectoring</b> che arriva a 100 Mbit/s intorno al 2010.</li>
+<li>Velocità vs distanza (limiti teorici): ADSL piatta a 8 Mbit/s fino a 3 km, ADSL2 a 12, ADSL2+ a 26 Mbit/s fino a circa 1 km; VDSL circa 50 Mbit/s fino a 500 m, VDSL2 fino a 100 Mbit/s ma solo nelle prime centinaia di metri. <b>Oltre circa 2 km tutte le curve coincidono</b>: su linee lunghe le frequenze alte sono inutilizzabili e VDSL non dà vantaggi rispetto ad ADSL2+.</li>
+</ul>
+<h2 id="10-vectoring">10. Vectoring<a class="headerlink" href="#10-vectoring" title="Permanent link">&para;</a></h2>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>In VDSL2 il disturbo principale è il crosstalk tra i doppini dello stesso cavo. Il vectoring lo <b>misura</b> e poi lo <b>cancella</b>, aggiungendo a ogni segnale un "anti-segnale" che annulla il disturbo che arriverà dai vicini.</p>
+</div>
+<ul>
+<li>In VDSL2 il crosstalk (in particolare il FEXT, alle alte frequenze) è il <b>disturbo dominante</b>, non il rumore termico.</li>
+<li>Il vectoring fa <b>cancellazione del rumore</b>: misura il crosstalk di ogni linea su tutte le altre del binder e lo cancella con un segnale in <b>opposizione di fase</b>.</li>
+<li>Richiede:<ul>
+<li><b>sincronizzazione</b> completa di tutte le linee del sistema vettorizzato (tutte sullo stesso DSLAM);</li>
+<li><b>condivisione</b> dei campioni di dati tra tutte le linee;</li>
+<li>il <b>calcolo</b> degli anti-segnali;</li>
+<li>un meccanismo di <b>stima</b> dei coefficienti di crosstalk.</li>
+</ul>
+</li>
+<li>Standard: <b>ITU-T G.993.5 (G.vector)</b>, per l'interoperabilità DSLAM/CPE.</li>
+</ul>
+<p><b>Due direzioni</b>:</p>
+<ul>
+<li><b>Downstream → precoding</b>: il DSLAM sa cosa sta per trasmettere su tutte le linee. Se la linea 2 disturberà la linea 1 con coefficiente <span class="arithmatex">\(G_{21}\)</span>, il DSLAM sottrae in anticipo <span class="arithmatex">\(G_{21} \cdot \text{Data}_2\)</span> dal segnale della linea 1. Lungo il cavo il disturbo si somma e si annulla: al CPE1 arriva pulito.</li>
+<li><b>Upstream → postcoding</b>: il DSLAM riceve tutte le linee insieme e sottrae dal segnale della linea 1 il contributo stimato della linea 2 <b>dopo</b> la ricezione.</li>
+</ul>
+<p><b>Come si stimano i coefficienti</b> (<i>vectoring principle</i>):</p>
+<ol>
+<li>Il DSLAM/MSAN vettorizzato manda <b>segnali di test</b> su ogni linea.</li>
+<li>Ogni modem misura cosa riceve.</li>
+<li>I modem rimandano al DSLAM la <b>differenza</b> tra il segnale ricevuto e quello di test atteso (cioè il crosstalk subito).</li>
+<li>Il DSLAM calcola i coefficienti di crosstalk.</li>
+<li>Il DSLAM trasmette il segnale di lavoro <b>precodificato</b>.</li>
+<li>Il modem riceve il segnale pulito.</li>
+</ol>
+<p><b>Guadagno</b> (dal grafico, downstream): a 200 m da circa 55 Mbit/s senza vectoring a circa 85 con il 50% delle linee vettorizzate e circa <b>112 Mbit/s</b> con tutte le linee vettorizzate. Il guadagno cala con la distanza (a circa 1 km le curve si avvicinano). Se una parte delle linee del cavo non è vettorizzata, il loro crosstalk non può essere cancellato: per questo serve che tutte le linee del binder siano sullo stesso DSLAM.</p>
+<h2 id="11-sfide-per-xdsl">11. Sfide per xDSL<a class="headerlink" href="#11-sfide-per-xdsl" title="Permanent link">&para;</a></h2>
+<p>Tecniche:</p>
+<ul>
+<li><b>Loop qualification</b>: capire prima se un doppino regge il servizio.</li>
+<li><b>Crosstalk</b>: il mezzo è condiviso → perdita di QoS.</li>
+<li><b>Bridged taps</b> (derivazioni a Y): rami di doppino aperti lasciati da vecchie installazioni; creano <b>eco/riflessioni</b> che degradano la DSL.</li>
+<li>Alimentazione dei <b>terminali remoti</b> (armadi con ONU/DSLAM).</li>
+<li><b>Spectral masking</b>: limiti di potenza per banda per non disturbare altri servizi.</li>
+<li><b>Rumore impulsivo</b>.</li>
+<li>Manutenzione dell'ATU-R a casa del cliente.</li>
+</ul>
+<h2 id="12-appendice-ppp-point-to-point-protocol">12. Appendice: PPP (Point-to-Point Protocol)<a class="headerlink" href="#12-appendice-ppp-point-to-point-protocol" title="Permanent link">&para;</a></h2>
+<h3 id="cose">Cos'è<a class="headerlink" href="#cose" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>PPP è un protocollo di livello 2 per collegamenti punto-punto. In ADSL crea la "sessione" tra l'utente e l'ISP: autentica l'utente (username/password), gli assegna l'indirizzo IP e trasporta i pacchetti.</p>
+</div>
+<ul>
+<li>Progettato per link semplici che trasportano pacchetti tra <b>due peer</b>.</li>
+<li><b>Multiplexa</b> più protocolli di livello rete sullo stesso link (IP, IPX, ...).</li>
+<li>Con ADSL è usato perché collega direttamente l'utente all'ISP e offre <b>autenticazione, autorizzazione, configurazione automatica</b> delle interfacce (IP, DNS).</li>
+<li>In gran parte d'Europa ADSL è basata su ATM → <b>PPPoA</b> (PPP over ATM). In alternativa PPP viaggia in trame Ethernet → <b>PPPoE</b> (PPP over Ethernet).</li>
+</ul>
+<h3 id="architettura-lcp-e-ncp">Architettura: LCP e NCP<a class="headerlink" href="#architettura-lcp-e-ncp" title="Permanent link">&para;</a></h3>
+<ul>
+<li><b>LCP</b> (<i>Link Control Protocol</i>): apre, configura, controlla e chiude il <b>link</b>. Negozia i parametri (tipo di autenticazione, compressione, ...) e gestisce l'autenticazione.</li>
+<li><b>NCP</b> (<i>Network Control Protocol</i>): una famiglia di protocolli, <b>uno per ogni protocollo di rete</b>, che configurano il livello 3. Es. <b>IPCP</b> configura IP (assegna l'indirizzo), IPXCP per IPX.</li>
+</ul>
+<h3 id="formato-della-trama">Formato della trama<a class="headerlink" href="#formato-della-trama" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Address</th>
+<th>Control</th>
+<th>Protocol</th>
+<th>Information</th>
+<th>Check (FCS)</th>
+<th>Flag</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1 byte</td>
+<td>1 byte</td>
+<td>1 byte</td>
+<td>1 o 2 byte</td>
+<td>variabile</td>
+<td>2 o 4 byte</td>
+<td>1 byte</td>
+</tr>
+<tr>
+<td>01111110</td>
+<td>11111111</td>
+<td>00000011</td>
+<td>es. IP, LCP</td>
+<td>datagramma</td>
+<td>CRC</td>
+<td>01111110</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><b>Flag</b> (0x7E): delimita l'inizio e la fine della trama.</li>
+<li><b>Address</b> (0xFF) e <b>Control</b> (0x03): fissi, ereditati da HDLC. Su un link punto-punto non servono, infatti si possono comprimere.</li>
+<li><b>Protocol</b>: dice cosa c'è nel campo Information (es. 0x0021 = IP, 0xC021 = LCP, 0x8021 = IPCP; <i>valori come complemento</i>).</li>
+<li><b>Information</b>: il datagramma, da 0 byte fino alla <b>MRU</b> (<i>Maximum Receive Unit</i>), di default <b>1500 byte</b> ma negoziabile. Può avere padding fino alla MRU.</li>
+<li><b>Check</b>: codice di controllo d'errore.</li>
+</ul>
+<h3 id="fasi-del-link">Fasi del link<a class="headerlink" href="#fasi-del-link" title="Permanent link">&para;</a></h3>
+<pre class="mermaid"><code>stateDiagram-v2
+  Dead --&gt; Establishment: UP
+  Establishment --&gt; Authentication: LCP ok
+  Establishment --&gt; Dead: fail
+  Authentication --&gt; Network: PAP/CHAP ok
+  Authentication --&gt; Dead: fail
+  Network --&gt; Termination: closing
+  Termination --&gt; Dead: LCP down</code></pre>
+<ol>
+<li><b>Dead</b>: nessun link. Quando la linea fisica si attiva si passa a Establishment.</li>
+<li><b>Establishment</b>: LCP negozia i parametri.</li>
+<li><b>Authentication</b>: PAP o CHAP.</li>
+<li><b>Network</b>: NCP configura il livello 3 (es. IPCP assegna l'IP); da qui passano i dati.</li>
+<li><b>Termination</b>: chiusura con LCP, poi si torna a Dead.</li>
+</ol>
+<h3 id="link-establishment">Link establishment<a class="headerlink" href="#link-establishment" title="Permanent link">&para;</a></h3>
+<p>Opzioni negoziate da LCP:</p>
+<ul>
+<li>dimensione della <b>MRU</b>;</li>
+<li>se e con quale protocollo <b>autenticarsi</b>;</li>
+<li><b>compressione</b> del campo Protocol e dei campi Address/Control;</li>
+<li><b>monitoraggio della qualità</b> del link;</li>
+<li><b>magic number</b>: numero casuale per scoprire se il link è in <b>loop</b> (se ricevi il tuo stesso magic number, stai parlando con te stesso).</li>
+</ul>
+<p>Scambio: un peer manda <b>Configure-Request</b> con le opzioni volute; l'altro risponde <b>Configure-Ack</b> se le accetta, <b>Configure-Nak</b> se non sono accettabili, proponendo valori alternativi.</p>
+<h3 id="autenticazione-pap-vs-chap">Autenticazione: PAP vs CHAP<a class="headerlink" href="#autenticazione-pap-vs-chap" title="Permanent link">&para;</a></h3>
+<div class="admonition abstract">
+<p class="admonition-title">In breve</p>
+<p>PAP manda la password in chiaro. CHAP non la manda mai: il server lancia una sfida e il client risponde con un hash calcolato a partire dalla password.</p>
+</div>
+<ul>
+<li><b>PAP</b> (<i>Password Authentication Protocol</i>): il client manda "username password" in chiaro; il server risponde accept/reject. Chi intercetta legge la password.</li>
+<li><b>CHAP</b> (<i>Challenge Handshake Authentication Protocol</i>): il server manda una <b>challenge</b> (numero casuale); il client risponde con un <b>hash a senso unico</b> calcolato su challenge e segreto condiviso; il server lo verifica e risponde accept/reject.</li>
+<li><b>CHAP è più sicuro</b>: la password non viaggia mai, e la challenge sempre diversa impedisce il replay.</li>
+</ul>
+<h2 id="domande-di-ripasso">Domande di ripasso<a class="headerlink" href="#domande-di-ripasso" title="Permanent link">&para;</a></h2>
+<details class="note">
+<summary>Perché il modem analogico è limitato a circa 56 kbit/s mentre ADSL arriva a megabit sullo stesso filo?</summary>
+<p>Perché il modem passa per lo switch voce, che filtra a 3,4 kHz: con Shannon e SNR di 40 dB la capacità è circa 45 kbit/s. ADSL invece collega il doppino al DSLAM tramite lo splitter e usa la banda fino a 1,1 MHz (o più), quindi <span class="arithmatex">\(W\)</span> è centinaia di volte più grande.</p>
+</details>
+<details class="note">
+<summary>Differenza tra NEXT e FEXT, e quale è peggiore?</summary>
+<p>NEXT: disturbatore e vittima sullo stesso lato del cavo; FEXT: su lati opposti. Il NEXT è peggiore perché il disturbo non è attenuato mentre il segnale utile sì. Si combatte separando in frequenza le due direzioni (FDD). Il FEXT si attenua lungo la linea ed è quello che il vectoring cancella in VDSL2.</p>
+</details>
+<details class="note">
+<summary>Perché DMT ha vinto su CAP?</summary>
+<p>DMT divide la banda in toni indipendenti: ogni tono ha la sua QAM e il suo numero di bit (water filling / bit loading), i toni rumorosi si spengono, non serve un equalizzatore adattivo complesso e la velocità si regola a passi di 32 kbit/s. Con DSP economici il maggior consumo di DMT non è più un problema. È lo standard ITU/ANSI.</p>
+</details>
+<details class="note">
+<summary>Perché VDSL richiede la fibra fino all'armadio?</summary>
+<p>VDSL usa frequenze fino a 12–30 MHz, che sul rame si attenuano moltissimo: oltre 1–2 km sono inutilizzabili e VDSL non dà più di ADSL2+. Portando la fibra all'ONU nell'armadio (FTTCab), il tratto in rame si riduce a poche centinaia di metri.</p>
+</details>
+<details class="note">
+<summary>Calcola la capacità teorica downstream e upstream di ADSL DMT</summary>
+<p>Up: 25 toni × 15 bit/s/Hz × 4 kHz = 1,5 Mbit/s. Down: 249 toni × 15 × 4 kHz ≈ 14,9 Mbit/s.</p>
+</details>
+<details class="note">
+<summary>Perché CHAP è più sicuro di PAP?</summary>
+<p>PAP trasmette la password in chiaro; CHAP trasmette solo l'hash di una challenge casuale combinata col segreto, quindi chi intercetta non ottiene la password né può riusare la risposta.</p>
+</details>
+<h2 id="riepilogo">Riepilogo<a class="headerlink" href="#riepilogo" title="Permanent link">&para;</a></h2>
+<ul>
+<li><b>xDSL</b> = dati digitali sul doppino telefonico, usando frequenze sopra la voce. Il limite dei 56k era il filtro voce, non il rame.</li>
+<li>La velocità <b>crolla con la distanza</b> e con il <b>crosstalk</b> (NEXT: stesso lato, peggiore; FEXT: lato opposto).</li>
+<li><b>ADSL</b>: asimmetrica, voce + dati sullo stesso filo; POTS 0–4 kHz, up 25–138 kHz, down 138–1104 kHz; 8 Mbit/s (ADSL2+: 24). FDD o echo cancellation.</li>
+<li><b>DMT</b>: 256 toni da 4,3125 kHz, ognuno con la sua QAM; <b>water filling</b> decide potenza e bit per tono. Ha battuto CAP.</li>
+<li><b>Architettura</b>: splitter (passivo, lifeline) → ATU-R ↔ doppino ↔ splitter → ATU-C nel <b>DSLAM</b> → rete ATM → ISP. Negoziazione del bit rate in 12–20 s.</li>
+<li><b>Stack</b>: IP / PPP / AAL5 / ATM / ADSL (PPPoA), oppure PPPoE.</li>
+<li><b>VDSL/VDSL2</b>: fino a 12/30 MHz, 55–100 Mbit/s, solo su rame corto → fibra fino all'armadio (FTTCab). FDD o TDD.</li>
+<li><b>Vectoring</b> (G.993.5): stima il crosstalk e lo cancella con precoding (down) e postcoding (up).</li>
+<li><b>PPP</b>: LCP (link) + NCP (rete, es. IPCP); fasi Dead → Establishment → Authentication → Network → Termination; PAP in chiaro, CHAP con challenge-hash.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Torna su
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Piede" >
+        
+          
+          <a href="../lezione-1/" class="md-footer__link md-footer__link--prev" aria-label="Precedente: Lezione 1 – Aree funzionali della rete">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Precedente
+              </span>
+              <div class="md-ellipsis">
+                Lezione 1 – Aree funzionali della rete
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../lezione-3/" class="md-footer__link md-footer__link--next" aria-label="Successivo: Lezione 3 – FTTx e PON">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Successivo
+              </span>
+              <div class="md-ellipsis">
+                Lezione 3 – FTTx e PON
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.indexes", "navigation.top", "navigation.footer", "toc.follow", "search.highlight", "search.suggest", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copiato", "clipboard.copy": "Copia", "search.result.more.one": "1 altro in questa pagina", "search.result.more.other": "# altri in questa pagina", "search.result.none": "Nessun documento trovato", "search.result.one": "1 documento trovato", "search.result.other": "# documenti trovati", "search.result.placeholder": "Scrivi per iniziare a cercare", "search.result.term.missing": "Non presente", "select.version": "Seleziona la versione"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="../../javascripts/mathjax/tex-mml-chtml.js"></script>
+      
+        <script src="../../javascripts/mermaid/mermaid.min.js"></script>
+      
+    
+  </body>
+</html>
