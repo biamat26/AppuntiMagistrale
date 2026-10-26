@@ -1,10 +1,25 @@
 """Convert Notion-flavoured markdown (from notion-fetch) into MkDocs Material markdown."""
 import re, sys, pathlib
 
+# Pagine Notion -> (testo del link, file di destinazione relativo alla pagina corrente).
+# Funziona perché le pagine collegate stanno nella stessa materia (stessa cartella).
 MENTIONS = {
     '3f5b1b09a64781cb8091fac690c93b9b': ('Lezione 5', 'lezione-5.md'),
     '3f4b1b09a64781769778d31d628a07de': ('Lezione 4', 'lezione-4.md'),
+    '3f2b1b09a647810283effd249e1d1948': ('Lezione 2', 'lezione-2.md'),
+    '3f6b1b09a64781148129d9b3e4ea2de4': ('Lezione 3', 'lezione-3.md'),
 }
+
+
+def fix_nested_lists(lines):
+    """Notion indenta le sottoliste di 2 spazi, Python-Markdown ne vuole 4."""
+    out = []
+    for l in lines:
+        m = re.match(r'^( +)(- |\d+\. )', l)
+        if m and len(m.group(1)) % 4:
+            l = ' ' * (len(m.group(1)) * 2) + l[len(m.group(1)):]
+        out.append(l)
+    return out
 
 
 def indent(lines, n=4):
@@ -85,6 +100,8 @@ def convert(raw):
     title = re.sub(r'^[^\w]+\s*', '', title)  # drop leading emoji
     text = body
     text = text.replace('```javascript', '```text')
+    text = re.sub(r'^<table-of-contents />\n?', '', text, flags=re.M)
+    text = re.sub(r'^<p />\n?', '', text, flags=re.M)
     text = text.replace('\\^', '^').replace('\\_', '_')
     def mention(m):
         pid = m.group(1)
@@ -104,6 +121,7 @@ def convert(raw):
             continue
         (out if in_code else buf).append(l)
     out.extend(convert_quotes(buf))
+    out = fix_nested_lists(out)
     text = '\n'.join(out)
     text = convert_toggles(text)
     if not text.lstrip().startswith('# '):

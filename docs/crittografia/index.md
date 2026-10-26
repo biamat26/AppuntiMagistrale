@@ -1,4 +1,4 @@
-# Crittografia – appunti di Luiggi
+# Crittografia
 
 Prof. Daniele Venturi, Sapienza. Esame scritto in 3 parti, ognuna con 1 esercizio e 1 domanda di teoria. Libro: *Introduction to Modern Cryptography*, Katz e Lindell.
 
@@ -13,6 +13,3 @@ Gli appunti seguono quelli scritti a mano dal prof. Le parti aggiunte per capire
 | [Lezione 4](lezione-4.md) | Lemma della collision probability, PPT, P vs NP, one-way function, funzioni trascurabili |
 | [Lezione 5](lezione-5.md) | Indistinguibilità computazionale, PRG, stretch amplification, argomento ibrido, hard-core bit |
 
-!!! note "Legenda"
-    - **In breve**: la definizione corta da sapere prima del concetto.
-    - *(non negli appunti del prof)*: parti aggiunte per capire meglio.

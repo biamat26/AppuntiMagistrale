@@ -1,18 +1,19 @@
-name: Sito crittografia-luiggi
+name: Sito appunti
 
 on:
   push:
     branches: [main, Luiggi]
     paths:
-      - "crittografia-luiggi/**"
-      - ".github/workflows/sito-crittografia-luiggi.yml"
+      - "docs/**"
+      - "mkdocs.yml"
+      - ".github/workflows/sito.yml"
   workflow_dispatch:
 
 permissions:
   contents: write
 
 concurrency:
-  group: sito-crittografia-luiggi
+  group: sito-appunti
   cancel-in-progress: true
 
 jobs:
@@ -24,7 +25,7 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install "mkdocs<2" "mkdocs-material==9.7.7"
-      - run: mkdocs build --strict -f crittografia-luiggi/mkdocs.yml -d ../site
+      - run: mkdocs build --strict
       - name: Pubblica sul branch gh-pages
         uses: peaceiris/actions-gh-pages@v4
         with:

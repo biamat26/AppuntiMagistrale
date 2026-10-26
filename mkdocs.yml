@@ -1,0 +1,87 @@
+site_name: Appunti di Luiggi
+site_description: Appunti della magistrale in Cybersecurity (Sapienza)
+site_url: https://biamat26.github.io/AppuntiMagistrale/
+repo_url: https://github.com/biamat26/AppuntiMagistrale
+repo_name: AppuntiMagistrale
+edit_uri: edit/Luiggi/docs/
+
+theme:
+  name: material
+  language: it
+  icon:
+    logo: material/notebook-outline
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Tema scuro
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Tema chiaro
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.indexes
+    - navigation.top
+    - navigation.footer
+    - toc.follow
+    - search.highlight
+    - search.suggest
+    - content.code.copy
+
+plugins:
+  - search:
+      lang: it
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.arithmatex:
+      generic: true
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js
+
+extra_css:
+  - stylesheets/extra.css
+
+nav:
+  - Home: index.md
+  - Crittografia:
+      - crittografia/index.md
+      - Ripasso probabilità: crittografia/ripasso-probabilita.md
+      - "Lezione 1 – Segretezza perfetta": crittografia/lezione-1.md
+      - "Lezione 2 – Shannon e MAC": crittografia/lezione-2.md
+      - "Lezione 3 – Hash ed estrattori": crittografia/lezione-3.md
+      - "Lezione 4 – Sicurezza computazionale e OWF": crittografia/lezione-4.md
+      - "Lezione 5 – PRG e hard-core bit": crittografia/lezione-5.md
+  - Distributed Systems:
+      - sistemi-distribuiti/index.md
+      - "Lezione 2 – Modelli, astrazioni e link": sistemi-distribuiti/lezione-2.md
+      - "Lezione 3 – Tempo (I): orologi fisici": sistemi-distribuiti/lezione-3.md
+      - "Lezione 4 – Tempo (II): tempo logico": sistemi-distribuiti/lezione-4.md
+      - "Lezione 5 – Failure detector e leader election": sistemi-distribuiti/lezione-5.md
+  - Network Infrastructures:
+      - network-infrastructures/index.md
+      - "Lezione 1 – Aree funzionali della rete": network-infrastructures/lezione-1.md
+      - "Lezione 2 – xDSL e PPP": network-infrastructures/lezione-2.md
+      - "Lezione 3 – FTTx e PON": network-infrastructures/lezione-3.md
+      - "Kathará": network-infrastructures/kathara.md
