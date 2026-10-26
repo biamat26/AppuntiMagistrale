@@ -3,7 +3,7 @@
 Appunti del corso di Crittografia (Prof. Daniele Venturi, Sapienza), in italiano, pubblicati come sito web:
 **https://biamat26.github.io/AppuntiMagistrale/**
 
-È una sezione separata da [`cryptography/`](../cryptography/). Seguono gli appunti scritti a mano dal prof; prima di ogni concetto importante c'è un riquadro **In breve**, e le parti aggiunte per capire meglio sono segnate *(non negli appunti del prof)*.
+Seguono gli appunti scritti a mano dal prof; prima di ogni concetto importante c'è un riquadro **In breve**, e le parti aggiunte per capire meglio sono segnate *(non negli appunti del prof)*.
 
 ## Struttura
 
