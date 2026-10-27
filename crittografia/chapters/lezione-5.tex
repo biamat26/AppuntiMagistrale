@@ -338,7 +338,9 @@ In parole: \(G\) prende \(\lambda\) bit e ne restituisce \(\lambda + 1\). Si spe
 
 \begin{inbreve}
 
-Una \textbf{riduzione} dimostra ``se qualcuno sa rompere A, allora sa rompere anche B'', costruendo un attaccante per B che usa quello per A come sottoprogramma. Se B è sicuro per ipotesi, allora anche A lo è.
+Una \textbf{riduzione} dimostra che uno schema nuovo è sicuro partendo da uno che è sicuro per ipotesi. Qui lo schema nuovo è \(G^\ell\) e quello sicuro per ipotesi è \(G\). Si dimostra: ``se qualcuno sa rompere \(G^\ell\), allora sa rompere anche \(G\)'', costruendo un attaccante contro \(G\) che usa come sottoprogramma quello contro \(G^\ell\). Ma \(G\) è sicuro, quindi nessuno sa rompere \(G^\ell\).
+
+Attenzione ai nomi: \(A\) e \(B\) sono gli \textbf{avversari} (programmi che attaccano), non gli schemi. \(A\) attacca \(G^\ell\), \(B\) attacca \(G\).
 
 \end{inbreve}
 
