@@ -1,0 +1,523 @@
+\chapter{Lezione 3 -- Il tempo nei sistemi distribuiti (I)}
+
+\section{Di cosa parliamo}
+
+In un sistema distribuito non esiste un orologio comune: ogni macchina ha il suo, e gli orologi non vanno tutti alla stessa velocità. Questa lezione affronta due domande:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Che ipotesi facciamo sul tempo?} Si introduce un terzo modello, quello \emph{eventualmente sincrono}, a metà tra asincrono e sincrono.
+\item
+  \textbf{Come si tengono allineati gli orologi fisici?} Si vedono i problemi degli orologi reali e tre soluzioni: l'algoritmo di Cristian, quello di Berkeley e NTP. Alla fine si vede il loro limite: per quanto bene li sincronizzi, non bastano a ordinare con certezza tutti gli eventi.
+\end{enumerate}
+
+Asincrono e sincrono sono già definiti nella Lezione 2; qui c'è solo quello che si aggiunge.
+
+\section{Il modello eventualmente sincrono}
+
+\subsection{Perché serve un terzo modello}
+
+\begin{inbreve}
+
+L'asincrono è troppo pessimista (troppe cose diventano impossibili), il sincrono troppo ottimista (le reti vere non lo rispettano sempre). L'eventualmente sincrono descrive le reti reali: quasi sempre puntuali, ma con ritardi imprevisti ogni tanto.
+
+\end{inbreve}
+
+Confronto veloce:
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Asincrono
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Sincrono
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Ritardi dei messaggi & Nessun limite & Limite noto \(\delta\): spedito al tempo \(t\), arriva entro \(t + \delta\) \\
+Orologi & Solo locali, utili per ordinare gli eventi dello stesso processo & Sincronizzabili (con una certa precisione) \\
+Passi dei processi & Avvengono quando decide lo scheduler & A intervalli prestabiliti e di durata limitata \\
+Pro & Descrive qualunque rete & Quasi tutto è risolvibile \\
+Contro & Molti problemi sono impossibili (es. mettersi d'accordo, il \emph{consenso}) & Descrive solo reti molto controllate \\
+\end{longtable}
+
+L'esempio del prof è un \texttt{ping\ google.com}: le risposte arrivano tutte in circa 40 ms, poi all'improvviso una ci mette 739 ms, poi si torna a 40. La rete è ``sincrona quasi sempre'', con brevi periodi asincroni.
+
+\subsection{Definizione}
+
+\begin{inbreve}
+
+All'inizio il sistema può comportarsi in modo asincrono, ma da un certo istante in poi diventa sincrono per sempre. Quell'istante esiste, ma nessuno sa quando sia.
+
+\end{inbreve}
+
+\begin{itemize}
+\tightlist
+\item
+  Il sistema è inizialmente \textbf{asincrono}.
+\item
+  Esiste un tempo \(T\), \textbf{sconosciuto}, dopo il quale il sistema è \textbf{sincrono per sempre}.
+\end{itemize}
+
+Perché ``per sempre'' se le reti vere alternano fasi buone e cattive? È una semplificazione: nella pratica basta che il periodo sincrono duri \textbf{abbastanza} perché l'algoritmo finisca. Dire ``per sempre'' rende le dimostrazioni più semplici.
+
+\textbf{Come si usa con safety e liveness} (collegamento con la Lezione 2):
+
+\begin{itemize}
+\tightlist
+\item
+  La \textbf{safety} (es. mutua esclusione) deve valere \textbf{sempre}, anche nei periodi asincroni: non puoi permettere che due processi entrino insieme in sezione critica solo perché la rete è lenta.
+\item
+  La \textbf{liveness} (es. no-starvation) può contare sui periodi sincroni: ``prima o poi'' il sistema diventa puntuale e allora il progresso arriva.
+\end{itemize}
+
+\subsection{Relazione tra i tre modelli}
+
+Attenzione, ci sono due inclusioni che vanno in \textbf{versi opposti}:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Esecuzioni possibili}: Sincrono \(\subset\) Eventualmente sincrono \(\subset\) Asincrono. Ogni esecuzione sincrona è anche eventualmente sincrona (con \(T = 0\)), e ogni esecuzione eventualmente sincrona è anche asincrona.
+\item
+  \textbf{Problemi risolvibili}: Asincrono \(\subset\) Eventualmente sincrono \(\subset\) Sincrono.
+\end{itemize}
+
+Il motivo: più esecuzioni il modello ammette, più scenari cattivi l'algoritmo deve sopportare, quindi meno problemi si riescono a risolvere. L'asincrono ammette di tutto ed è il più difficile; il sincrono ammette poco ed è il più facile.
+
+\section{Perché il tempo è importante}
+
+Molte applicazioni hanno bisogno di \textbf{ordinare gli eventi}: controllo del traffico aereo, ordini di acquisto e vendita in borsa, monitoraggio di rete. Esempi di algoritmi che dipendono dal tempo:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{consistenza dei dati} (quale scrittura è l'ultima?);
+\item
+  \textbf{autenticazione} (certificati e ticket hanno una scadenza);
+\item
+  \textbf{evitare lavoro doppio}: \texttt{make} decide se ricompilare un file confrontando gli orari di modifica;
+\item
+  \textbf{reti di sensori con TDMA}: ogni sensore trasmette solo nel suo intervallo di tempo, quindi tutti devono essere d'accordo sull'ora.
+\end{itemize}
+
+Nella Lezione 2 abbiamo visto che in asincrono due esecuzioni diverse possono essere indistinguibili. Se ogni processo potesse attaccare a ogni evento l'ora esatta (\textbf{timestamp}), potremmo ricostruire la storia globale.
+
+\textbf{Soluzione ingenua}: ogni processo mette sugli eventi l'ora del proprio orologio fisico. Funziona solo se gli orologi sono d'accordo tra loro, e il resto della lezione mostra quanto è difficile.
+
+\section{Orologi fisici}
+
+\subsection{Come funziona l'orologio di un computer}
+
+\begin{inbreve}
+
+Dentro il computer c'è un cristallo di quarzo che oscilla e un contatore che conta le oscillazioni. Il sistema operativo trasforma il contatore in un'ora leggibile.
+
+\end{inbreve}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Orologio hardware} \(H_i(t)\): un oscillatore più un registro che si incrementa a ogni oscillazione (\emph{tick}).
+\item
+  \textbf{Orologio software} (quello che usano i programmi): il sistema operativo lo calcola dall'hardware come
+\end{itemize}
+
+\[
+C_i(t) = \alpha H_i(t) + \beta
+\]
+
+I parametri \(\alpha\) (velocità) e \(\beta\) (spostamento) servono a correggere l'orologio.
+
+\subsection{Skew e drift}
+
+\begin{inbreve}
+
+Lo \textbf{skew} è quanto due orologi segnano ore diverse in un certo istante. Il \textbf{drift} è quanto un orologio va più veloce o più lento del tempo vero. Il drift fa crescere lo skew col passare del tempo.
+
+\end{inbreve}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Skew} tra due orologi: \(\text{Skew}_{i,j}(t) = |C_i(t) - C_j(t)|\).
+\item
+  \textbf{Drift rate}: di quanto l'orologio sbaglia per ogni secondo reale. Si guarda la velocità \(dH/dt\):
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \(dH/dt = 1\): orologio perfetto;
+  \item
+    \(dH/dt > 1\): orologio veloce;
+  \item
+    \(dH/dt < 1\): orologio lento.
+  \end{itemize}
+\end{itemize}
+
+Numeri utili:
+
+\begin{itemize}
+\tightlist
+\item
+  un drift di 2 μs/s significa che per ogni secondo reale l'orologio avanza di 1 s + 2 μs;
+\item
+  un quarzo normale ha drift circa \(10^{-5}\) s/s, cioè sbaglia di circa 1 secondo ogni 11-12 giorni;
+\item
+  un quarzo di alta precisione arriva a \(10^{-7}\)--\(10^{-8}\) s/s.
+\end{itemize}
+
+Il drift non è costante: dipende anche dalla temperatura del cristallo.
+
+\subsection{Orologio corretto}
+
+Un orologio hardware è \textbf{corretto} se il suo drift resta entro un limite noto \(\rho > 0\) (es. \(10^{-5}\)):
+
+\[
+1 - \rho \le \frac{dH}{dt} \le 1 + \rho
+\]
+
+Con un orologio corretto si possono misurare intervalli di tempo commettendo un errore limitato.
+
+\subsection{Ogni quanto risincronizzare}
+
+\begin{inbreve}
+
+Anche partendo perfettamente allineati, due orologi si allontanano. Se so quanto velocemente si allontanano, so ogni quanto devo risincronizzarli per restare entro una tolleranza.
+
+\end{inbreve}
+
+Caso peggiore: due orologi partono allineati al tempo 0, uno va veloce al massimo (\(1+\rho\)), l'altro lento al massimo (\(1-\rho\)). Dopo un tempo \(t\):
+
+\[
+|C_1(t) - C_2(t)| = (1+\rho)t - (1-\rho)t = 2\rho t
+\]
+
+Se voglio che lo skew non superi mai \(\Delta\), devo risincronizzarli almeno ogni
+
+\[
+t = \frac{\Delta}{2\rho}
+\]
+
+Esempio: \(\rho = 10^{-5}\) e tolleranza \(\Delta = 1\) ms. Allora \(t = 10^{-3} / (2 \cdot 10^{-5}) = 50\) s: bisogna risincronizzare ogni 50 secondi.
+
+Al momento della risincronizzazione l'orologio veloce è avanti di \(\Delta/2\) e quello lento indietro di \(\Delta/2\); la correzione riporta l'orologio veloce indietro di \(\Delta\) per allinearlo all'altro. Ma ``riportare indietro'' va fatto con attenzione, come spiega la sezione seguente.
+
+\subsection{Monotonia: l'orologio non può tornare indietro}
+
+\begin{inbreve}
+
+Un orologio non deve mai segnare un'ora precedente a una già segnata. Se è avanti, non lo si riporta indietro di colpo: lo si fa andare un po' più piano finché l'ora giusta lo raggiunge.
+
+\end{inbreve}
+
+L'orologio software deve essere \textbf{monotono}:
+
+\[
+t' > t \Rightarrow C(t') > C(t)
+\]
+
+Se lo spostassi indietro di colpo, due eventi dello stesso processo potrebbero ricevere timestamp nell'ordine sbagliato (l'effetto prima della causa), e un programma come \texttt{make} si confonderebbe.
+
+Quindi un orologio avanti si \textbf{rallenta}, scegliendo bene \(\alpha\) e \(\beta\) (che possono cambiare nel tempo). In pratica il sistema operativo ``ignora'' alcuni interrupt del timer, così l'ora avanza più lentamente finché non si riallinea.
+
+\section{UTC, sincronizzazione esterna e interna}
+
+\subsection{UTC}
+
+\textbf{UTC} (Universal Time Coordinated) è lo standard internazionale dell'ora, basato sugli orologi atomici: 1 secondo = tempo per 9.192.631.770 transizioni di un atomo di cesio. Gli orologi atomici hanno drift intorno a \(10^{-13}\).
+
+I segnali UTC arrivano via radio (precisione circa 1 ms) o via GPS (circa 1 μs), e un computer con un ricevitore può allineare il suo orologio all'ora vera.
+
+\subsection{Esterna vs interna}
+
+\begin{inbreve}
+
+\textbf{esterna} = ogni orologio è vicino all'ora vera (UTC). \textbf{Interna} = gli orologi sono vicini tra loro, anche se magari tutti sbagliati rispetto all'ora vera.
+
+\end{inbreve}
+
+Sia \(D > 0\) il limite di sincronizzazione (la tolleranza) e \(S\) la sorgente UTC.
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Sincronizzazione esterna} (\emph{accuracy}): per ogni processo \(i\) e ogni istante \(t\) nell'intervallo \(I\),
+\end{itemize}
+
+\[
+|S(t) - C_i(t)| < D
+\]
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Sincronizzazione interna} (\emph{agreement}): per ogni coppia di processi \(i, j\) e ogni istante \(t\) in \(I\),
+\end{itemize}
+
+\[
+|C_i(t) - C_j(t)| < D
+\]
+
+Relazioni tra le due:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Interna non implica esterna}: gli orologi possono essere d'accordo tra loro e derivare tutti insieme lontano dall'ora vera.
+\item
+  \textbf{Esterna entro D implica interna entro 2D}: se ogni orologio dista meno di \(D\) da UTC, due orologi distano meno di \(2D\) tra loro (uno può essere \(D\) avanti e l'altro \(D\) indietro). Formalmente è la disuguaglianza triangolare: \(|C_i - C_j| \le |C_i - S| + |S - C_j| < 2D\).
+\end{itemize}
+
+\section{Algoritmi di sincronizzazione}
+
+Tre approcci:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Server centrale, su richiesta}: algoritmo di Cristian (esterna).
+\item
+  \textbf{Server centrale che interroga tutti}: algoritmo di Berkeley (interna).
+\item
+  \textbf{Servizio distribuito}: NTP.
+\end{itemize}
+
+\subsection{Algoritmo di Cristian}
+
+\begin{inbreve}
+
+Chiedo l'ora a un server che conosce l'ora esatta. Siccome la risposta impiega del tempo ad arrivarmi, all'ora ricevuta aggiungo una stima di quel ritardo: metà del tempo totale di andata e ritorno.
+
+\end{inbreve}
+
+Nelle slide è scritto ``Christian'', ma l'autore è Flaviu \textbf{Cristian}.
+
+Algoritmo di sincronizzazione \textbf{esterna}. C'è un time server \(S\) collegato a una sorgente UTC.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Il processo \(p\) manda a \(S\) una richiesta \(m_r\) e fa partire un cronometro.
+\item
+  \(S\) risponde con un messaggio \(m_t\) che contiene la sua ora \(t\).
+\item
+  Alla ricezione \(p\) misura il \textbf{round trip time} \(RTT\) (tempo tra invio della richiesta e arrivo della risposta) e imposta
+\end{enumerate}
+
+\[
+C_p = t + \frac{RTT}{2}
+\]
+
+L'idea è che andata e ritorno durino uguale, quindi la risposta ha viaggiato circa \(RTT/2\).
+
+\textbf{Precisione.} Sia \(min\) il tempo minimo possibile per un viaggio in un verso. Il viaggio della risposta è durato tra \(min\) (se la risposta è stata velocissima) e \(RTT - min\) (se è stata velocissima la richiesta). La stima \(RTT/2\) sta in mezzo, quindi sbaglia al massimo di
+
+\[
+\pm \left( \frac{RTT}{2} - min \right)
+\]
+
+Funziona bene solo se l'RTT è piccolo rispetto alla precisione che vogliamo. Funziona ``probabilisticamente'' anche in asincrono: se una misura ha un RTT enorme la si scarta e si riprova.
+
+\textbf{Problemi}
+
+\begin{itemize}
+\tightlist
+\item
+  Il server è un \textbf{single point of failure}: se crasha nessuno si sincronizza. Soluzione: chiedere a un gruppo di server sincronizzati.
+\item
+  I server possono essere guasti in modo arbitrario o \textbf{attaccati} (un server malevolo può spostare l'ora di tutti). Soluzioni: ridondanza e \textbf{autenticazione} delle risposte.
+\end{itemize}
+
+\subsection{Algoritmo di Berkeley}
+
+\begin{inbreve}
+
+Non c'è un'ora ``vera'' di riferimento. Un coordinatore raccoglie le ore di tutti, ne fa la media scartando quelle assurde, e dice a ciascuno di quanto correggersi per arrivare alla media.
+
+\end{inbreve}
+
+Algoritmo di sincronizzazione \textbf{interna} con struttura \textbf{master-slave}. (Nelle slide a volte è scritto ``Berkley''.)
+
+\textbf{Passo 1: misurare le differenze.}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Il master \(p_m\) manda a ogni processo (anche a sé stesso) un messaggio con la propria ora \(t_1\).
+\item
+  Ogni processo \(p_i\) risponde con la sua ora \(t_2\).
+\item
+  Il master riceve la risposta, legge l'ora \(t_3\) e stima la differenza \(\Delta p_i\) tra l'orologio di \(p_i\) e il suo (tenendo conto del tempo di viaggio, come in Cristian: in pratica \(\Delta p_i \approx t_2 - \frac{t_1 + t_3}{2}\)).
+\end{enumerate}
+
+\textbf{Passo 2: calcolare le correzioni (master).}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Calcola la media \(avg\) delle \(\Delta p_i\), \textbf{escludendo i processi ``guasti''}: quelli il cui orologio differisce da quello del master più di una soglia \(\gamma\).
+\item
+  Per \textbf{ogni} processo (anche i guasti) calcola la correzione \(adj_{p_i} = avg - \Delta p_i\) e gliela manda.
+\end{enumerate}
+
+\textbf{Passo 3 (slave).} Ogni processo applica la correzione. Se è negativa \textbf{rallenta} il proprio orologio (monotonia), non lo porta indietro.
+
+\textbf{Esempio.} Il master segna 3:05; \(p_1\) segna 2:55, \(p_2\) 3:00, \(p_3\) 3:25.
+
+\begin{itemize}
+\tightlist
+\item
+  Differenze: \(\Delta p_m = 0\), \(\Delta p_1 = -10\), \(\Delta p_2 = -5\), \(\Delta p_3 = +20\). Nella slide c'è scritto ``3:25 -- 3:20 = 20'', ma è un refuso: è 3:25 -- 3:05.
+\item
+  \(p_3\) è troppo lontano, quindi è considerato guasto e non entra nella media: \(avg = (0 - 10 - 5)/3 = -5\).
+\item
+  Correzioni: master \(-5\), \(p_1\) \(+5\), \(p_2\) \(0\), \(p_3\) \(-25\).
+\end{itemize}
+
+Verifica: dopo le correzioni tutti segnano 3:00. Anche \(p_3\), pur escluso dalla media, viene riallineato.
+
+\textbf{Precisione e tolleranza ai guasti}
+
+\begin{itemize}
+\tightlist
+\item
+  La precisione dipende dal massimo RTT: il master scarta le misure con RTT troppo grande.
+\item
+  Se il master crasha se ne elegge un altro (in un tempo non prevedibile).
+\item
+  Tollera comportamenti arbitrari degli slave (es. uno che manda valori sbagliati), perché i valori troppo lontani vengono scartati dalla media.
+\end{itemize}
+
+\subsection{NTP (Network Time Protocol)}
+
+\begin{inbreve}
+
+È il servizio che sincronizza davvero gli orologi su Internet. I server sono organizzati a livelli: in cima quelli collegati agli orologi atomici, sotto quelli che si sincronizzano con loro, e così via fino ai nostri computer.
+
+\end{inbreve}
+
+\begin{itemize}
+\tightlist
+\item
+  Sincronizza i client con \textbf{UTC} attraverso Internet.
+\item
+  È organizzato ad albero, a livelli (\emph{strati}):
+
+  \begin{enumerate}
+  \def\labelenumi{\arabic{enumi}.}
+  \tightlist
+  \item
+    \textbf{server primari}: collegati direttamente a una sorgente UTC;
+  \item
+    \textbf{server secondari}: si sincronizzano con i primari;
+  \item
+    livelli più bassi, fino ai computer degli utenti.
+  \end{enumerate}
+\item
+  \textbf{Affidabile}: server e percorsi ridondanti, se un server cade ce ne sono altri.
+\item
+  \textbf{Scalabile}: grazie alla gerarchia nessun server deve servire tutti.
+\end{itemize}
+
+\section{Il limite della precisione limitata}
+
+\begin{inbreve}
+
+Anche con orologi ben sincronizzati, ogni timestamp ha un margine d'errore. Se due eventi su processi diversi capitano a distanza più piccola di quel margine, non si può sapere quale è venuto prima.
+
+\end{inbreve}
+
+Con una sincronizzazione entro \(D\), il timestamp di un evento non è un istante preciso ma un \textbf{intervallo di incertezza} intorno al valore letto (nelle slide disegnato come un cerchio attorno all'evento).
+
+\begin{itemize}
+\tightlist
+\item
+  Se gli intervalli di due eventi \textbf{non si sovrappongono}, l'ordine è certo.
+\item
+  Se \textbf{si sovrappongono}, l'ordine reale non si può stabilire: l'evento con il timestamp più basso potrebbe essere avvenuto dopo.
+\end{itemize}
+
+Quindi gli orologi fisici, per quanto sincronizzati, non bastano per ordinare in modo affidabile tutti gli eventi di un sistema distribuito. Questo motiva la prossima parte del corso (``Time II''), che presumibilmente introdurrà tempi \emph{logici} che non dipendono dagli orologi fisici.
+
+\section{Homework}
+
+\begin{approfondimento}{Quale schema di messaggi è `cattivo' per Cristian? (soluzione proposta;
+le slide 2024/25 riportano la domanda senza risposta scritta)}
+
+La slide mostra due schemi di richiesta/risposta. Nel primo andata e ritorno impiegano più o meno lo stesso tempo (frecce ugualmente inclinate). Nel secondo la richiesta è lenta (freccia molto inclinata) e la risposta istantanea (freccia verticale).
+
+Il cattivo è il \textbf{secondo}, cioè quello \textbf{asimmetrico}. Cristian assume che la risposta abbia viaggiato per \(RTT/2\). Se la risposta in realtà è arrivata subito (ritardo ≈ \(min\)), \(p\) aggiunge troppo e finisce avanti di circa \(RTT/2 - min\): è proprio il caso peggiore dell'errore.
+
+\end{approfondimento}
+
+\begin{approfondimento}{Fair-loss con consegna temporizzata: si può avere un perfect link con
+tempo di consegna limitato? (risposta confermata dalle slide 2024/25)}
+
+\textbf{Risposta del prof}: no. Supponiamo che esista un algoritmo A che garantisce la consegna entro X unità di tempo: l'avversario può far perdere tutte le copie spedite in quell'intervallo. Lo slogan della slide: \textbf{sincrono + perdite di messaggi illimitate = asincrono}.
+
+\textbf{Testo}: sistema sincrono, link fair-loss con in più la proprietà \emph{timed delivery}: se \(p\) manda \(m\) al tempo \(t\) e \(m\) non va perso, \(q\) lo consegna entro \(t + 1\). Si può costruire un perfect link che garantisca anche un \textbf{limite} sul tempo di consegna?
+
+\textbf{Idea di risposta: no, non con un limite fisso.} Il fair-loss promette solo che, rispedendo all'infinito, prima o poi i messaggi passano. Non dice dopo quanti tentativi. L'avversario può far perdere le prime \(k\) copie per qualunque \(k\) scelto, quindi per qualunque limite \(B\) che proponi esiste un'esecuzione in cui \(m\) arriva dopo \(B\).
+
+\textbf{Cosa si ottiene comunque}: ogni copia che arriva ci mette al massimo 1 unità di tempo. Ritrasmettendo ogni unità di tempo, il ritardo di consegna è al massimo ``numero di copie perse + 1''. Il limite diventa fisso solo aggiungendo un'ipotesi sul link, del tipo ``al più \(k\) perdite consecutive'': allora \(m\) arriva entro \(k + 1\) unità di tempo.
+
+\end{approfondimento}
+
+\begin{approfondimento}{Sincronizzazione completamente distribuita: media dei vicini (dalle
+slide 2024/25, soluzione proposta)}
+
+\textbf{Testo}: devi revisionare un algoritmo di sincronizzazione per grafi qualsiasi. Ogni processo legge gli orologi dei vicini, ne fa la media e imposta il proprio orologio a quel valore. C'è qualcosa che non va?
+
+Problemi:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Monotonia}: ``impostare'' l'orologio alla media può spostarlo \textbf{indietro}. Va rallentato, non riportato indietro.
+\item
+  \textbf{Ritardi ignorati}: il valore letto da un vicino è già vecchio quando arriva. Senza compensare (come fa Cristian con RTT/2) si introduce un errore sistematico.
+\item
+  \textbf{Valori anomali}: un vicino guasto o malevolo con un orologio assurdo sposta la media di tutti, e l'errore si propaga nel grafo. Berkeley risolve scartando gli outlier oltre una soglia.
+\item
+  \textbf{Solo interna}: anche quando converge, gli orologi concordano tra loro ma possono derivare tutti insieme lontano da UTC.
+\item
+  \textbf{Convergenza lenta}: in un grafo sparso l'informazione si propaga solo tra vicini, quindi servono molti giri.
+\end{itemize}
+
+\end{approfondimento}
+
+\section{Riepilogo}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Eventualmente sincrono}: asincrono fino a un tempo \(T\) ignoto, poi sincrono per sempre. Modella le reti reali; la safety deve valere sempre, la liveness può contare sulla fase sincrona.
+\item
+  Esecuzioni: Sync \(\subset\) E-Sync \(\subset\) Async. Problemi risolvibili: al contrario.
+\item
+  Orologio software \(C = \alpha H + \beta\); \textbf{skew} = differenza tra due orologi, \textbf{drift} = errore di velocità. Due orologi corretti si allontanano al massimo di \(2\rho t\), quindi per skew \(\le \Delta\) si risincronizza ogni \(\Delta / 2\rho\).
+\item
+  Gli orologi devono essere \textbf{monotoni}: se sono avanti si rallentano, non si portano indietro.
+\item
+  \textbf{Esterna} = vicino a UTC entro \(D\); \textbf{interna} = vicini tra loro entro \(D\). Esterna entro \(D\) implica interna entro \(2D\), non viceversa.
+\item
+  \textbf{Cristian} (esterna): \(C = t + RTT/2\), errore \(\pm(RTT/2 - min)\).
+\item
+  \textbf{Berkeley} (interna): il master fa la media delle differenze scartando gli outlier e manda a ognuno la sua correzione.
+\item
+  \textbf{NTP}: gerarchia di server a strati, ridondante e scalabile.
+\item
+  \textbf{Limite}: ogni timestamp ha un'incertezza, quindi eventi troppo vicini non si possono ordinare con gli orologi fisici.
+\end{itemize}

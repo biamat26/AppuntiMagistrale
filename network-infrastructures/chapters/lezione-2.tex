@@ -1,0 +1,1208 @@
+\chapter{Lezione 2 -- xDSL (ADSL, VDSL) e PPP}
+
+\section{Di cosa parliamo}
+
+La \textbf{rete d'accesso} è l'ultimo tratto di rete, quello che collega casa tua alla centrale dell'operatore. In Italia (e nel mondo) per decenni questo tratto è stato un \textbf{doppino di rame} pensato solo per la voce.
+
+La famiglia \textbf{xDSL} è l'insieme di tecnologie che riusano quel doppino per trasportare dati digitali ad alta velocità, senza rifare i cavi. La lezione spiega: perché il doppino ha dei limiti, come ADSL e VDSL li aggirano (bande di frequenza, modulazione DMT, gestione del crosstalk), com'è fatta l'architettura (modem, splitter, DSLAM) e quali protocolli girano sopra (ATM, PPP).
+
+\section{Cos'è xDSL}
+
+\begin{inbreve}
+
+DSL = usare il normale filo del telefono per mandare dati digitali, sfruttando frequenze molto più alte di quelle della voce. La ``x'' sta per ``una delle tante varianti''.
+
+\end{inbreve}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{DSL} = \emph{Digital Subscriber Loop} (in origine) o \emph{Digital Subscriber Line} (nome più commerciale). Il \textbf{subscriber loop} (o \emph{local loop}) è il doppino che va dalla centrale all'abbonato.
+\item
+  \textbf{xDSL} = la famiglia: la x indica la variante.
+\end{itemize}
+
+\subsection{Spiegato semplice}
+
+DSL è la tecnologia che permette di avere \textbf{Internet sul normale filo del telefono di casa}. L'``ADSL'' che quasi tutti avevano in casa negli anni 2000--2010 è una delle sue versioni.
+
+\textbf{L'idea di base}
+
+\begin{itemize}
+\tightlist
+\item
+  Ogni casa è collegata alla centrale con un \textbf{doppino di rame}: due fili intrecciati, nati più di cento anni fa solo per il telefono.
+\item
+  La voce al telefono usa solo le frequenze \textbf{basse} (da 0 a circa 4 kHz). Il filo però riesce a trasportare frequenze molto più alte, fino a qualche MHz, che per il telefono restavano \textbf{inutilizzate}.
+\item
+  La DSL sfrutta quelle frequenze alte per i dati. Sullo stesso filo viaggiano due cose insieme senza disturbarsi: \textbf{in basso la voce}, \textbf{in alto i dati di Internet}.
+\end{itemize}
+
+\textbf{Analogia}: è come una strada con più corsie. Prima si usava solo la corsia lenta (la voce); la DSL apre le corsie veloci, che c'erano già ma nessuno usava.
+
+\textbf{Cosa serve per farla funzionare}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{A casa}: il \textbf{modem DSL} (il router dell'operatore), che trasforma i dati del PC in segnali ad alta frequenza e viceversa, più dei \textbf{filtri} (splitter o microfiltri) sulle prese del telefono che separano voce e dati.
+\item
+  \textbf{In centrale}: il \textbf{DSLAM}, il ``modem dall'altra parte'' per centinaia di utenti, che manda il loro traffico verso Internet.
+\end{itemize}
+
+\textbf{Perché è stata un successo}: il doppino arrivava \textbf{già in tutte le case}. Niente scavi né cavi nuovi: bastavano un modem a casa e un DSLAM in centrale.
+
+\textbf{Il suo limite}: le frequenze alte si ``consumano'' lungo il filo. Più sei lontano dalla centrale, più il segnale arriva debole e più la velocità scende.
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{ADSL}: circa 8--20 Mbit/s se sei vicino alla centrale.
+\item
+  \textbf{VDSL}: 50--100 Mbit/s, ma solo con pochi metri di rame. Per questo si porta la fibra fino all'armadio stradale vicino a casa (``fibra misto rame'', \textbf{FTTCab}) e il rame si usa solo per l'ultimo tratto.
+\end{itemize}
+
+Il resto della lezione spiega come tutto questo funziona nel dettaglio: bande di frequenza, modulazione DMT, crosstalk.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Sigla
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Nome
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Idea chiave
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+IDSL & ISDN DSL & DSL sulla linea ISDN \\
+HDSL & High data rate DSL & Simmetrica, nata per sostituire le linee T1 \\
+SDSL / SHDSL & Symmetric DSL & Versione standardizzata di HDSL \\
+ADSL & Asymmetric DSL & Download molto più veloce dell'upload \\
+ADSL lite (G.lite) & -- & ADSL ridotta, senza splitter \\
+RADSL & Rate-Adaptive DSL & Adatta la velocità alla qualità della linea \\
+VDSL / VDSL2 & Very high speed DSL & Molto veloce ma solo su tratte di rame corte \\
+\end{longtable}
+
+\subsection{Perché ha avuto successo}
+
+\begin{itemize}
+\tightlist
+\item
+  Esistono \textbf{oltre 600 milioni} di doppini nel mondo: l'infrastruttura c'è già, rifarla costa enormemente.
+\item
+  Domanda crescente di trasmissione dati (soprattutto accesso a Internet/IP).
+\item
+  \textbf{Concorrenza} e \textbf{deregolamentazione} del mercato telecom.
+\item
+  Domanda di telefonia base (POTS) nei paesi in via di sviluppo.
+\end{itemize}
+
+\textbf{POTS} = \emph{Plain Old Telephone Service}, il telefono analogico tradizionale.
+
+\subsection{Esempio: la rete in rame di Telecom Italia}
+
+\begin{itemize}
+\tightlist
+\item
+  33.576.600 terminazioni di rete (linee)
+\item
+  11.000 centrali (\textbf{CO}, \emph{Central Office})
+\item
+  150.000 armadi stradali (\textbf{cabinet})
+\item
+  oltre 105,7 milioni di km-coppia di cavo
+\item
+  distanza media centrale-utente: \textbf{1,5 km} (1,2 km in città)
+\end{itemize}
+
+Quest'ultimo numero conta molto: come vedremo, la velocità DSL crolla con la distanza.
+
+\subsection{Un po' di storia}
+
+\begin{itemize}
+\tightlist
+\item
+  Anni '80: nasce l'idea di una linea digitale d'abbonato per l'accesso \textbf{ISDN} (rete digitale integrata), a 160 kbit/s. Poi si punta a velocità vicine al \textbf{T1} (1,544 Mbit/s): progetto \textbf{HDSL}.
+\item
+  Poi interesse per l'\textbf{asimmetria}, pensando al Video on Demand.
+\item
+  \textbf{1988}: Joe Lechleider (Bellcore) inventa l'\textbf{ADSL}: mette il segnale dati a larga banda \textbf{sopra} la banda della voce analogica, sullo stesso doppino. Voce e dati convivono.
+\end{itemize}
+
+\section{Il doppino e i suoi limiti}
+
+\subsection{La rete d'accesso prima del DSL}
+
+\begin{inbreve}
+
+Dalla centrale escono tantissimi doppini, raggruppati in grossi cavi, che passano per armadi stradali e arrivano alle case. Dentro la centrale c'era solo lo switch telefonico.
+
+\end{inbreve}
+
+\begin{center}\includegraphics[width=0.95\linewidth,height=0.4\textheight,keepaspectratio]{lezione-2-1}\end{center}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{UTP} (\emph{Unshielded Twisted Pair}): coppia di fili di rame intrecciati, non schermati.
+\item
+  \textbf{Binder group}: fascio di doppini raggruppati nello stesso cavo. Doppini vicini si disturbano tra loro (→ crosstalk, sezione 5).
+\item
+  \textbf{PSTN}: \emph{Public Switched Telephone Network}, la rete telefonica a commutazione di circuito.
+\end{itemize}
+
+\subsection{Il modem analogico (V.90) e il limite di Shannon}
+
+\begin{inbreve}
+
+Il vecchio modem trasforma i bit in suoni e li manda dentro la normale chiamata telefonica. Ma la chiamata ha solo 3,4 kHz di banda, e Shannon dice che lì dentro non ci stanno più di circa 45 kbit/s.
+
+\end{inbreve}
+
+Il modem passa per lo switch telefonico come una chiamata qualunque, quindi è limitato al \textbf{canale vocale}: circa \(W = 3{,}4\) kHz (la centrale filtra tutto il resto).
+
+\textbf{Capacità di Shannon} (massimo bit rate teorico su un canale con banda \(W\) e rapporto segnale/rumore SNR):
+
+\[
+C = W \log_2(1 + \text{SNR})
+\]
+
+Con \(W = 3400\) Hz e \(\text{SNR} = 10000\) (cioè \(10\log_{10} 10000 = 40\) dB):
+
+\[
+C = 3400 \cdot \log_2(10001) \approx 44{,}8 \text{ kbit/s}
+\]
+
+Promemoria: \(\log_2 x = \ln x / \ln 2 = \log_{10} x / \log_{10} 2\).
+
+\textbf{Idea chiave del DSL}: il limite non è il \textbf{rame}, è il \textbf{filtro} a 3,4 kHz della centrale. Il doppino da solo trasporta frequenze fino a qualche MHz (su tratte corte anche decine di MHz). Se si collega il doppino a un apparato dati invece che allo switch voce, la banda \(W\) diventa enormemente più grande.
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule\noalign{}
+Servizio sul doppino & Banda massima usata \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Voce & 3400 Hz \\
+ISDN (USA) & 80 kHz \\
+ISDN (Germania) & 120 kHz \\
+T1 con codifica 2B1Q & 400 kHz \\
+ADSL & circa 1 MHz \\
+\end{longtable}
+
+\subsection{Limiti della rete telefonica per i dati}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Spazio} limitato nelle centrali per nuovi apparati.
+\item
+  \textbf{Distanza} utente-centrale.
+\item
+  POTS e ISDN passano dallo \textbf{switch voce}, che non è fatto per i dati (commutazione di circuito, banda fissa).
+\item
+  Soluzione: far gestire i dati da \textbf{apparati dati} dedicati (il DSLAM, sezione 7), separando i dati dalla voce già in centrale.
+\end{itemize}
+
+\subsection{Banda in funzione della distanza}
+
+\begin{inbreve}
+
+Più il doppino è lungo, più il segnale si attenua (soprattutto alle alte frequenze), e meno bit al secondo riesci a far passare.
+
+\end{inbreve}
+
+Grafico per UTP categoria 3 (valori letti dal grafico, approssimati):
+
+\begin{longtable}[]{@{}lllllll@{}}
+\toprule\noalign{}
+Lunghezza & circa 100 m & 900 m & 1,4 km & 2,7 km & 3,7 km & 5 km \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Mbit/s & 50 & 25 & 13 & 8 & 6 & 1,5 \\
+\end{longtable}
+
+Il crollo nel primo chilometro è il motivo per cui VDSL porta la fibra vicino alle case (sezione 9).
+
+\subsection{Cosa cambia tra le varianti xDSL}
+
+Le varianti si distinguono per:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{velocità e distanza} raggiungibili;
+\item
+  \textbf{simmetria} (upload = download?);
+\item
+  \textbf{supporto al POTS} (la voce analogica continua a funzionare sullo stesso filo?);
+\item
+  \textbf{posizione degli apparati} (in centrale, nell'armadio, \ldots).
+\end{itemize}
+
+\section{HDSL (High data rate DSL)}
+
+\begin{inbreve}
+
+La prima DSL di successo, simmetrica, usata dalle aziende e dagli operatori come sostituto economico delle linee dedicate T1. Non lascia spazio al telefono.
+
+\end{inbreve}
+
+\begin{itemize}
+\tightlist
+\item
+  È stata la forma di DSL più diffusa, nata per fornire servizio \textbf{T1 su linea dedicata} (\emph{leased line}).
+\item
+  Usa \textbf{equalizzazione adattiva} e la codifica \textbf{2B1Q} (\emph{2 binary, 1 quaternary}): 2 bit codificati in un simbolo a 4 livelli di tensione.
+\item
+  Molto usata per collegare le stazioni radio base della telefonia cellulare.
+\item
+  \textbf{Svantaggi}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{non} supporta la voce analogica sullo stesso filo;
+  \item
+    essendo simmetrica, trasmette nella stessa banda in entrambe le direzioni → crosstalk a \textbf{entrambe} le estremità.
+  \end{itemize}
+\item
+  Usava 2 o 4 doppini; \textbf{HDSL-2} fa lo stesso con \textbf{un solo} doppino.
+\end{itemize}
+
+\section{ADSL (Asymmetric DSL)}
+
+\begin{inbreve}
+
+L'ADSL è la DSL ``di casa'': voce e Internet sullo stesso doppino, con il download molto più veloce dell'upload, perché l'utente tipico scarica molto e carica poco.
+
+\end{inbreve}
+
+\subsection{Caratteristiche}
+
+\begin{itemize}
+\tightlist
+\item
+  Pensata per il \textbf{Video on Demand} (obiettivo fallito), ha poi conquistato l'accesso a Internet.
+\item
+  Il local loop è \textbf{dedicato} all'abbonato: nessuna contesa di banda sul doppino (a differenza del cavo coassiale condiviso).
+\item
+  Trasporta \textbf{passivamente} la voce analogica: il telefono funziona anche se il modem è spento.
+\item
+  \textbf{Asimmetria}: più capacità in downstream che in upstream. L'utente è un consumatore ``passivo'' che scarica, non un server che deve inviare molto.
+\item
+  \textbf{Downstream} = dalla centrale all'utente; \textbf{upstream} = dall'utente alla centrale.
+\end{itemize}
+
+\subsection{Velocità}
+
+\begin{itemize}
+\tightlist
+\item
+  ADSL classica: \textbf{8 Mbit/s} in download su circa \textbf{2 km} di doppino.
+\item
+  \textbf{ADSL2+}: fino a \textbf{24 Mbit/s}, a seconda della distanza dalla centrale.
+\end{itemize}
+
+\subsection{Bande di frequenza}
+
+\begin{inbreve}
+
+Lo spettro del doppino viene diviso in tre fette: la voce in basso, poi una fetta piccola per l'upload, poi una fetta grande per il download.
+
+\end{inbreve}
+
+ADSL standard:
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule\noalign{}
+Uso & Banda \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+POTS (voce) & 0 -- 4 kHz \\
+Banda di guardia & 4 -- 25,875 kHz \\
+Upstream & 25,875 -- 138 kHz \\
+Downstream & 138 -- 1104 kHz \\
+\end{longtable}
+
+La banda di guardia serve perché i filtri non sono ideali: lo spettro della voce ha una coda (\emph{rolloff}) che si spegne verso i 20 kHz.
+
+\subsection{FDD vs Echo cancellation}
+
+\begin{inbreve}
+
+Per far parlare le due direzioni sullo stesso filo ci sono due strade. \textbf{FDD}: ognuno parla nella sua banda. \textbf{Echo cancellation}: si sovrappongono le bande e ogni modem ``sottrae'' la propria eco dal segnale che riceve.
+
+\end{inbreve}
+
+\textbf{FDD} (\emph{Frequency Division Duplexing}, o FDM):
+
+\begin{itemize}
+\tightlist
+\item
+  upstream e downstream in bande \textbf{separate} (circa 25--200 kHz up, 200/250--1000 kHz down nello schema del prof; 25--138 / 138--1104 kHz nello standard).
+\item
+  Semplice. Ed elimina il NEXT (sezione 5): chi riceve il downstream non ``sente'' l'upstream dei vicini, perché è su un'altra banda.
+\end{itemize}
+
+\textbf{Echo cancellation (EC)}:
+
+\begin{itemize}
+\tightlist
+\item
+  il downstream parte anch'esso da 25 kHz e si \textbf{sovrappone} all'upstream;
+\item
+  il modem trasmette e riceve contemporaneamente nella stessa banda e cancella l'eco del proprio segnale con elaborazione numerica;
+\item
+  usa la banda \textbf{in modo più efficiente} (il downstream guadagna le frequenze basse, che si attenuano meno), ma è \textbf{più complesso e costoso};
+\item
+  \textbf{problema}: nella zona sovrapposta il ricevitore downstream subisce il \textbf{NEXT} dagli upstream degli altri doppini (che può eliminare solo per la propria eco, non per quella degli altri).
+\end{itemize}
+
+\section{Crosstalk (diafonia)}
+
+\begin{inbreve}
+
+I doppini dello stesso cavo si comportano come piccole antenne: il segnale di uno ``si sente'' un po' sugli altri. Questo disturbo si chiama crosstalk ed è il nemico numero uno della DSL veloce.
+
+\end{inbreve}
+
+Il crosstalk dipende da:
+
+\begin{itemize}
+\tightlist
+\item
+  la \textbf{densità spettrale di potenza} (PSD) del segnale che disturba;
+\item
+  il \textbf{numero di doppini} nello stesso cavo;
+\item
+  quanto le \textbf{bande si sovrappongono} tra segnale utile e segnali disturbanti.
+\end{itemize}
+
+Cresce con la \textbf{frequenza} → è un problema serio proprio per le DSL veloci, che usano frequenze alte.
+
+Se nello stesso binder convivono tecnologie diverse (POTS, ISDN, HDSL, ADSL, VDSL), ognuna disturba le altre nella zona di spettro che condividono.
+
+\subsection{FEXT (Far-End Crosstalk)}
+
+\begin{inbreve}
+
+Un trasmettitore disturba un ricevitore che sta \textbf{all'altro capo} del cavo.
+
+\end{inbreve}
+
+\begin{itemize}
+\tightlist
+\item
+  TX e RX disturbato sono su lati \textbf{opposti} del cavo.
+\item
+  Il disturbo percorre tutta la linea, quindi arriva \textbf{attenuato} quanto il segnale utile.
+\item
+  Per ADSL i cavi sono ``corti'', quindi l'attenuazione non basta a renderlo trascurabile. Per limitarlo, un cavo di distribuzione di solito non contiene più di una dozzina di doppini.
+\end{itemize}
+
+\subsection{NEXT (Near-End Crosstalk)}
+
+\begin{inbreve}
+
+Un trasmettitore disturba un ricevitore che sta \textbf{dallo stesso lato}, vicinissimo. È il caso peggiore: il disturbo è forte, il segnale utile è debole.
+
+\end{inbreve}
+
+\begin{itemize}
+\tightlist
+\item
+  TX e RX disturbato sono sullo \textbf{stesso lato} del cavo.
+\item
+  Il segnale utile arriva da lontano ed è attenuato; il disturbo nasce a pochi centimetri ed è fortissimo → il rapporto segnale/rumore crolla.
+\item
+  Il NEXT è uno dei motivi per cui ADSL separa in frequenza upstream e downstream (\textbf{FDD}): se ricevi in una banda diversa da quella in cui i vicini trasmettono, il NEXT sparisce.
+\end{itemize}
+
+\subsection{Andamento in frequenza}
+
+Grafico delle funzioni di accoppiamento medie (loop di 1 km):
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{NEXT}: cresce con la frequenza (circa −60 dB a bassa frequenza, circa −25 dB a 11 MHz). Non dipende dalla lunghezza della linea.
+\item
+  \textbf{FEXT}: scende con la frequenza (da circa −65 a −120 dB), perché viaggia lungo tutta la linea e si attenua come il segnale.
+\item
+  \textbf{Canale} (segnale utile): si attenua molto con la frequenza (da circa −10 dB fino a −110 dB).
+\item
+  Oltre circa 1,5 MHz il NEXT supera il segnale utile: ricevere in una banda dove i vicini trasmettono diventa impossibile.
+\end{itemize}
+
+Il grafico \emph{Crosstalk on line} mostra la PSD del rumore indotto su un doppino da 24 HDSL, 24 ISDN e 5 T1 adiacenti, confrontata con il rumore bianco di fondo (AWGN) a −140 dBm/Hz: ISDN e HDSL disturbano le basse frequenze (sotto i 400 kHz), il T1 le alte. Il crosstalk è ben sopra il rumore termico.
+
+\section{Modulazione: CAP e DMT}
+
+\subsection{Richiamo: QAM}
+
+\begin{inbreve}
+
+QAM manda più bit per simbolo variando insieme ampiezza e fase di una portante. Più punti ha la costellazione, più bit per simbolo, ma serve un SNR più alto per non confonderli.
+
+\end{inbreve}
+
+\begin{itemize}
+\tightlist
+\item
+  Ogni simbolo è un punto \((A_k, B_k)\) nel piano: componente in fase e in quadratura.
+\item
+  \textbf{M-QAM} ha \(M\) punti → \(\log_2 M\) bit per simbolo. Es. 16-QAM: 16 punti, 4 bit/simbolo; QPSK = 4-QAM, 2 bit/simbolo; QAM64: 6 bit/simbolo.
+\item
+  Dalla curva BER vs \(E_b/N_0\): per un BER di \(10^{-6}\) servono circa 10,5 dB con M=4, 14,5 con M=16, 19 con M=64, 23,5 con M=256. \textbf{Ogni raddoppio di bit costa SNR.}
+\end{itemize}
+
+\subsection{CAP (Carrier-less Amplitude/Phase)}
+
+\begin{inbreve}
+
+Una QAM su \textbf{una sola} portante che occupa tutta la banda; la portante stessa non viene trasmessa.
+
+\end{inbreve}
+
+\begin{itemize}
+\tightlist
+\item
+  I dati modulano una singola portante (è una QAM).
+\item
+  La portante viene \textbf{soppressa} prima della trasmissione: non porta informazione e il ricevitore può ricostruirla. Da qui \emph{carrier-less}.
+\item
+  Problema: il rumore e l'attenuazione cambiano molto lungo la banda → serve un \textbf{equalizzatore adattivo} complesso.
+\end{itemize}
+
+\subsection{DMT (Discrete Multi-Tone)}
+
+\begin{inbreve}
+
+Invece di una portante larga, DMT usa centinaia di \textbf{piccole sottoportanti} (toni), ognuna con la sua QAM. Su ogni tono si mettono tanti bit se lì la linea è pulita, pochi o zero se è rumorosa.
+
+\end{inbreve}
+
+\begin{itemize}
+\tightlist
+\item
+  La banda ADSL è divisa in \textbf{256 sottocanali} da \textbf{4,3125 kHz}: \(256 \times 4{,}3125 = 1104\) kHz.
+\item
+  Ogni tono è al centro del suo sottocanale ed è modulato \textbf{indipendentemente} in QAM: fino a QAM64 sui toni puliti, giù fino a QPSK su quelli rumorosi.
+\item
+  Schema: un convertitore \textbf{serie-parallelo} divide il flusso di \(R\) bit/s in \(n\) flussi da \(\alpha_i R\) (con \(0 \le \alpha_i \le 1\), \(\sum \alpha_i = 1\)), ognuno modula una portante \(\cos 2\pi f_i t\); i segnali vengono sommati.
+\item
+  I toni troppo disturbati vengono semplicemente \textbf{spenti} (\emph{unused tones}).
+\item
+  La velocità si \textbf{adatta} alle condizioni della linea, tono per tono.
+\item
+  Upstream: toni da circa 32 kHz in su; downstream fino a 1,1 MHz. La potenza tra toni varia al massimo di 3--7 dB.
+\end{itemize}
+
+\textbf{Capacità teorica massima} (max 15 bit/s/Hz per tono, larghezza circa 4 kHz):
+
+\begin{itemize}
+\tightlist
+\item
+  upstream: \(25 \times 15 \times 4 \text{ kHz} = 1{,}5\) Mbit/s
+\item
+  downstream: \(249 \times 15 \times 4 \text{ kHz} \approx 14{,}9\) Mbit/s
+\end{itemize}
+
+\subsection{Water filling}
+
+\begin{inbreve}
+
+È la regola per decidere quanta potenza dare a ogni tono. Immagina di versare acqua in un fondale irregolare: dove il fondale è basso (canale buono) l'acqua è profonda (tanta potenza), dove è alto (canale cattivo) poca o nulla.
+
+\end{inbreve}
+
+\begin{itemize}
+\tightlist
+\item
+  Il ``fondale'' è la curva \((S/N)^{-1}\) in funzione della frequenza: alta dove il canale è cattivo.
+\item
+  Si ``versa'' una quantità d'acqua pari alla \textbf{potenza media di trasmissione} totale. L'acqua si livella a un'altezza \(K\).
+\item
+  La \textbf{profondità} \(p(f_k)\) sopra il tono \(f_k\) è la potenza assegnata a quel tono. I toni dove il fondale supera \(K\) ricevono zero potenza (fuori dalla banda utile \(W\), tra \(f_{min}\) e \(f_{max}\)).
+\item
+  Nota \(p(f_k)\), si ricava il numero di \textbf{bit per simbolo} da usare nella costellazione QAM di quel tono (\emph{bit loading}).
+\end{itemize}
+
+In formule (\emph{complemento, non nelle slide}): con \(N_k\) = rumore e \(g_k\) = guadagno del canale sul tono \(k\),
+
+\[
+p_k = \max\left(0,\ K - \frac{N_k}{g_k}\right), \qquad \sum_k p_k = P_{tot}, \qquad b_k \approx \log_2\left(1 + \frac{p_k\, g_k}{\Gamma N_k}\right)
+\]
+
+dove \(\Gamma\) è un margine (``gap'') che tiene conto del fatto che le modulazioni reali non raggiungono Shannon.
+
+\subsection{CAP vs DMT}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+CAP
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+DMT
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Consumo & Più basso, meno porte logiche & Più alto (picco/medio), gap in calo \\
+Portanti downstream & 1 & 256 \\
+Portanti upstream & 1 & 32 \\
+Granularità della velocità & 320 kbit/s & 32 kbit/s \\
+Equalizzatore adattivo & Necessario & Non serve \\
+Standard & In corso (proprietario Globespan) & ITU e ANSI \\
+\end{longtable}
+
+\begin{itemize}
+\tightlist
+\item
+  DMT è \textbf{più veloce} e si adatta meglio al canale; CAP era più semplice. I progressi dei DSP hanno reso DMT economico: \textbf{DMT è lo standard} (G.992.x) ed è quello usato da ADSL e VDSL.
+\end{itemize}
+
+\section{Architettura ADSL}
+
+\subsection{Modello di riferimento}
+
+\begin{inbreve}
+
+A ogni estremo del doppino c'è uno \textbf{splitter} che separa voce e dati. Lato casa i dati vanno al modem (ATU-R); lato centrale vanno a una scheda del DSLAM (ATU-C), che raccoglie il traffico di tanti utenti e lo manda verso Internet. La voce va allo switch telefonico come sempre.
+
+\end{inbreve}
+
+\begin{center}\includegraphics[width=0.95\linewidth,height=0.4\textheight,keepaspectratio]{lezione-2-2}\end{center}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{ATU-R} (\emph{ADSL Transmission/Termination Unit -- Remote}): il modem ADSL a casa. Detto anche \textbf{NT ADSL} (\emph{Network Termination}).
+\item
+  \textbf{ATU-C} (\emph{ADSL Transmission Unit -- Central office}): il modem lato centrale, uno per abbonato, su una scheda (\emph{line card}) del DSLAM.
+\item
+  \textbf{DSLAM} (\emph{DSL Access Multiplexer}): l'apparato in centrale che raccoglie tanti ATU-C.
+\item
+  \textbf{POTS splitter} (PS): filtro passa-basso/passa-alto che separa voce e dati.
+\item
+  \textbf{CPE} (\emph{Customer Premises Equipment}): gli apparati dell'utente.
+\item
+  I fornitori di contenuti arrivano alla centrale tramite le interfacce \textbf{A4} e \textbf{A9} (definite dall'ADSL Forum).
+\end{itemize}
+
+\subsection{Principi di funzionamento}
+
+Due servizi sullo stesso filo:
+
+\begin{itemize}
+\tightlist
+\item
+  accesso \textbf{trasparente} alla voce tradizionale: lo splitter manda le frequenze \textbf{sotto 3400 Hz} al cablaggio telefonico di casa;
+\item
+  servizio dati ad alta velocità: le frequenze \textbf{sopra} la banda vocale vanno all'ATU-R.
+\end{itemize}
+
+\subsection{ATU-C e ATU-R}
+
+Sono due \textbf{modem} che dialogano a livello fisico. Si occupano di:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{allocazione delle frequenze}: POTS sotto 3400 Hz, upstream 25--200 kHz, downstream 25 (EC) o 250 (FDM) fino a 1000 kHz;
+\item
+  \textbf{echo cancellation} (se usata): entrambi parlano contemporaneamente, più efficiente di FDM ma più complesso e costoso;
+\item
+  \textbf{rate adaptation}: adattare la velocità alla linea;
+\item
+  \textbf{gestione}: statistiche (SNR a livello fisico, conteggio pacchetti a livello rete), aggiornamenti software, gestione remota da parte dell'operatore.
+\end{itemize}
+
+L'ATU-R supporta anche una topologia \emph{multidrop} (più dispositivi in casa).
+
+\subsection{DSLAM}
+
+Funzioni:
+
+\begin{itemize}
+\tightlist
+\item
+  ospitare un insieme di ATU-C;
+\item
+  \textbf{multiplexare} il traffico degli utenti verso la rete (e demultiplexarlo in senso inverso);
+\item
+  \textbf{negoziare} la velocità di linea;
+\item
+  fare da \textbf{piattaforma di gestione} centrale.
+\end{itemize}
+
+Può stare in centrale, in un sito vicino, in un terminale remoto (armadio) o presso il cliente. Un DSLAM gestisce fino a qualche centinaio di linee.
+
+\subsection{Interfacce verso il PC (CPE)}
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule\noalign{}
+Interfaccia & Velocità & Note \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+10BaseT (Ethernet) & 10 Mbit/s su 100 m & Diffusissima sui PC \\
+ATM25 & 25 Mbit/s su 100 m & Punto-punto, rara, costosa \\
+USB & 12 Mbit/s fino a 30 m & Diffusa sui PC più recenti \\
+Wi-Fi & -- & Oggi la più comune \\
+\end{longtable}
+
+\subsection{Splitter}
+
+\begin{inbreve}
+
+Lo splitter è un filtro passivo con due uscite: una passa-basso verso i telefoni, una passa-alto verso il modem.
+
+\end{inbreve}
+
+\begin{itemize}
+\tightlist
+\item
+  Deve garantire la voce come \textbf{servizio salvavita} (\emph{lifeline}): il telefono deve funzionare anche senza corrente → filtro \textbf{passivo}.
+\item
+  Deve bloccare il \textbf{rumore impulsivo} del telefono (es. lo squillo, che è un segnale ad alta tensione) verso la DSL.
+\item
+  Non è semplicemente un passa-basso {[}0, 25 kHz{]} seguito da un passa-banda {[}25, 1104 kHz{]}, ma un filtro \textbf{multibanda} (ibrido).
+\end{itemize}
+
+Configurazioni in casa:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Splittered}: un unico splitter all'ingresso della linea; dopo, il cablaggio è separato per telefono e modem.
+\item
+  \textbf{Distributed splitters (microfiltri)}: nessuno splitter centrale; ogni telefono ha il suo \textbf{filtro passa-basso} (PB) sulla presa, e il modem ha il \textbf{passa-alto} (PA) integrato.
+\item
+  \textbf{Splitterless (G.lite)}: nessun filtro; ADSL ridotta, più robusta ai disturbi del telefono.
+\end{itemize}
+
+\subsection{Negoziazione e adattamento della velocità}
+
+\begin{itemize}
+\tightlist
+\item
+  All'accensione ATU-R e ATU-C \textbf{negoziano} il bit rate: quattro opzioni iniziali, multipli di \textbf{32 kbit/s}. L'intera fase (\emph{training/retraining}) dura \textbf{12--20 s}: è il tempo che il modem ci mette ad ``agganciare'' la portante.
+\item
+  \textbf{Autoconfigurazione}: vengono configurati sull'ATU-R indirizzi IP e filtri software.
+\item
+  \textbf{Rate adaptation}, vantaggi: velocità più alta per chi ha un buon doppino; copertura di distanze maggiori per l'operatore.
+\item
+  Sfide tecniche: quali metriche e algoritmi usare, accordo tra ATU di produttori diversi, sincronizzazione. Sfide commerciali: come fissare prezzi e garanzie di banda se la velocità dipende dalla linea?
+\end{itemize}
+
+\subsection{Esempio: pagina di stato di un modem ADSL}
+
+Dallo screenshot del prof (gateway Technicolor):
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Parametro
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Valore (up / down)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Significato
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Tipo DSL & ITU-T G.992.5 & ADSL2+ \\
+Banda & 1.022 / 2.042 kbit/s & Velocità negoziata (profilo commerciale limitato) \\
+Potenza di output & 12,0 / 19,2 dBm & Potenza trasmessa dai due lati \\
+Attenuazione linea & 19,7 / 35,5 dB & Più alta in down: usa frequenze più alte, che si attenuano di più. Cresce con la distanza \\
+Margine SN & 6,9 / 10,3 dB & SNR di riserva rispetto al minimo necessario: più è alto, più la linea è stabile \\
+Errori FEC & 0 / 7.703 & Errori corretti dal codice a correzione d'errore \\
+Errori CRC / HEC & 0 / 0 & Errori non correggibili (nessuno) \\
+\end{longtable}
+
+\section{Stack protocollare ADSL}
+
+\begin{inbreve}
+
+Sopra il livello fisico ADSL, storicamente i dati viaggiano in celle \textbf{ATM}; dentro ATM c'è una sessione \textbf{PPP} tra utente e operatore, e dentro PPP c'è IP.
+
+\end{inbreve}
+
+Stack tipico dal client verso Internet:
+
+\begin{verbatim}
+Client                     Telco CO / DSLAM        BRAS (session mgmt)     Internet
+Upper layers  ─────────────────────────────────────────────────────────────  Upper layers
+IP            ─────────────────────────────────────────────  IP  ──────────  IP
+PPP           ─────────────────────────────────────────────  PPP
+AAL5          ─────────────────────────────────────────────  AAL5
+ATM           ────────────────────  ATM  ──────────────────  ATM
+ADSL          ────────────────────  ADSL
+\end{verbatim}
+
+\begin{itemize}
+\tightlist
+\item
+  Il \textbf{DSLAM} lavora solo fino a ATM: commuta le celle dal doppino verso la rete ATM.
+\item
+  Il \textbf{PPP} viene terminato più avanti, dal server di gestione delle sessioni dell'ISP (il router che fa autenticazione e assegna l'IP).
+\item
+  \textbf{AAL5}: livello di adattamento ATM che spezza i pacchetti in celle da 53 byte e li ricompone.
+\end{itemize}
+
+\subsection{Lato utente: tre configurazioni}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{PC con scheda ATM/ADSL}: il PC fa tutto lo stack (TCP/IP → incapsulamento → AAL5/ATM → ADSL).
+\item
+  \textbf{Modem bridge}: il PC parla Ethernet; il modem fa da ponte incapsulando le trame Ethernet in ATM (\textbf{RFC 1483}). Il PC vede la rete come una LAN.
+\item
+  \textbf{Modem router}: il modem fa \textbf{routing IP} (è il classico router di casa): termina lui la sessione verso l'ISP, il PC parla solo Ethernet/Wi-Fi con il router.
+\end{itemize}
+
+\subsection{Lato rete}
+
+Due varianti (dal Pattavina):
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{PPP su ATM}: ATU-R → DSLAM → rete ATM → router dell'ISP, dove si termina PPP/AAL5 e si passa sulla rete IP.
+\item
+  \textbf{PPP su Ethernet su ATM}: stesso percorso, ma tra AAL5 e PPP ci sono LLC/SNAP e MAC Ethernet; il router si collega poi a una rete Frame Relay (Q.922).
+\end{itemize}
+
+\section{VDSL e VDSL2}
+
+\subsection{VDSL}
+
+\begin{inbreve}
+
+VDSL spinge il doppino al limite usando frequenze fino a decine di MHz. Funziona solo su tratte di rame cortissime, quindi la fibra deve arrivare fino all'armadio vicino casa.
+
+\end{inbreve}
+
+\begin{itemize}
+\tightlist
+\item
+  Spinge al limite ciò che si può trasmettere su doppini di rame calibro 24.
+\item
+  \textbf{Regola d'oro}: la velocità massima si ottiene con il rame \textbf{più corto possibile}.
+\end{itemize}
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule\noalign{}
+Upstream & Downstream & Distanza \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+12,96 Mbit/s & 12,96 Mbit/s & 1000 m \\
+2 Mbit/s & 25,92 Mbit/s & 1000 m \\
+25,84 Mbit/s & 25,92 Mbit/s & 300 m \\
+2 Mbit/s & 51,84 Mbit/s (STS-1) & 300 m \\
+\end{longtable}
+
+Nota: VDSL può essere sia \textbf{simmetrica} sia \textbf{asimmetrica}.
+
+\subsection{Architettura: fibra + rame corto}
+
+\begin{itemize}
+\tightlist
+\item
+  Dalla centrale parte \textbf{fibra ottica} fino a una \textbf{ONU} (\emph{Optical Network Unit}), che converte da ottico a elettrico.
+\item
+  Dall'ONU parte il \textbf{doppino} (corto) fino a casa, dove c'è lo splitter (S) e il modem \textbf{NT VDSL}.
+\item
+  Nella ONU c'è il modem lato rete, detto \textbf{VTU-O} (\emph{VDSL Transmission Unit -- ONU}); a casa il \textbf{VTU-R}.
+\end{itemize}
+
+Due configurazioni tipiche, a seconda di dove sta l'ONU:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{FTTEx} (\emph{Fiber To The Exchange}): ONU nella centrale locale. Il rame parte da lì e passa per il \textbf{feeder cable} (200--2000 coppie).
+\item
+  \textbf{FTTCab} (\emph{Fiber To The Cabinet}): ONU nell'armadio stradale. Il rame è solo \textbf{distribution cable} (25--50 coppie) + \textbf{drop cable} (2--5 coppie) fino a casa. È la configurazione italiana della ``fibra misto rame''.
+\end{itemize}
+
+Nella centrale c'è l'\textbf{OLT} (\emph{Optical Line Terminal}) dentro l'\textbf{AN} (\emph{Access Network}): il confine tra rete core e rete d'accesso.
+
+\subsection{Spettro VDSL: FDD vs TDD}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{FDD}: bande separate. Dopo POTS e ISDN, upstream da 300--600 kHz, poi downstream, poi un'altra banda upstream (per i sistemi simmetrici), fino a circa 17 MHz.
+\item
+  \textbf{TDD} (\emph{Time Division Duplexing}): upstream e downstream usano la \textbf{stessa banda} (da 300--600 kHz fino a 11 MHz), ma in \textbf{istanti diversi}: si alternano nel tempo.
+\end{itemize}
+
+\subsection{ADSL vs VDSL}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Tecnologia
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Banda
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Velocità max
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Portanti DMT
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+ADSL & 25 kHz -- 1,1 MHz & 0,8 up / 8 down Mbit/s & 256 da 4,3125 kHz \\
+ADSL2+ & 25 kHz -- 2,2 MHz & 1 up / 24 down (29 con Amend. 1) & 512 da 4,3125 kHz \\
+VDSL & 25 kHz -- 12 MHz & 15 up / 55 down & 2782 da 4,3125 kHz \\
+VDSL2 & 25 kHz -- 30 MHz (profilo 17a: 17,66 MHz) & 100 up / 100 down & 4096 da 4,3125 kHz o 3478 da 8,625 kHz \\
+\end{longtable}
+
+\textbf{Schema}: la spaziatura dei toni resta 4,3125 kHz; ad allargare la banda si aggiungono toni. ADSL2+ raddoppia la banda di ADSL (512 toni invece di 256), quindi raddoppia circa il downstream sulle linee corte.
+
+\subsection{Famiglia xDSL: standard ITU}
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule\noalign{}
+Famiglia & Racc. ITU & Nome & Anno & Max (Mbit/s) \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+ADSL & G.992.1 & G.dmt & 1999 & 7 down / 0,8 up \\
+ADSL2 & G.992.3 & G.dmt.bis & 2002 & 8 down / 1 up \\
+ADSL2+ & G.992.5 & ADSL2plus & 2003 & 24 down / 1 up \\
+ADSL-RE & G.992.3 & Reach Extended & 2003 & 8 down / 1 up \\
+SHDSL & G.991.2 & G.SHDSL & 2003 & 5,6 simmetrica \\
+VDSL & G.993.1 & Very-high-data-rate DSL & 2004 & 55 down / 15 up \\
+VDSL2-LR & G.993.2 & VDSL2 Long Reach & 2005 & 55 down / 30 up \\
+VDSL2-SR & G.993.2 & VDSL2 Short Reach & 2005 & 100 simmetrica \\
+\end{longtable}
+
+\subsection{Evoluzione}
+
+\begin{itemize}
+\tightlist
+\item
+  Velocità nel tempo (scala logaritmica): modem in banda vocale da V.26 (circa 2,4 kbit/s, anni '60) a V.90 (56 kbit/s); poi ISDN (160 kbit/s, 1985), HDSL, ADSL (8 Mbit/s, 1995), VDSL, VDSL2 e \textbf{vectoring} che arriva a 100 Mbit/s intorno al 2010.
+\item
+  Velocità vs distanza (limiti teorici): ADSL piatta a 8 Mbit/s fino a 3 km, ADSL2 a 12, ADSL2+ a 26 Mbit/s fino a circa 1 km; VDSL circa 50 Mbit/s fino a 500 m, VDSL2 fino a 100 Mbit/s ma solo nelle prime centinaia di metri. \textbf{Oltre circa 2 km tutte le curve coincidono}: su linee lunghe le frequenze alte sono inutilizzabili e VDSL non dà vantaggi rispetto ad ADSL2+.
+\end{itemize}
+
+\section{Vectoring}
+
+\begin{inbreve}
+
+In VDSL2 il disturbo principale è il crosstalk tra i doppini dello stesso cavo. Il vectoring lo \textbf{misura} e poi lo \textbf{cancella}, aggiungendo a ogni segnale un ``anti-segnale'' che annulla il disturbo che arriverà dai vicini.
+
+\end{inbreve}
+
+\begin{itemize}
+\tightlist
+\item
+  In VDSL2 il crosstalk (in particolare il FEXT, alle alte frequenze) è il \textbf{disturbo dominante}, non il rumore termico.
+\item
+  Il vectoring fa \textbf{cancellazione del rumore}: misura il crosstalk di ogni linea su tutte le altre del binder e lo cancella con un segnale in \textbf{opposizione di fase}.
+\item
+  Richiede:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{sincronizzazione} completa di tutte le linee del sistema vettorizzato (tutte sullo stesso DSLAM);
+  \item
+    \textbf{condivisione} dei campioni di dati tra tutte le linee;
+  \item
+    il \textbf{calcolo} degli anti-segnali;
+  \item
+    un meccanismo di \textbf{stima} dei coefficienti di crosstalk.
+  \end{itemize}
+\item
+  Standard: \textbf{ITU-T G.993.5 (G.vector)}, per l'interoperabilità DSLAM/CPE.
+\end{itemize}
+
+\textbf{Due direzioni}:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Downstream → precoding}: il DSLAM sa cosa sta per trasmettere su tutte le linee. Se la linea 2 disturberà la linea 1 con coefficiente \(G_{21}\), il DSLAM sottrae in anticipo \(G_{21} \cdot \text{Data}_2\) dal segnale della linea 1. Lungo il cavo il disturbo si somma e si annulla: al CPE1 arriva pulito.
+\item
+  \textbf{Upstream → postcoding}: il DSLAM riceve tutte le linee insieme e sottrae dal segnale della linea 1 il contributo stimato della linea 2 \textbf{dopo} la ricezione.
+\end{itemize}
+
+\textbf{Come si stimano i coefficienti} (\emph{vectoring principle}):
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Il DSLAM/MSAN vettorizzato manda \textbf{segnali di test} su ogni linea.
+\item
+  Ogni modem misura cosa riceve.
+\item
+  I modem rimandano al DSLAM la \textbf{differenza} tra il segnale ricevuto e quello di test atteso (cioè il crosstalk subito).
+\item
+  Il DSLAM calcola i coefficienti di crosstalk.
+\item
+  Il DSLAM trasmette il segnale di lavoro \textbf{precodificato}.
+\item
+  Il modem riceve il segnale pulito.
+\end{enumerate}
+
+\textbf{Guadagno} (dal grafico, downstream): a 200 m da circa 55 Mbit/s senza vectoring a circa 85 con il 50\% delle linee vettorizzate e circa \textbf{112 Mbit/s} con tutte le linee vettorizzate. Il guadagno cala con la distanza (a circa 1 km le curve si avvicinano). Se una parte delle linee del cavo non è vettorizzata, il loro crosstalk non può essere cancellato: per questo serve che tutte le linee del binder siano sullo stesso DSLAM.
+
+\section{Sfide per xDSL}
+
+Tecniche:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Loop qualification}: capire prima se un doppino regge il servizio.
+\item
+  \textbf{Crosstalk}: il mezzo è condiviso → perdita di QoS.
+\item
+  \textbf{Bridged taps} (derivazioni a Y): rami di doppino aperti lasciati da vecchie installazioni; creano \textbf{eco/riflessioni} che degradano la DSL.
+\item
+  Alimentazione dei \textbf{terminali remoti} (armadi con ONU/DSLAM).
+\item
+  \textbf{Spectral masking}: limiti di potenza per banda per non disturbare altri servizi.
+\item
+  \textbf{Rumore impulsivo}.
+\item
+  Manutenzione dell'ATU-R a casa del cliente.
+\end{itemize}
+
+\section{Appendice: PPP (Point-to-Point Protocol)}
+
+\subsection{Cos'è}
+
+\begin{inbreve}
+
+PPP è un protocollo di livello 2 per collegamenti punto-punto. In ADSL crea la ``sessione'' tra l'utente e l'ISP: autentica l'utente (username/password), gli assegna l'indirizzo IP e trasporta i pacchetti.
+
+\end{inbreve}
+
+\begin{itemize}
+\tightlist
+\item
+  Progettato per link semplici che trasportano pacchetti tra \textbf{due peer}.
+\item
+  \textbf{Multiplexa} più protocolli di livello rete sullo stesso link (IP, IPX, \ldots).
+\item
+  Con ADSL è usato perché collega direttamente l'utente all'ISP e offre \textbf{autenticazione, autorizzazione, configurazione automatica} delle interfacce (IP, DNS).
+\item
+  In gran parte d'Europa ADSL è basata su ATM → \textbf{PPPoA} (PPP over ATM). In alternativa PPP viaggia in trame Ethernet → \textbf{PPPoE} (PPP over Ethernet).
+\end{itemize}
+
+\subsection{Architettura: LCP e NCP}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{LCP} (\emph{Link Control Protocol}): apre, configura, controlla e chiude il \textbf{link}. Negozia i parametri (tipo di autenticazione, compressione, \ldots) e gestisce l'autenticazione.
+\item
+  \textbf{NCP} (\emph{Network Control Protocol}): una famiglia di protocolli, \textbf{uno per ogni protocollo di rete}, che configurano il livello 3. Es. \textbf{IPCP} configura IP (assegna l'indirizzo), IPXCP per IPX.
+\end{itemize}
+
+\subsection{Formato della trama}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.1429}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Flag
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Address
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Control
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Protocol
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Information
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Check (FCS)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Flag
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+1 byte & 1 byte & 1 byte & 1 o 2 byte & variabile & 2 o 4 byte & 1 byte \\
+01111110 & 11111111 & 00000011 & es. IP, LCP & datagramma & CRC & 01111110 \\
+\end{longtable}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Flag} (0x7E): delimita l'inizio e la fine della trama.
+\item
+  \textbf{Address} (0xFF) e \textbf{Control} (0x03): fissi, ereditati da HDLC. Su un link punto-punto non servono, infatti si possono comprimere.
+\item
+  \textbf{Protocol}: dice cosa c'è nel campo Information (es. 0x0021 = IP, 0xC021 = LCP, 0x8021 = IPCP; \emph{valori come complemento}).
+\item
+  \textbf{Information}: il datagramma, da 0 byte fino alla \textbf{MRU} (\emph{Maximum Receive Unit}), di default \textbf{1500 byte} ma negoziabile. Può avere padding fino alla MRU.
+\item
+  \textbf{Check}: codice di controllo d'errore.
+\end{itemize}
+
+\subsection{Fasi del link}
+
+\begin{center}\includegraphics[width=0.95\linewidth,height=0.4\textheight,keepaspectratio]{lezione-2-3}\end{center}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Dead}: nessun link. Quando la linea fisica si attiva si passa a Establishment.
+\item
+  \textbf{Establishment}: LCP negozia i parametri.
+\item
+  \textbf{Authentication}: PAP o CHAP.
+\item
+  \textbf{Network}: NCP configura il livello 3 (es. IPCP assegna l'IP); da qui passano i dati.
+\item
+  \textbf{Termination}: chiusura con LCP, poi si torna a Dead.
+\end{enumerate}
+
+\subsection{Link establishment}
+
+Opzioni negoziate da LCP:
+
+\begin{itemize}
+\tightlist
+\item
+  dimensione della \textbf{MRU};
+\item
+  se e con quale protocollo \textbf{autenticarsi};
+\item
+  \textbf{compressione} del campo Protocol e dei campi Address/Control;
+\item
+  \textbf{monitoraggio della qualità} del link;
+\item
+  \textbf{magic number}: numero casuale per scoprire se il link è in \textbf{loop} (se ricevi il tuo stesso magic number, stai parlando con te stesso).
+\end{itemize}
+
+Scambio: un peer manda \textbf{Configure-Request} con le opzioni volute; l'altro risponde \textbf{Configure-Ack} se le accetta, \textbf{Configure-Nak} se non sono accettabili, proponendo valori alternativi.
+
+\subsection{Autenticazione: PAP vs CHAP}
+
+\begin{inbreve}
+
+PAP manda la password in chiaro. CHAP non la manda mai: il server lancia una sfida e il client risponde con un hash calcolato a partire dalla password.
+
+\end{inbreve}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{PAP} (\emph{Password Authentication Protocol}): il client manda ``username password'' in chiaro; il server risponde accept/reject. Chi intercetta legge la password.
+\item
+  \textbf{CHAP} (\emph{Challenge Handshake Authentication Protocol}): il server manda una \textbf{challenge} (numero casuale); il client risponde con un \textbf{hash a senso unico} calcolato su challenge e segreto condiviso; il server lo verifica e risponde accept/reject.
+\item
+  \textbf{CHAP è più sicuro}: la password non viaggia mai, e la challenge sempre diversa impedisce il replay.
+\end{itemize}
+
+\section{Domande di ripasso}
+
+\begin{approfondimento}{Perché il modem analogico è limitato a circa 56 kbit/s mentre ADSL
+arriva a megabit sullo stesso filo?}
+
+Perché il modem passa per lo switch voce, che filtra a 3,4 kHz: con Shannon e SNR di 40 dB la capacità è circa 45 kbit/s. ADSL invece collega il doppino al DSLAM tramite lo splitter e usa la banda fino a 1,1 MHz (o più), quindi \(W\) è centinaia di volte più grande.
+
+\end{approfondimento}
+
+\begin{approfondimento}{Differenza tra NEXT e FEXT, e quale è peggiore?}
+
+NEXT: disturbatore e vittima sullo stesso lato del cavo; FEXT: su lati opposti. Il NEXT è peggiore perché il disturbo non è attenuato mentre il segnale utile sì. Si combatte separando in frequenza le due direzioni (FDD). Il FEXT si attenua lungo la linea ed è quello che il vectoring cancella in VDSL2.
+
+\end{approfondimento}
+
+\begin{approfondimento}{Perché DMT ha vinto su CAP?}
+
+DMT divide la banda in toni indipendenti: ogni tono ha la sua QAM e il suo numero di bit (water filling / bit loading), i toni rumorosi si spengono, non serve un equalizzatore adattivo complesso e la velocità si regola a passi di 32 kbit/s. Con DSP economici il maggior consumo di DMT non è più un problema. È lo standard ITU/ANSI.
+
+\end{approfondimento}
+
+\begin{approfondimento}{Perché VDSL richiede la fibra fino all'armadio?}
+
+VDSL usa frequenze fino a 12--30 MHz, che sul rame si attenuano moltissimo: oltre 1--2 km sono inutilizzabili e VDSL non dà più di ADSL2+. Portando la fibra all'ONU nell'armadio (FTTCab), il tratto in rame si riduce a poche centinaia di metri.
+
+\end{approfondimento}
+
+\begin{approfondimento}{Calcola la capacità teorica downstream e upstream di ADSL DMT}
+
+Up: 25 toni × 15 bit/s/Hz × 4 kHz = 1,5 Mbit/s. Down: 249 toni × 15 × 4 kHz ≈ 14,9 Mbit/s.
+
+\end{approfondimento}
+
+\begin{approfondimento}{Perché CHAP è più sicuro di PAP?}
+
+PAP trasmette la password in chiaro; CHAP trasmette solo l'hash di una challenge casuale combinata col segreto, quindi chi intercetta non ottiene la password né può riusare la risposta.
+
+\end{approfondimento}
+
+\section{Riepilogo}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{xDSL} = dati digitali sul doppino telefonico, usando frequenze sopra la voce. Il limite dei 56k era il filtro voce, non il rame.
+\item
+  La velocità \textbf{crolla con la distanza} e con il \textbf{crosstalk} (NEXT: stesso lato, peggiore; FEXT: lato opposto).
+\item
+  \textbf{ADSL}: asimmetrica, voce + dati sullo stesso filo; POTS 0--4 kHz, up 25--138 kHz, down 138--1104 kHz; 8 Mbit/s (ADSL2+: 24). FDD o echo cancellation.
+\item
+  \textbf{DMT}: 256 toni da 4,3125 kHz, ognuno con la sua QAM; \textbf{water filling} decide potenza e bit per tono. Ha battuto CAP.
+\item
+  \textbf{Architettura}: splitter (passivo, lifeline) → ATU-R ↔ doppino ↔ splitter → ATU-C nel \textbf{DSLAM} → rete ATM → ISP. Negoziazione del bit rate in 12--20 s.
+\item
+  \textbf{Stack}: IP / PPP / AAL5 / ATM / ADSL (PPPoA), oppure PPPoE.
+\item
+  \textbf{VDSL/VDSL2}: fino a 12/30 MHz, 55--100 Mbit/s, solo su rame corto → fibra fino all'armadio (FTTCab). FDD o TDD.
+\item
+  \textbf{Vectoring} (G.993.5): stima il crosstalk e lo cancella con precoding (down) e postcoding (up).
+\item
+  \textbf{PPP}: LCP (link) + NCP (rete, es. IPCP); fasi Dead → Establishment → Authentication → Network → Termination; PAP in chiaro, CHAP con challenge-hash.
+\end{itemize}

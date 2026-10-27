@@ -1,3 +1,0 @@
-# Kathará (appunti veloci)
-
-nano lab.conf x creare file dove metti pc e router

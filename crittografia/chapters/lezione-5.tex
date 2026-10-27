@@ -1,0 +1,666 @@
+\chapter{Lezione 5 -- Pseudocasualità, PRG e hard-core bit}
+
+\emph{Segue gli appunti del prof. Le parti aggiunte per capire meglio sono segnate ``non negli appunti del prof''. Usa i concetti della Lezione 4: avversario PPT, funzioni trascurabili, one-way function.}
+
+\section{Pseudocasualità}
+
+\begin{inbreve}
+
+Una funzione \textbf{pseudocasuale} è una funzione \textbf{deterministica} che prende una stringa uniforme (corta) e restituisce \textbf{tanti bit} che ``sembrano'' casuali. ``Sembrano'' ha un significato preciso: \textbf{nessun avversario PPT riesce a distinguerli da bit davvero casuali}, se non con probabilità trascurabile.
+
+\end{inbreve}
+
+\textbf{Il collegamento con la lezione 3} \emph{(non negli appunti del prof)}: l'estrattore tira fuori pochi bit puliti da una fonte sporca; la funzione pseudocasuale li usa come seme e ne genera quanti ne servono. È il passo 2 (``espansione'') visto nella lezione 3.
+
+\begin{verbatim}
+fonte sporca → [Estrattore] → seme (pochi bit casuali) → [PRG] → tanti bit pseudocasuali
+\end{verbatim}
+
+\section{Indistinguibilità computazionale}
+
+\begin{inbreve}
+
+Due distribuzioni sono \textbf{computazionalmente indistinguibili} (\(\approx_c\)) se nessun avversario PPT riesce a capire da quale delle due viene un campione, se non con vantaggio trascurabile. È la versione ``per avversari efficienti'' della distanza statistica della lezione 3.
+
+\end{inbreve}
+
+\subsection{Ensemble di distribuzioni}
+
+Con la sicurezza computazionale tutto dipende dal parametro \(\lambda\) (più è grande, più l'avversario fatica). Per questo non si confrontano due distribuzioni singole, ma due \textbf{famiglie} di distribuzioni, una per ogni valore di \(\lambda\):
+
+\[
+X = \{X_\lambda\}_{\lambda \in \mathbb{N}} \qquad Y = \{Y_\lambda\}_{\lambda \in \mathbb{N}}
+\]
+
+\begin{nota}
+
+\textbf{Cosa vuol dire} \emph{(non negli appunti del prof)}: \(X_\lambda\) è un modo di generare stringhe casuali che dipende da \(\lambda\). Una famiglia così si chiama \textbf{ensemble}. Esempio: \(\{U_\lambda\}\), dove \(U_\lambda\) è la distribuzione \textbf{uniforme} su stringhe di \(\lambda\) bit (\(U_1\) su 1 bit, \(U_2\) su 2 bit, \ldots).
+
+\end{nota}
+
+\subsection{Definizione (del prof)}
+
+\(X \approx_c Y\) se per ogni avversario PPT \(A\):
+
+\[
+\Big| \Pr[A(X_\lambda) = 1] - \Pr[A(Y_\lambda) = 1] \Big| \le \text{negl}(\lambda)
+\]
+
+dove \(\Pr[A(X_\lambda) = 1]\) è un'abbreviazione per \(\Pr[A(z) = 1 : z \leftarrow X_\lambda]\).
+
+\begin{nota}
+
+\textbf{Cosa sono le cose}
+
+\begin{itemize}
+\tightlist
+\item
+  \(A\) = un programma efficiente (il \textbf{distinguisher}) che riceve una stringa \(z\) e risponde 1 (``secondo me viene da \(Y\)'') o 0 (``secondo me viene da \(X\)''). È l'assaggiatore alla cieca.
+\item
+  \(z \leftarrow X_\lambda\) = ``\(z\) è estratta dalla distribuzione \(X_\lambda\)''.
+\item
+  \(\Pr[A(z) = 1 : z \leftarrow X_\lambda]\) = quanto spesso \(A\) risponde 1 quando la stringa viene da \(X\). I due punti si leggono ``nella situazione in cui''.
+\item
+  La differenza in valore assoluto è il \textbf{vantaggio} di \(A\): quanto cambia il suo comportamento a seconda della provenienza della stringa.
+\item
+  \(\le \text{negl}(\lambda)\) = il vantaggio deve essere trascurabile, e questo per \textbf{ogni} \(A\) PPT.
+\end{itemize}
+
+\end{nota}
+
+\begin{esempio}
+
+\textbf{Esempi di vantaggio} \emph{(non negli appunti del prof)}: \(A\) dice 1 il 50\% delle volte con \(X\) e il 50\% con \(Y\): vantaggio 0, non distingue. \(A\) dice 1 il 10\% con \(X\) e il 90\% con \(Y\): vantaggio 0,8, distingue benissimo.
+
+\end{esempio}
+
+\subsection{La stessa cosa come gioco}
+
+\(\text{GAME}(\lambda, b)\), con \(b \in \{0, 1\}\):
+
+\begin{verbatim}
+Avversario A                          Challenger C
+                                      se b = 0: z ← X_λ
+                                      se b = 1: z ← Y_λ
+      ←──────────── z ─────────────
+      ──────── b' ∈ {0,1} ─────────→
+\end{verbatim}
+
+Il challenger estrae \(z\) da \(X_\lambda\) (se \(b = 0\)) o da \(Y_\lambda\) (se \(b = 1\)) e lo dà ad \(A\), che risponde con \(b'\). La definizione diventa:
+
+\[
+\{\text{GAME}(\lambda, 0)\} \approx_c \{\text{GAME}(\lambda, 1)\}
+\]
+
+cioè la risposta di \(A\) ha (quasi) la stessa distribuzione nei due giochi. È lo stesso schema di GAME(0)/GAME(1) della lezione 2.
+
+\subsection{Esempio concreto: due macchine}
+
+\emph{(Non negli appunti del prof.)}
+
+\textbf{Lo scenario.} Ci sono due ``macchine'' che producono stringhe di bit: la macchina \(X\) (es. l'uscita di un generatore pseudocasuale) e la macchina \(Y\) (es. bit davvero casuali). Ad \(A\) viene data \textbf{una} stringa e deve dire da quale macchina viene: risponde 1 (``viene da \(Y\)'') o 0 (``viene da \(X\)''). La domanda è: \textbf{esiste un} \(A\) \textbf{che si comporta in modo diverso a seconda della macchina da cui arriva la stringa?}
+
+\textbf{Caso 1: un generatore scarso.}
+
+\begin{itemize}
+\tightlist
+\item
+  Macchina \(X\): produce 2 bit, ma sempre \textbf{uguali} tra loro: 00 oppure 11, metà e metà.
+\item
+  Macchina \(Y\): produce 2 bit davvero casuali: 00, 01, 10, 11, ognuno al 25\%.
+\item
+  Regola di \(A\): \textbf{``rispondi 1 se i due bit sono diversi''}.
+\end{itemize}
+
+Quanto spesso \(A\) risponde 1?
+
+\begin{itemize}
+\tightlist
+\item
+  Se la stringa viene da \(X\): i bit sono sempre uguali, quindi \textbf{mai}: \(\Pr[A(z) = 1 : z \leftarrow X] = 0\)
+\item
+  Se la stringa viene da \(Y\): i bit sono diversi in 01 e 10, metà dei casi: \(\Pr[A(z) = 1 : z \leftarrow Y] = 1/2\)
+\end{itemize}
+
+\textbf{Vantaggio} \(= |0 - 1/2| = 1/2\). \(A\) si comporta in modo molto diverso nei due casi, quindi \textbf{distingue} le due macchine: questo generatore \textbf{non} è indistinguibile da bit casuali (\(X \not\approx_c Y\)).
+
+\textbf{Caso 2: un generatore buono.} Ora \(X\) è un buon PRG. Qualunque regola efficiente \(A\) provi, risponde 1 \textbf{quasi con la stessa frequenza} nei due casi, ad esempio:
+
+\begin{itemize}
+\tightlist
+\item
+  \(\Pr[A \text{ risponde } 1 \text{ con } X] = 0{,}5000000001\)
+\item
+  \(\Pr[A \text{ risponde } 1 \text{ con } Y] = 0{,}5\)
+\end{itemize}
+
+Il vantaggio è \(0{,}0000000001\), trascurabile. Se questo vale per \textbf{ogni} \(A\) efficiente, allora \(X \approx_c Y\).
+
+\textbf{La formula letta in italiano}: \emph{``per ogni programma efficiente} \(A\)\emph{, la frequenza con cui} \(A\) \emph{dice 1 sulle stringhe di} \(X\) \emph{e quella con cui dice 1 sulle stringhe di} \(Y\) \emph{differiscono di una quantità trascurabile''}. \(\lambda\) è la lunghezza delle stringhe: il vantaggio deve diventare trascurabile al crescere di \(\lambda\).
+
+\textbf{Il gioco è la stessa cosa}: il challenger tira una moneta \(b\); se \(b = 0\) prende la stringa dalla macchina \(X\), se \(b = 1\) dalla macchina \(Y\), e la dà ad \(A\), che risponde \(b'\) (il suo tentativo di indovinare \(b\)). ``GAME(λ, 0) ≈c GAME(λ, 1)'' vuol dire che \(A\) dice 1 con quasi la stessa frequenza sia quando la stringa viene da \(X\) sia quando viene da \(Y\): è esattamente la formula. Nella Lezione 2 le due macchine erano ``cifra \(m_0\)'' e ``cifra \(m_1\)''.
+
+\subsection{Statistica vs computazionale}
+
+\emph{(Non negli appunti del prof.)}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Statistica (lezione 3)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Computazionale
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Simbolo & \(X \approx_\varepsilon Y\) & \(X \approx_c Y\) \\
+Chi prova a distinguere & Chiunque, anche con potenza infinita & Solo avversari PPT \\
+Vantaggio ammesso & Al più un numero fissato ε & Una funzione trascurabile di λ \\
+\end{longtable}
+
+L'indistinguibilità computazionale è \textbf{più debole}: due distribuzioni possono essere molto diverse statisticamente, ma nessun avversario efficiente riesce ad accorgersene. È proprio questo che rende possibili i PRG.
+
+\section{Pseudorandom generator (PRG)}
+
+\begin{inbreve}
+
+Un \textbf{PRG} è una funzione deterministica che prende un seme casuale di \(\lambda\) bit e restituisce \(\lambda + \ell\) bit, cioè \textbf{più} bit di quanti ne ha ricevuti, in modo che l'uscita sia computazionalmente indistinguibile da bit davvero casuali.
+
+\end{inbreve}
+
+\subsection{Definizione (del prof)}
+
+Una funzione \(G : \{0,1\}^\lambda \to \{0,1\}^{\lambda + \ell}\), con \(\ell > 0\), è un \textbf{PRG (sicuro)} se
+
+\[
+\{X_\lambda\} = \{G(U_\lambda)\}_\lambda \ \approx_c \ \{U_{\lambda + \ell}\}_\lambda = \{Y_\lambda\}
+\]
+
+\begin{nota}
+
+\textbf{Cosa sono le cose}
+
+\begin{itemize}
+\tightlist
+\item
+  \(U_\lambda\) = un seme di \(\lambda\) bit scelto \textbf{uniformemente a caso}.
+\item
+  \(G(U_\lambda)\) = la distribuzione che si ottiene scegliendo un seme a caso e applicandogli \(G\): escono \(\lambda + \ell\) bit.
+\item
+  \(U_{\lambda + \ell}\) = \(\lambda + \ell\) bit davvero casuali.
+\item
+  \(\ell\) = lo \textbf{stretch} (``allungamento''): quanti bit in più escono rispetto al seme.
+\item
+  In parole: nessun avversario PPT distingue l'uscita di \(G\) da bit davvero casuali.
+\item
+  \emph{(Non negli appunti del prof)}: si intende anche che \(G\) sia calcolabile in tempo polinomiale, altrimenti non servirebbe a niente.
+\end{itemize}
+
+\end{nota}
+
+\textbf{Notare} \emph{(non negli appunti del prof)}: \(G\) è \textbf{deterministica} (stesso seme, stessa uscita). Tutta la casualità viene dal seme; \(G\) la ``stira'' su più bit.
+
+\subsection{Esercizio: nessun PRG è sicuro contro attaccanti illimitati}
+
+\begin{inbreve}
+
+Un PRG può essere sicuro \textbf{solo} contro avversari efficienti. Un avversario con potenza infinita lo rompe sempre, anche se il PRG allunga di un solo bit (\(G : \{0,1\}^\lambda \to \{0,1\}^{\lambda+1}\)).
+
+\end{inbreve}
+
+\textbf{Soluzione del prof.} L'avversario \(A\), dato \(z \in \{0,1\}^{\lambda+1}\), cerca un seme \(s \in \{0,1\}^\lambda\) tale che \(z = G(s)\). Se lo trova risponde 1, altrimenti 0.
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Se} \(z\) \textbf{viene dal PRG} (\(z = G(s)\) con \(s \leftarrow U_\lambda\)): il seme esiste di sicuro, quindi \(\Pr[A(z) = 1] = 1\).
+\item
+  \textbf{Se} \(z\) \textbf{è uniforme} (\(z \leftarrow U_{\lambda+1}\)): \(\Pr[A(z) = 1] \le 1/2\).
+\end{itemize}
+
+Quindi il vantaggio è almeno \(1 - 1/2 = 1/2\), per niente trascurabile.
+
+\textbf{Perché} \(\le 1/2\) \emph{(non negli appunti del prof)}: i semi sono \(2^\lambda\), quindi \(G\) produce al massimo \(2^\lambda\) stringhe diverse. Le stringhe di \(\lambda + 1\) bit sono \(2^{\lambda+1}\), il doppio. Quindi una stringa uniforme cade tra le uscite di \(G\) al massimo nella metà dei casi.
+
+\textbf{Perché non funziona contro un avversario PPT} \emph{(non negli appunti del prof)}: per cercare il seme \(A\) deve provare tutti i \(2^\lambda\) semi, cioè fare un numero \textbf{esponenziale} di passi. Un avversario PPT non può farlo. Un PRG è sicuro proprio perché nessun avversario efficiente sa fare di meglio.
+
+\section{Come si costruisce un PRG?}
+
+\begin{inbreve}
+
+Se esistono le one-way function, esistono PRG che allungano di quanto si vuole (un numero polinomiale di bit). La dimostrazione completa è difficile; il prof ne vede i due ingredienti principali.
+
+\end{inbreve}
+
+\textbf{Teorema}: se esistono le OWF, esistono PRG con stretch \(\ell(\lambda) = \text{poly}(\lambda)\).
+
+I due ingredienti:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Stretch amplification}: passare da \(\ell(\lambda) = 1\) a \(\ell(\lambda) = \text{poly}(\lambda)\), cioè da un PRG che allunga di 1 bit a uno che allunga di quanto si vuole.
+\item
+  \textbf{Hard-core bit}: per costruire il PRG che allunga di 1 bit, partendo da una OWF.
+\end{enumerate}
+
+\section{Ingrediente 1: stretch amplification}
+
+\begin{inbreve}
+
+Basta un PRG che aggiunge \textbf{un solo bit} per ottenerne uno che ne aggiunge quanti ne vogliamo. L'idea è applicare \(G\) più volte di fila, tenendo da parte un bit a ogni passo.
+
+\end{inbreve}
+
+\subsection{Teorema}
+
+Se \(G : \{0,1\}^\lambda \to \{0,1\}^{\lambda+1}\) è un PRG, allora per ogni \(\ell(\lambda) = \text{poly}(\lambda)\) esiste un PRG \(G^\ell : \{0,1\}^\lambda \to \{0,1\}^{\lambda + \ell}\).
+
+\begin{nota}
+
+\textbf{Notazione} \emph{(non negli appunti del prof)}: \(G^\ell\) \textbf{non} è una potenza: è solo il nome del nuovo PRG, quello che allunga di \(\ell\) bit.
+
+\end{nota}
+
+\subsection{La costruzione (del prof)}
+
+\begin{verbatim}
+s0 ──→ [G] ──s1──→ [G] ──s2──→ ... ──s(ℓ-1)──→ [G] ──→ sℓ
+        │           │                           │
+        ↓           ↓                           ↓
+        b1          b2                          bℓ
+\end{verbatim}
+
+\begin{itemize}
+\tightlist
+\item
+  \(s_0 \leftarrow U_\lambda\): il seme iniziale, casuale
+\item
+  per ogni \(i \in [\ell]\) (cioè \(i = 1, \dots, \ell\)): \((s_i, b_i) = G(s_{i-1})\), con \(s_i \in \{0,1\}^\lambda\) e \(b_i \in \{0,1\}\)
+\item
+  \textbf{output}: \((b_1, \dots, b_\ell, s_\ell)\)
+\end{itemize}
+
+In parole: \(G\) prende \(\lambda\) bit e ne restituisce \(\lambda + 1\). Si spezza l'uscita in due: \(\lambda\) bit diventano il \textbf{nuovo seme} \(s_i\), l'ultimo bit \(b_i\) si \textbf{mette da parte}. Si ripete \(\ell\) volte e alla fine si restituiscono tutti i bit messi da parte più l'ultimo seme: \(\ell + \lambda\) bit.
+
+\subsection{Spiegazione semplice con un esempio}
+
+\emph{(Non negli appunti del prof.)}
+
+\textbf{L'idea: riusare l'uscita come nuovo seme.} \(G\) prende 3 bit e ne restituisce 4. Li dividiamo: \textbf{3 bit} li \textbf{rimettiamo dentro} \(G\) come nuovo seme (sembrano casuali, quindi vanno benissimo come seme), \textbf{1 bit} lo \textbf{teniamo da parte} come ``guadagno''. E ripetiamo: a ogni giro guadagniamo un bit.
+
+\begin{nota}
+
+\textbf{Analogia}: un distributore che, se metti una moneta, ti ridà \textbf{la moneta + una caramella}. Rimetti la moneta, ti ridà moneta + caramella. Dopo 3 giri hai \textbf{3 caramelle} e ancora la moneta in mano.
+
+\end{nota}
+
+\textbf{Passo per passo} (valori di \(G\) inventati, solo per vedere il meccanismo), seme iniziale \textbf{101}:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Giro 1}: \(G(101) = 0110\) → tieni da parte l'ultimo bit \textbf{0}, rimetti dentro \textbf{011}
+\item
+  \textbf{Giro 2}: \(G(011) = 1101\) → tieni da parte \textbf{1}, rimetti dentro \textbf{110}
+\item
+  \textbf{Giro 3}: \(G(110) = 0001\) → tieni da parte \textbf{1}, rimane \textbf{000}
+\end{itemize}
+
+\textbf{Alla fine} si mettono insieme i bit messi da parte (0, 1, 1) e l'ultimo seme rimasto (000): \textbf{011 000} = 6 bit. Partiti da \textbf{3} bit, ne abbiamo ottenuti \textbf{6}. Con \(\ell\) giri se ne ottengono \(3 + \ell\).
+
+\textbf{I nomi nella formula del prof}:
+
+\begin{itemize}
+\tightlist
+\item
+  \(s_0\) = il seme iniziale (101)
+\item
+  \(s_i\) = il seme che si rimette dentro al giro \(i\) (011, 110, 000)
+\item
+  \(b_i\) = il bit messo da parte al giro \(i\) (0, 1, 1)
+\item
+  \((s_i, b_i) = G(s_{i-1})\) = ``al giro \(i\), \(G\) applicato al seme precedente dà il nuovo seme e un bit''
+\item
+  output \((b_1, \dots, b_\ell, s_\ell)\) = tutti i bit messi da parte, più l'ultimo seme
+\item
+  \(G^\ell\) = il nome di questo nuovo generatore, quello che fa \(\ell\) giri
+\end{itemize}
+
+\subsection{Come dimostrarlo: per riduzione}
+
+\begin{inbreve}
+
+Una \textbf{riduzione} dimostra ``se qualcuno sa rompere A, allora sa rompere anche B'', costruendo un attaccante per B che usa quello per A come sottoprogramma. Se B è sicuro per ipotesi, allora anche A lo è.
+
+\end{inbreve}
+
+Il piano del prof: \textbf{supponiamo che esista un avversario PPT} \(A\) \textbf{che rompe} \(G^\ell\)\textbf{; costruiamo un avversario PPT} \(B\) \textbf{che rompe} \(G\)\textbf{.} Siccome \(G\) è un PRG per ipotesi, \(B\) non può esistere, quindi nemmeno \(A\).
+
+\begin{nota}
+
+\textbf{``Rompere''} \emph{(non negli appunti del prof)} = distinguere l'uscita dall'uniforme con vantaggio \textbf{non trascurabile}, cioè almeno \(1/p(\lambda)\) per qualche polinomio \(p\).
+
+\end{nota}
+
+\textbf{Il problema} (i ``???'' del prof):
+
+\begin{verbatim}
+A ←── z' ∈ {0,1}^(λ+ℓ) ─── B ←────── z ─────── C      z ← G(U_λ)  oppure  z ← U_(λ+1)
+          ???
+\end{verbatim}
+
+\(B\) riceve dal challenger una stringa \(z\) di \(\lambda + 1\) bit, ma \(A\) sa attaccare solo stringhe di \(\lambda + \ell\) bit. Come fa \(B\) a usare \(A\)? Per risolvere questo serve una tecnica nuova: l'argomento ibrido.
+
+\subsection{Argomento ibrido (hybrid argument)}
+
+\begin{inbreve}
+
+Per dimostrare che due distribuzioni ``lontane'' \(X\) e \(Y\) sono indistinguibili, si costruisce una \textbf{catena di distribuzioni intermedie} (gli \textbf{ibridi}) in cui ogni anello differisce dal successivo per un dettaglio piccolissimo. Se nessun avversario nota i singoli passi, non nota nemmeno la differenza tra i due estremi.
+
+\end{inbreve}
+
+\textbf{Definizione (del prof)}: per mostrare \(X \approx_c Y\) si trovano ibridi \(H_0, H_1, \dots, H_\ell\) tali che:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \(H_0 \equiv X\) e \(H_\ell \equiv Y\) (gli estremi sono le due distribuzioni da confrontare)
+\item
+  \(H_0 \approx_c H_1\), \(H_1 \approx_c H_2\), \ldots, \(H_{\ell-1} \approx_c H_\ell\) (ogni passo è indistinguibile)
+\end{enumerate}
+
+Allora, per la \textbf{disuguaglianza triangolare}, \(H_0 \approx_c H_\ell\), \textbf{purché} \(\ell(\lambda) = \text{poly}(\lambda)\).
+
+\begin{nota}
+
+\textbf{Analogia} \emph{(non negli appunti del prof)}: cambi una foto un pixel alla volta, finché diventa un'altra foto. Se a ogni passo nessuno nota la differenza con la versione precedente, e i passi sono ``pochi'' (polinomiali), nessuno distingue nemmeno la prima foto dall'ultima.
+
+\end{nota}
+
+\begin{approfondimento}{Perché funziona e perché serve ℓ polinomiale (non negli appunti del
+prof)}
+
+Chiamiamo \(p_i = \Pr[A(z) = 1 : z \leftarrow H_i]\). La \textbf{disuguaglianza triangolare} dice che la distanza diretta tra due numeri non supera la somma delle distanze passando per numeri intermedi:
+
+\(|p_0 - p_\ell| \le |p_0 - p_1| + |p_1 - p_2| + \dots + |p_{\ell-1} - p_\ell|\)
+
+A sinistra c'è il vantaggio di \(A\) sugli estremi; a destra la somma dei vantaggi sui singoli passi. Ogni passo ha vantaggio trascurabile, e i passi sono \(\ell\): il totale è al più \(\ell \cdot \text{negl}(\lambda)\). Se \(\ell\) è polinomiale, poly · negl = negl (Lezione 4), quindi il totale è ancora trascurabile.
+
+Se invece i passi fossero esponenziali (es. \(2^\lambda\)), \(2^\lambda \cdot 2^{-\lambda} = 1\): non sarebbe più trascurabile e l'argomento crollerebbe.
+
+\end{approfondimento}
+
+\subsection{Gli ibridi nel nostro caso}
+
+Gli estremi sono:
+
+\begin{itemize}
+\tightlist
+\item
+  \(H_0 \equiv G^\ell(U_\lambda)\): tutto pseudocasuale
+\item
+  \(H_\ell \equiv U_{\ell + \lambda}\): tutto davvero casuale
+\end{itemize}
+
+L'ibrido \(H_i\) (definizione del prof):
+
+\begin{itemize}
+\tightlist
+\item
+  \(b_1, \dots, b_i \leftarrow \{0,1\}\): i primi \(i\) bit sono \textbf{davvero casuali}
+\item
+  \(s_i \leftarrow U_\lambda\): il seme al passo \(i\) è \textbf{davvero casuale}
+\item
+  \((b_{i+1}, \dots, b_\ell, s_\ell) = G^{\ell - i}(s_i)\): il resto si calcola con la costruzione, facendo i rimanenti \(\ell - i\) passi
+\end{itemize}
+
+Cioè: \textbf{si sostituisce un bit pseudocasuale alla volta con un bit davvero casuale}, partendo da sinistra.
+
+\begin{esempio}
+
+\textbf{Esempio con} \(\ell = 3\) \emph{(non negli appunti del prof)}:
+
+\begin{itemize}
+\tightlist
+\item
+  \(H_0\): \(s_0\) casuale, poi \(b_1, b_2, b_3, s_3\) tutti calcolati con \(G\) = \(G^3(U_\lambda)\)
+\item
+  \(H_1\): \(b_1\) casuale, \(s_1\) casuale, poi \(b_2, b_3, s_3\) calcolati con \(G\)
+\item
+  \(H_2\): \(b_1, b_2\) casuali, \(s_2\) casuale, poi \(b_3, s_3\) calcolati con \(G\)
+\item
+  \(H_3\): \(b_1, b_2, b_3\) casuali e \(s_3\) casuale = \(U_{3+\lambda}\)
+\end{itemize}
+
+\end{esempio}
+
+\textbf{Cosa cambia tra} \(H_0\) \textbf{e} \(H_1\) \emph{(non negli appunti del prof)}: solo il primo passo. In \(H_0\) la coppia \((s_1, b_1) = G(s_0)\) è \textbf{pseudocasuale}; in \(H_1\) è \textbf{davvero casuale}. Tutto il resto si calcola allo stesso modo a partire da \(s_1\).
+
+\subsection{La riduzione: H₀ ≈c H₁}
+
+Ora la riduzione funziona. Il prof la fa concretamente per \(H_0 \approx_c H_1\).
+
+\textbf{Supponiamo per assurdo} che esista un PPT \(A\) che distingue \(H_0\) da \(H_1\). Costruiamo \(B\) che rompe \(G\):
+
+\begin{verbatim}
+A ←── (b1, b2, ..., bℓ, sℓ) ─── B ←──── z ∈ {0,1}^(λ+1) ──── C     z ← G(U_λ)  oppure  z ← U_(λ+1)
+  ──────────── b' ────────────→   ────────── b' ─────────→
+\end{verbatim}
+
+\(B\), ricevuto \(z \in \{0,1\}^{\lambda+1}\):
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  spezza \(z = (b_1, s_1)\), con \(b_1 \in \{0,1\}\) e \(s_1 \in \{0,1\}^\lambda\)
+\item
+  calcola il resto con la costruzione: \((b_2, \dots, b_\ell, s_\ell) = G^{\ell-1}(s_1)\)
+\item
+  dà ad \(A\) la stringa \((b_1, b_2, \dots, b_\ell, s_\ell)\)
+\item
+  quando \(A\) risponde \(b'\), \(B\) risponde anche lui \(b'\) al challenger
+\end{enumerate}
+
+\textbf{Osservazione chiave (del prof)}:
+
+\begin{itemize}
+\tightlist
+\item
+  se \(z \leftarrow G(U_\lambda)\), la coppia \((b_1, s_1)\) è un'uscita di \(G\), quindi la stringa data ad \(A\) è distribuita come \(H_0\)
+\item
+  se \(z \leftarrow U_{\lambda+1}\), la coppia \((b_1, s_1)\) è davvero casuale, quindi la stringa è distribuita come \(H_1\)
+\end{itemize}
+
+\textbf{Per ipotesi}, \(A\) distingue \(H_0\) da \(H_1\):
+
+\[
+\Big| \Pr[A(b_1, \dots, b_\ell, s_\ell) = 1 : (b_1, \dots, s_\ell) \leftarrow \underbrace{G^\ell(U_\lambda)}_{= H_0}] - \Pr[A(b_1, \dots, b_\ell, s_\ell) = 1 : (b_1, \dots, s_\ell) \leftarrow H_1] \Big| \ge \frac{1}{p(\lambda)}
+\]
+
+per qualche polinomio \(p(\lambda)\). E per l'osservazione chiave:
+
+\[
+\Pr[B(z) = 1 : z \leftarrow G(U_\lambda)] = \Pr[A(b_1, \dots, b_\ell, s_\ell) = 1 : (b_1, \dots, s_\ell) \leftarrow H_0]
+\]
+
+\[
+\Pr[B(z) = 1 : z \leftarrow U_{\lambda+1}] = \Pr[A(b_1, \dots, b_\ell, s_\ell) = 1 : (b_1, \dots, s_\ell) \leftarrow H_1]
+\]
+
+Quindi \(B\) distingue \(G(U_\lambda)\) da \(U_{\lambda+1}\) con vantaggio \(\ge 1/p(\lambda)\), cioè \textbf{rompe} \(G\). Ma \(G\) è un PRG: \textbf{contraddizione}. Inoltre \(B\) è PPT, perché chiama \(G\) al più \(\ell\) volte (polinomiale) e poi \(A\).
+
+Con una dimostrazione molto simile, \textbf{per ogni} \(i\)\textbf{:} \(H_i \approx_c H_{i+1}\), e per l'argomento ibrido \(G^\ell(U_\lambda) = H_0 \approx_c H_\ell = U_{\lambda+\ell}\). ∎
+
+\begin{approfondimento}{Il caso generale H\_i ≈c H\_(i+1) (non negli appunti del prof)}
+
+È uguale, ma \(B\) inserisce \(z\) al passo \(i+1\) invece che al passo 1. Ricevuto \(z\):
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  sceglie \(b_1, \dots, b_i\) \textbf{davvero casuali}
+\item
+  spezza \(z = (b_{i+1}, s_{i+1})\)
+\item
+  calcola \((b_{i+2}, \dots, b_\ell, s_\ell) = G^{\ell-i-1}(s_{i+1})\)
+\item
+  dà ad \(A\) la stringa \((b_1, \dots, b_\ell, s_\ell)\) e ne inoltra la risposta
+\end{enumerate}
+
+Se \(z \leftarrow G(U_\lambda)\), il passo \(i+1\) è pseudocasuale (come se \(s_i\) fosse uniforme e \((s_{i+1}, b_{i+1}) = G(s_i)\)): la stringa è distribuita come \(H_i\). Se \(z\) è uniforme, il passo \(i+1\) è davvero casuale: la stringa è distribuita come \(H_{i+1}\). Stesso ragionamento di prima.
+
+\end{approfondimento}
+
+\section{Ingrediente 2: hard-core bit}
+
+\textbf{Da dove si prende il primo} \(G : \{0,1\}^\lambda \to \{0,1\}^{\lambda+1}\)? In teoria si può costruire partendo da \textbf{qualunque} OWF, ma non è molto efficiente. Più avanti si vedranno costruzioni efficienti basate su \textbf{teoria dei numeri}, \textbf{reticoli} (lattices), ecc.
+
+L'ingrediente principale sono gli \textbf{hard-core bit}.
+
+\subsection{Hard-core bit}
+
+\begin{inbreve}
+
+Una OWF nasconde il suo input \(x\) ``nel complesso'', ma potrebbe lasciar trapelare qualche pezzo di \(x\). Un \textbf{hard-core bit} è un bit \(h(x)\), calcolato da \(x\), che resta \textbf{impossibile da indovinare} anche conoscendo \(f(x)\): sembra un bit completamente casuale.
+
+\end{inbreve}
+
+Sia \(f : \{0,1\}^n \to \{0,1\}^n\) una OWF. La domanda del prof: \textbf{possiamo dire che un particolare bit di} \(x\) \textbf{è difficile da calcolare?}
+
+\textbf{Intuitivamente}: \(h : \{0,1\}^n \to \{0,1\}\) è \textbf{hard-core} per \(f\) se \(h(x)\) è difficile da calcolare conoscendo \(f(x)\).
+
+\textbf{Formalmente (in alternativa)}:
+
+\[
+(f(x), h(x)) \approx_c (f(x), u) \qquad u \leftarrow \{0,1\}
+\]
+
+\begin{nota}
+
+\textbf{Cosa sono le cose}
+
+\begin{itemize}
+\tightlist
+\item
+  \(x\) = l'input segreto, scelto a caso.
+\item
+  \(h\) = una funzione che da \(x\) calcola \textbf{un solo bit} (es. ``il primo bit di \(x\)'', o lo XOR di alcuni bit di \(x\)).
+\item
+  \((f(x), h(x))\) = l'output della OWF \textbf{insieme} al bit \(h(x)\).
+\item
+  \((f(x), u)\) = l'output della OWF insieme a un bit \(u\) \textbf{completamente casuale}, che non c'entra niente con \(x\).
+\item
+  In parole: anche conoscendo \(f(x)\), il bit \(h(x)\) è indistinguibile da un bit tirato a caso.
+\end{itemize}
+
+\end{nota}
+
+\textbf{Perché serve questa nozione} \emph{(non negli appunti del prof)}: essere one-way vuol dire solo che non si riesce a ricavare \textbf{tutto} \(x\). Non garantisce che non si ricavi \textbf{qualche pezzo} di \(x\). Ad esempio se \(f\) è one-way, anche \(f'(x) = f(x) \| x_1\) (che scrive in chiaro il primo bit di \(x\)) è one-way, ma il primo bit di \(x\) ovviamente non è nascosto. Un hard-core bit è un bit che invece è \textbf{garantito} nascosto.
+
+\subsection{Perché è utile: un PRG da una one-way permutation}
+
+Supponiamo che \(f : \{0,1\}^n \to \{0,1\}^n\) sia una \textbf{one-way permutation (OWP)}.
+
+\begin{nota}
+
+\textbf{Permutazione} \emph{(definizione non negli appunti del prof)}: una funzione da \(\{0,1\}^n\) a \(\{0,1\}^n\) in cui \textbf{ogni output viene da esattamente un input} (una biiezione). In pratica ``rimescola'' le stringhe senza perderne nessuna. Quindi: \textbf{se} \(s\) \textbf{è uniforme, anche} \(f(s)\) \textbf{è uniforme}. Una OWP è una OWF che è anche una permutazione.
+
+\end{nota}
+
+Allora il prof definisce:
+
+\[
+G(s) = f(s) \,\|\, h(s) \qquad s \leftarrow U_n
+\]
+
+(\(\|\) = \textbf{concatenazione}: si attaccano le due stringhe una dopo l'altra. Es. \(f(s) = 111\) e \(h(s) = 1\) danno \(f(s) \| h(s) = 1111\). Quindi gli \(n\) bit di \(f(s)\) più il bit \(h(s)\) fanno \(n+1\) bit: con \(n = 128\), escono 129 bit.)
+
+\textbf{Perché è un PRG}, passo per passo:
+
+\[
+G(s) = f(s) \,\|\, h(s) \ \approx_c \ f(s) \,\|\, b \ \equiv \ U_{n+1} \qquad b \leftarrow \{0,1\}
+\]
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \(f(s) \| h(s) \approx_c f(s) \| b\): è esattamente la definizione di hard-core bit: \(h(s)\) non si distingue da un bit casuale \(b\), anche conoscendo \(f(s)\).
+\item
+  \(f(s) \| b \equiv U_{n+1}\): \(f(s)\) è uniforme su \(n\) bit (perché \(f\) è una permutazione e \(s\) è uniforme), e \(b\) è un bit uniforme indipendente. Insieme fanno \(n + 1\) bit uniformi.
+\end{enumerate}
+
+Quindi \(G : \{0,1\}^n \to \{0,1\}^{n+1}\) allunga di 1 bit ed è un PRG. Con l'ingrediente 1 si allunga poi di quanto si vuole.
+
+\subsection{In generale}
+
+\begin{itemize}
+\tightlist
+\item
+  Si riesce a far funzionare la stessa idea partendo da una qualunque \textbf{OWF} (non serve che sia una permutazione), ma è più complicato.
+\item
+  \textbf{Ogni} OWF \(f\) ammette un hard-core bit \(h\). \emph{(Non negli appunti del prof: è il teorema di Goldreich-Levin; l'hard-core bit è lo XOR di un sottoinsieme casuale dei bit di} \(x\)\emph{.)}
+\end{itemize}
+
+\subsection{Domanda: esiste un unico h che funziona per ogni f?}
+
+\textbf{No.} L'idea del prof: preso un qualunque \(h\), si costruisce una funzione \(f_{\text{BAD}}\) tale che
+
+\begin{itemize}
+\tightlist
+\item
+  \(h\) \textbf{non} è hard-core per \(f_{\text{BAD}}\)
+\item
+  ma \(f_{\text{BAD}}\) è comunque una OWF
+\end{itemize}
+
+Va bene se \(f_{\text{BAD}}\) usa al suo interno un'altra OWF ausiliaria \(f : \{0,1\}^n \to \{0,1\}^n\).
+
+\begin{approfondimento}{Come si costruisce f\_BAD (non negli appunti del prof)}
+
+Si prende \(f_{\text{BAD}}(x) = f(x) \,\|\, h(x)\), cioè si scrive \(h(x)\) \textbf{in chiaro} nell'output.
+
+\begin{itemize}
+\tightlist
+\item
+  \(h\) \textbf{non è hard-core per} \(f_{\text{BAD}}\): chi vede \(f_{\text{BAD}}(x)\) legge direttamente \(h(x)\) nell'ultimo bit. Altro che difficile da calcolare.
+\item
+  \(f_{\text{BAD}}\) \textbf{è comunque one-way}: se qualcuno sapesse invertire \(f_{\text{BAD}}\), cioè trovare \(x'\) con \(f(x') \| h(x') = f(x) \| h(x)\), avrebbe in particolare \(f(x') = f(x)\), e quindi saprebbe invertire \(f\). Ma \(f\) è one-way. (È una riduzione! Il prof la fa per bene all'inizio della Lezione 6: chi attacca \(f\) non conosce \(h(x)\) e deve indovinarlo.)
+\end{itemize}
+
+Quindi nessun \(h\) fissato funziona per tutte le OWF: l'hard-core bit va scelto in base alla funzione. È lo stesso schema del ``nessun estrattore fisso funziona per tutte le fonti'' della lezione 3.
+
+\end{approfondimento}
+
+\section{Riepilogo}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Pseudocasuale} = bit generati in modo deterministico da un seme corto, che nessun avversario PPT distingue da bit casuali (se non con probabilità trascurabile)
+\item
+  \(X \approx_c Y\): per ogni PPT \(A\), \(|\Pr[A(X_\lambda) = 1] - \Pr[A(Y_\lambda) = 1]| \le \text{negl}(\lambda)\); equivalente al gioco GAME(λ, 0) ≈c GAME(λ, 1)
+\item
+  \textbf{PRG}: \(G : \{0,1\}^\lambda \to \{0,1\}^{\lambda+\ell}\) con \(G(U_\lambda) \approx_c U_{\lambda+\ell}\)
+\item
+  \textbf{Nessun PRG è sicuro contro avversari illimitati}: basta cercare il seme (vantaggio ≥ 1/2), ma richiede tempo esponenziale
+\item
+  \textbf{OWF ⇒ PRG} con stretch polinomiale; due ingredienti:
+\item
+  \textbf{Stretch amplification}: da stretch 1 a stretch poly, applicando \(G\) in catena; si dimostra per \textbf{riduzione} usando l'\textbf{argomento ibrido} (ibridi \(H_i\): i primi \(i\) bit davvero casuali)
+\item
+  \textbf{Hard-core bit}: \((f(x), h(x)) \approx_c (f(x), u)\); con una OWP, \(G(s) = f(s) \| h(s)\) è un PRG con stretch 1
+\item
+  Ogni OWF ha un hard-core bit, ma nessun \(h\) funziona per tutte le OWF (\(f_{\text{BAD}}\))
+\end{itemize}

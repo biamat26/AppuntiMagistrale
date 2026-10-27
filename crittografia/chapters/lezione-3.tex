@@ -1,0 +1,651 @@
+\chapter{Lezione 3 -- MAC da hash ed estrazione di casualità}
+
+\section{Esempio di famiglia pairwise independent}
+
+\[
+h_{a,b}(m) = a \cdot m + b \bmod p
+\]
+
+\begin{itemize}
+\tightlist
+\item
+  \(p\) è un \textbf{primo grande} (di \(\lambda\) bit)
+\item
+  Chiave: \((a, b) \in \mathbb{Z}_p^2 = \mathcal{K}\)
+\item
+  Messaggi e tag: \(m \in \mathbb{Z}_p = \mathcal{M} = \mathcal{T}\)
+\end{itemize}
+
+\subsection{Lemma}
+
+\begin{inbreve}
+
+Dimostriamo che \(a \cdot m + b \bmod p\) è pairwise independent, cioè che i tag di due messaggi diversi si comportano come due numeri casuali indipendenti.
+
+\end{inbreve}
+
+La famiglia \(\mathcal{H} = \{h_{a,b}\}\) qui sopra è \textbf{pairwise independent}.
+
+\subsection{Dimostrazione}
+
+\begin{inbreve}
+
+Si contano le chiavi \((a, b)\) che danno una certa coppia di tag. È un sistema di 2 equazioni in 2 incognite, quindi c'è una sola chiave: ogni coppia di tag ha probabilità \(1/p^2\).
+
+\end{inbreve}
+
+Fissiamo \(m, m' \in \mathbb{Z}_p\) con \(m \ne m'\) e \(\tau, \tau' \in \mathbb{Z}_p\). Vogliamo calcolare
+
+\[
+\Pr_{a,b}[h_{a,b}(m) = \tau \wedge h_{a,b}(m') = \tau']
+\]
+
+Le due condizioni \(a m + b = \tau\) e \(a m' + b = \tau'\) formano un \textbf{sistema lineare} nelle incognite \(a, b\). In forma matriciale:
+
+\[
+\Pr_{a,b}\left[ \begin{pmatrix} m & 1 \\ m' & 1 \end{pmatrix} \begin{pmatrix} a \\ b \end{pmatrix} = \begin{pmatrix} \tau \\ \tau' \end{pmatrix} \right] = \Pr_{a,b}\left[ \begin{pmatrix} a \\ b \end{pmatrix} = \begin{pmatrix} m & 1 \\ m' & 1 \end{pmatrix}^{-1} \begin{pmatrix} \tau \\ \tau' \end{pmatrix} \right] = \frac{1}{p^2}
+\]
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{L'inversa esiste} perché \(m \ne m'\): il determinante è \(m - m' \ne 0 \bmod p\), e modulo un primo ogni numero non nullo è invertibile.
+\item
+  Quindi c'è \textbf{una sola} coppia \((a, b)\) che soddisfa il sistema. Siccome \((a, b)\) è uniforme su \(p^2\) coppie, la probabilità di beccarla è \(1/p^2\). ∎
+\end{itemize}
+
+\textbf{Intuizione}: ogni coppia di tag \((\tau, \tau')\) corrisponde a esattamente una chiave, quindi la coppia di tag è uniforme su \(\mathbb{Z}_p^2\).
+
+\section{MAC da hash pairwise independent}
+
+\subsection{Teorema}
+
+\begin{inbreve}
+
+Se come tag usi una hash pairwise independent, Eve, anche dopo aver visto un messaggio con il suo tag, ha probabilità al massimo \(1/|\mathcal{T}|\) di produrre il tag giusto per un altro messaggio.
+Eve conosce l'\textbf{insieme dei tag possibili} \(\mathcal{T}\) (fa parte dello schema, che è pubblico: es. ``i numeri da 0 a \(p-1\)''), ma non sa \textbf{quale} di questi è il tag giusto per il suo messaggio \(m'\), perché dipende dalla chiave. Può usare qualunque strategia (riciclare \(\tau\), fare calcoli, \ldots), ma nessuna funziona meglio che sceglierne uno a caso tra i \(|\mathcal{T}|\) possibili.
+
+\end{inbreve}
+
+Ogni famiglia pairwise independent \(\mathcal{H} = \{h_k : \mathcal{M} \to \mathcal{T}\}\) definisce un MAC \textbf{ε-statisticamente sicuro} con
+
+\[
+\varepsilon = \frac{1}{|\mathcal{T}|}
+\]
+
+\subsection{Dimostrazione}
+
+Per ogni \(m \ne m'\) e ogni \(\tau, \tau'\), per definizione di probabilità condizionata:
+
+\[
+\Pr[\tau' = h_K(m') \mid \tau = h_K(m)] = \frac{\Pr[\tau' = h_K(m') \wedge \tau = h_K(m)]}{\Pr[h_K(m) = \tau]} = \frac{1/|\mathcal{T}|^2}{1/|\mathcal{T}|} = \frac{1}{|\mathcal{T}|}
+\]
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Numeratore}: per pairwise independence la coppia \((h_K(m), h_K(m'))\) è uniforme su \(\mathcal{T}^2\), quindi ogni coppia ha probabilità \(1/|\mathcal{T}|^2\).
+\item
+  \textbf{Denominatore}: sommando il numeratore su tutti i \(|\mathcal{T}|\) possibili \(\tau'\) si ottiene \(|\mathcal{T}| \cdot 1/|\mathcal{T}|^2 = 1/|\mathcal{T}|\). ∎
+\end{itemize}
+
+Per l'esercizio 1 della lezione 2, \(1/|\mathcal{T}|\) è il \textbf{miglior} \(\varepsilon\) possibile.
+
+\begin{nota}
+
+Con l'esempio \(h_{a,b}\): \(|\mathcal{T}| = p \approx 2^\lambda\), quindi \(\varepsilon \approx 2^{-\lambda}\), con una chiave di \(2\lambda\) bit.
+
+\end{nota}
+
+\subsection{Da dove vengono questi numeri}
+
+\begin{inbreve}
+
+Con una chiave di \(2\lambda\) bit, la costruzione \(h_{a,b}\) dà sicurezza \(2^{-\lambda}\). Sono quattro piccoli conti, a partire dal fatto che \textbf{λ è il numero di bit di} \(p\) (il prof sceglie un primo ``di λ bit'').
+
+\end{inbreve}
+
+\textbf{1. Perché} \(p \approx 2^\lambda\). Un numero di λ bit sta tra \(2^{\lambda-1}\) e \(2^\lambda\). Per esempio, i numeri da 3 bit vanno da \(100 = 4\) a \(111 = 7\), tutti vicini a \(2^3 = 8\). Quindi un primo di λ bit vale circa \(2^\lambda\).
+
+\textbf{2. Perché} \(|\mathcal{T}| = p\). Il tag è \((a \cdot m + b) \bmod p\): il ``mod p'' si applica a \textbf{tutta} l'espressione (prima si calcola \(a \cdot m + b\), poi si prende il resto della divisione per \(p\)). Il resto di una divisione per \(p\) sta sempre tra \(0\) e \(p-1\), quindi i tag possibili sono \(0, 1, \dots, p-1\): sono \(p\) valori, e \(|\mathcal{T}| = p \approx 2^\lambda\).
+
+\begin{esempio}
+
+\textbf{Esempio} con \(p = 7\), \(a = 3\), \(m = 2\), \(b = 5\): \(a \cdot m + b = 11\), e \(11 \bmod 7 = 4\). Qualunque calcolo si faccia, il tag è sempre uno tra 0, 1, \ldots, 6.
+
+\end{esempio}
+
+\textbf{3. Perché} \(\varepsilon \approx 2^{-\lambda}\). Dal teorema, \(\varepsilon = 1/|\mathcal{T}| = 1/p \approx 1/2^\lambda = 2^{-\lambda}\).
+
+\textbf{4. Perché la chiave è di} \(2\lambda\) \textbf{bit.} La chiave è la coppia \((a, b)\), e \(a\) e \(b\) sono numeri mod \(p\), cioè tra \(0\) e \(p-1\). Per scrivere in binario qualunque numero fino a \(p-1\) bastano λ bit, quindi \(a\) e \(b\) occupano λ bit ciascuno: in totale \(\lambda + \lambda = 2\lambda\) bit.
+
+\begin{esempio}
+
+\textbf{Esempio con λ = 3}:
+
+\begin{itemize}
+\tightlist
+\item
+  \(p = 7\) (in binario \(111\), cioè 3 bit), e \(7 \approx 2^3 = 8\)
+\item
+  tag possibili: \(0, \dots, 6\), cioè 7 valori
+\item
+  \(\varepsilon = 1/7 \approx 1/8 = 2^{-3}\)
+\item
+  \(a\) e \(b\) valgono da 0 a 6, cioè da \(000\) a \(110\) in binario: 3 bit ciascuno, chiave di \(3 + 3 = 6 = 2 \cdot 3\) bit
+\end{itemize}
+
+\end{esempio}
+
+\begin{esempio}
+
+\textbf{Esempio reale con λ = 128}: \(p\) è un primo di 128 bit, \(\varepsilon \approx 2^{-128}\) (Eve non falsifica praticamente mai), chiave di 256 bit.
+
+\end{esempio}
+
+\textbf{Il messaggio}: con una chiave di \(2\lambda\) bit si ottiene sicurezza \(2^{-\lambda}\). È proprio il minimo previsto dalla ``bad news'' qui sotto con \(t = 1\): \((1 + 1) \cdot \lambda = 2\lambda\).
+
+\subsection{Bad news}
+
+\begin{inbreve}
+
+Con la sicurezza statistica la chiave del MAC deve crescere con il numero di messaggi da autenticare. Lo stesso problema dell'OTP.
+
+\end{inbreve}
+
+\textbf{Teorema}: ogni MAC \textbf{t-time} \(2^{-\lambda}\)-sicuro ha una chiave di dimensione (almeno) \((t+1) \cdot \lambda\).
+
+\emph{t-time} = sicuro anche se Eve vede \(t\) coppie valide. Quindi, come per la segretezza perfetta, con la sicurezza statistica la chiave \textbf{cresce} con il numero di messaggi da autenticare. Con \(t = 1\) servono \(2\lambda\) bit, esattamente quelli di \(h_{a,b}\).
+
+\section{Randomness extraction}
+
+\textbf{Definizione}: la \emph{randomness extraction} (estrazione di casualità) è il processo che, partendo da una sorgente di casualità \textbf{imperfetta} (in cui alcuni valori escono più spesso di altri), produce bit \textbf{perfettamente casuali}, cioè uniformi. La funzione che lo fa si chiama \textbf{estrattore} (\(\text{Ext}\)).
+
+\begin{esempio}
+
+\textbf{Esempio}: hai solo una moneta truccata che fa testa il 70\% delle volte. Se la usi così com'è per creare una chiave, Eve sa che i bit valgono più spesso 1 che 0: la chiave non è uniforme e i teoremi visti (OTP, MAC) non valgono più. L'estrattore prende i lanci della moneta truccata e tira fuori bit come quelli di una moneta onesta.
+
+Le sorgenti reali sono di questo tipo: un computer è deterministico, quindi la casualità la prende da misure fisiche (movimenti del mouse, tempi tra un tasto e l'altro, rumore elettrico), che sono imprevedibili solo in parte.
+
+\end{esempio}
+
+\subsection{Un estrattore in pratica (trucco di von Neumann)}
+
+\emph{(Non negli appunti del prof: esempio per capire cosa fa un estrattore.)}
+
+Hai una moneta piegata che fa testa il 60\% delle volte e ti servono bit perfettamente 50/50. Lanci la moneta \textbf{due volte} e guardi la coppia:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Testa poi Croce} → scrivi \textbf{0}
+\item
+  \textbf{Croce poi Testa} → scrivi \textbf{1}
+\item
+  \textbf{Testa Testa} oppure \textbf{Croce Croce} → butti via e rilanci
+\end{itemize}
+
+\textbf{Perché funziona}: \(\Pr[\text{TC}] = 0{,}6 \times 0{,}4 = 0{,}24\) e \(\Pr[\text{CT}] = 0{,}4 \times 0{,}6 = 0{,}24\). Le due probabilità sono identiche, quindi 0 e 1 escono esattamente al 50\%, anche se la moneta è truccata.
+
+È questo che fa un estrattore: \textbf{entra roba sbilanciata, esce roba perfettamente bilanciata}. Il prezzo è che si butta via una parte dei lanci: si ottengono \textbf{meno bit} di quanti se ne sono raccolti.
+
+\begin{nota}
+
+Questo trucco funziona solo se i lanci sono indipendenti tra loro. L'estrattore del corso (hash + seme) funziona con fonti molto più generali, ma l'idea è la stessa.
+
+\end{nota}
+
+Come fanno Alice e Bob a ottenere \textbf{bit casuali}? È cruciale in crittografia:
+
+\begin{itemize}
+\tightlist
+\item
+  le \textbf{chiavi} devono essere \textbf{uniformi}
+\item
+  la casualità servirà anche più avanti per la sicurezza (es. sicurezza \textbf{CPA})
+\end{itemize}
+
+Si può pensare come un processo a più passi:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Randomness extraction}: partendo da una sorgente di casualità \textbf{imperfetta}, generare casualità ``pura'' (uniforme).
+\item
+  \textbf{Espansione}: espandere in modo \textbf{deterministico} quello che si è estratto, quanto serve (\textbf{pseudocasualità}).
+\item
+  In più, un modo per \textbf{rinfrescare} la casualità, da poter espandere di nuovo.
+\end{enumerate}
+
+Oggi ci occupiamo del passo 1.
+
+\textbf{La domanda}: abbiamo una sorgente \(X\) e vogliamo progettare una funzione \textbf{deterministica} \(\text{Ext}\) tale che \(\text{Ext}(X)\) sia \textbf{uniforme}.
+
+È \textbf{impossibile in generale}: se \(X\) è costante, anche \(\text{Ext}(X)\) lo è. Serve che \(X\) sia \textbf{imprevedibile} almeno in parte.
+
+\subsection{Definizione: min-entropia}
+
+\begin{inbreve}
+
+La min-entropia misura quanto è imprevedibile una fonte, in bit. Min-entropia \(k\) vuol dire che la fonte è difficile da indovinare quanto \(k\) lanci di una moneta onesta, e quindi che se ne possono estrarre circa \(k\) bit casuali.
+
+\end{inbreve}
+
+La \textbf{min-entropia} di \(X\) è
+
+\[
+H_\infty(X) = -\log \max_x \Pr[X = x]
+\]
+
+(logaritmo in base 2)
+
+\textbf{Intuizione}: \(\max_x \Pr[X = x]\) è la probabilità di indovinare \(X\) al primo colpo puntando sul valore più probabile. La min-entropia misura quanto è difficile questo ``miglior tentativo'': se \(H_\infty(X) = k\), il miglior tentativo riesce con probabilità \(2^{-k}\). Più min-entropia c'è, meglio è.
+
+\begin{esempio}
+
+\textbf{Esempi}:
+
+\begin{itemize}
+\item
+  \(X = 0^n\) (costante): \(\max \Pr = 1\), quindi \(H_\infty(X) = -\log 1 = 0\)
+\item
+  \(X \equiv U_n\), cioè \(X \leftarrow \{0,1\}^n\) uniforme: \(\max \Pr = 2^{-n}\), quindi \(H_\infty(X) = n\)
+\item
+  \emph{(non negli appunti del prof)} \(X\) su 2 bit con \(\Pr[00] = 1/2\) e gli altri tre valori a \(1/6\): \(H_\infty(X) = -\log(1/2) = 1\). Due bit di lunghezza, ma solo 1 bit di min-entropia, perché la sorgente è sbilanciata verso 00.
+\end{itemize}
+
+\end{esempio}
+
+\subsection{A cosa serve la min-entropia}
+
+L'estrattore butta via una parte dei bit. La domanda naturale è: \textbf{quanti bit puliti si possono ottenere, al massimo?}
+
+La min-entropia risponde proprio a questo: misura \textbf{quanti ``bit puliti'' ci sono nascosti dentro la fonte sporca}. Da una fonte con min-entropia \(k\) si possono estrarre al massimo circa \(k\) bit perfetti.
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Moneta onesta}: ogni lancio vale 1 bit pulito. Min-entropia \textbf{1}.
+\item
+  \textbf{Moneta piegata (testa al 60\%)}: ogni lancio vale \textbf{meno} di un bit pulito, perché è un po' prevedibile. Min-entropia circa \textbf{0,74}.
+\item
+  \textbf{Moneta che fa sempre testa}: ogni lancio vale \textbf{0} bit puliti. Non c'è niente da estrarre.
+\end{itemize}
+
+Quindi la min-entropia è il \textbf{``contenuto di casualità vera''} della fonte, e dice quanta roba l'estrattore può tirarne fuori.
+
+\subsection{Come si calcola}
+
+La formula \(-\log_2(p)\) si può riscrivere in un modo più comodo:
+
+\[
+H_\infty(X) = \log_2\!\left(\frac{1}{p}\right) \qquad p = \text{probabilità del risultato più probabile}
+\]
+
+Cioè: si fa 1 diviso la probabilità, e poi ci si chiede ``2 elevato a quanto fa questo numero?'' (è proprio quello che fa \(\log_2\): ad esempio \(\log_2 8 = 3\) perché \(2^3 = 8\)).
+
+\begin{esempio}
+
+\textbf{Esempi}:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Moneta onesta}, \(p = 1/2\): \(1/p = 2\), e \(2^1 = 2\), quindi min-entropia \textbf{1}.
+\item
+  \textbf{Due monete oneste}, \(p = 1/4\): \(1/p = 4\), e \(2^2 = 4\), quindi min-entropia \textbf{2}.
+\item
+  \textbf{Moneta piegata}, \(p = 0{,}6\): \(1/p \approx 1{,}67\). Siccome \(2^0 = 1\) e \(2^1 = 2\), la risposta sta tra 0 e 1; il conto preciso dà \textbf{0,74} (infatti \(2^{0{,}74} \approx 1{,}67\)).
+\end{itemize}
+
+\end{esempio}
+
+\textbf{Con la calcolatrice} (che di solito ha solo \(\ln\)): \(\log_2(x) = \ln(x) / \ln(2)\). Per la moneta piegata: \(\ln(1{,}67) / \ln(2) \approx 0{,}511 / 0{,}693 \approx 0{,}74\).
+
+\textbf{Tipicamente} si sa solo che \(H_\infty(X) \ge k\) per qualche \(k < n\), e si vuole estrarre quanta più casualità possibile.
+
+\subsection{Teorema: estrattori deterministici impossibili}
+
+\begin{inbreve}
+
+Un estrattore fissato in anticipo può sempre essere fregato da una fonte costruita apposta contro di lui, anche se quella fonte è quasi perfettamente casuale.
+
+\end{inbreve}
+
+\begin{nota}
+
+\textbf{Notazione: cosa è cosa}
+
+\begin{itemize}
+\tightlist
+\item
+  \(\{0,1\}\) = l'insieme dei due bit possibili, 0 oppure 1: cioè \textbf{un singolo bit}.
+\item
+  \(\{0,1\}^n\) = le \textbf{stringhe di} \(n\) \textbf{bit}. Es. \(\{0,1\}^3\) contiene 000, 001, \ldots, 111 (8 stringhe). L'esponente dice quanti bit; senza esponente è uno solo.
+\item
+  \(\to\) = ``restituisce'': a sinistra cosa entra nella funzione, a destra cosa esce.
+\item
+  \(\times\) = ``e'': la funzione prende \textbf{due} input insieme.
+\end{itemize}
+
+Quindi \(\text{Ext}: \{0,1\}^n \to \{0,1\}\) si legge: \emph{``Ext prende una stringa di* \(n\) \emph{bit (quella della fonte) e restituisce un solo bit''}. Es. con \(n = 3\) e Ext =''prendi il primo bit'': \(\text{Ext}(101) = 1\).
+Nella versione con il seme, \(\text{Ext}: \{0,1\}^d \times \{0,1\}^n \to \{0,1\}^\ell\) si legge: }''entra un seme di* \(d\) \emph{bit e una stringa della fonte di} \(n\) \emph{bit, escono} \(\ell\) \emph{bit puliti''}.
+
+\end{nota}
+
+\textbf{Perché un solo bit in output}: si sceglie l'obiettivo più facile possibile. Se non si riesce a estrarre nemmeno 1 bit pulito, a maggior ragione non si riesce con di più: così il risultato negativo è il più forte possibile.
+
+Non esiste nessun \(\text{Ext}: \{0,1\}^n \to \{0,1\}\) che funzioni per tutte le sorgenti con \(H_\infty(X) \ge k\), \textbf{nemmeno} con \(k = n - 1\) (e nemmeno per estrarre un solo bit).
+
+\subsection{Dimostrazione}
+
+Prendiamo un qualunque \(\text{Ext}: \{0,1\}^n \to \{0,1\}\).
+
+Sia \(b \in \{0,1\}\) il bit che \textbf{massimizza} \(|\text{Ext}^{-1}(b)|\), cioè il bit con più preimmagini.
+
+\begin{verbatim}
+ {0,1}^n
+┌───────────────┐
+│  x  x  x  x  │ ───→  0
+│───────────────│
+│  x  x  x     │ ───→  1
+└───────────────┘
+\end{verbatim}
+
+Le due preimmagini \(\text{Ext}^{-1}(0)\) e \(\text{Ext}^{-1}(1)\) si spartiscono tutte le \(2^n\) stringhe, quindi la più grande ne contiene almeno metà:
+
+\[
+|\text{Ext}^{-1}(b)| \ge 2^{n-1}
+\]
+
+Sia \(X_{\text{BAD}}\) uniforme su \(\text{Ext}^{-1}(b)\).
+
+\begin{itemize}
+\tightlist
+\item
+  Ogni valore ha probabilità \(1/|\text{Ext}^{-1}(b)| \le 2^{-(n-1)}\), quindi \(H_\infty(X_{\text{BAD}}) \ge n - 1\)
+\item
+  \textbf{ma} \(\text{Ext}(X_{\text{BAD}}) = b\) è \textbf{costante}! ∎
+\end{itemize}
+
+\textbf{Intuizione}: qualunque estrattore fissato ha un ``punto debole''. Basta una sorgente cattiva che peschi solo dagli input che finiscono nello stesso output.
+
+\subsection{Takeaway}
+
+Nessun \(\text{Ext}\) deterministico può funzionare per \textbf{tutte} le sorgenti con min-entropia. Approcci possibili:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Più sorgenti indipendenti}: \emph{2-source extractors}.
+\item
+  \textbf{Strumenti crittografici} (es. funzioni hash): ma servono ipotesi forti su queste funzioni.
+\item
+  \textbf{Seeded extraction}: è quello che vediamo nel corso.
+\end{itemize}
+
+\section{Seeded extraction}
+
+\begin{inbreve}
+
+Invece di fissare l'estrattore, lo si sceglie a caso tra tantissimi usando un \textbf{seme} pubblico. Così nessuna fonte può essere costruita apposta contro l'estrattore che verrà usato.
+
+\end{inbreve}
+
+\textbf{Idea}: invece di un solo estrattore, una \textbf{famiglia} di estrattori, indicizzata da un \textbf{seed} (seme):
+
+\[
+\text{Ext}: \underbrace{\{0,1\}^d}_{\text{seed}} \times \underbrace{\{0,1\}^n}_{\text{sorgente}} \to \underbrace{\{0,1\}^\ell}_{\text{output}}
+\]
+
+Il seed sarà \textbf{casuale}. Perché non è barare (usare casualità per produrre casualità)?
+
+\begin{itemize}
+\tightlist
+\item
+  Il seed è un \textbf{catalizzatore} corto: l'output può essere più lungo.
+\item
+  Il seed è \textbf{pubblico} (l'avversario lo conosce!) e \textbf{riutilizzabile}.
+\end{itemize}
+
+\subsection{Definizione: estrattore con seed}
+
+\begin{inbreve}
+
+Un \((k, \varepsilon)\)-estrattore trasforma \textbf{ogni} fonte con min-entropia almeno \(k\) in bit che, presi insieme al seme, sono quasi indistinguibili da bit perfettamente casuali (a meno di un errore \(\varepsilon\)).
+
+\end{inbreve}
+
+\(\text{Ext}: \{0,1\}^d \times \{0,1\}^n \to \{0,1\}^\ell\) è un \((k, \varepsilon)\)\textbf{-seeded extractor} se per ogni \(X\) con \(H_\infty(X) \ge k\):
+
+\[
+(S, \text{Ext}(S, X)) \approx_\varepsilon (S, U_\ell) \ \equiv U_{d+\ell}
+\]
+
+dove \(S \leftarrow U_d\) (seed uniforme).
+
+\textbf{Significato di} \(\approx_\varepsilon\): ogni avversario \(A\), anche con \textbf{potenza illimitata}, distingue \((S, \text{Ext}(S, X))\) da \(U_{d+\ell}\) con probabilità (vantaggio) al più \(\varepsilon\).
+
+\textbf{Nota}: il seed \(S\) compare \textbf{insieme} all'output. È questo che formalizza ``il seed è pubblico'': l'output deve sembrare uniforme anche a chi conosce il seed.
+
+\subsection{Distanza statistica}
+
+\begin{inbreve}
+
+La distanza statistica è un numero tra 0 e 1 che dice quanto due distribuzioni sono diverse. È il massimo vantaggio con cui chiunque, anche con potenza infinita, riesce a distinguerle.
+
+\end{inbreve}
+
+\[
+X \approx_\varepsilon Y \iff \text{SD}(X; Y) \le \varepsilon
+\]
+
+\[
+\text{SD}(X; Y) = \frac{1}{2} \sum_z \Big| \Pr[X = z] - \Pr[Y = z] \Big|
+\]
+
+\begin{nota}
+
+\textbf{Cosa sono le variabili}
+
+\begin{itemize}
+\tightlist
+\item
+  \(X\), \(Y\) = due \textbf{distribuzioni}, cioè due modi di generare valori a caso (es. due monete).
+\item
+  \(z\) = \textbf{un valore possibile} (per una moneta: 1 o 0).
+\item
+  \(\Pr[X = z]\) = la probabilità che \(X\) dia il valore \(z\); idem \(\Pr[Y = z]\).
+\item
+  \(|\dots - \dots|\) = di quanto differiscono le due probabilità su quel valore (sempre positivo).
+\item
+  \(\sum_z\) = ``somma su tutti i valori \(z\) possibili'': si fa il conto per ogni valore e si sommano i risultati.
+\item
+  \(\frac{1}{2}\) = si divide per 2, perché quello che una distribuzione ha in più su un valore lo ha in meno su un altro (le probabilità sommano sempre a 1): senza il ½ la stessa differenza verrebbe contata due volte. Così la SD sta sempre tra 0 e 1.
+\item
+  \(\text{SD}(X; Y)\) = la \textbf{distanza statistica}, il numero che esce dalla formula.
+\item
+  \(\varepsilon\) = l'errore massimo che si accetta (un numero piccolo).
+\item
+  \(X \approx_\varepsilon Y\) = ``X e Y sono quasi uguali, con errore al massimo \(\varepsilon\)''.
+\item
+  \(\iff\) = ``se e solo se'', cioè ``è la stessa cosa di''. La prima formula è quindi solo la definizione del simbolo \(\approx_\varepsilon\).
+\end{itemize}
+
+\end{nota}
+
+\textbf{Intuizione}: misura quanto due distribuzioni sono diverse. Vale 0 se sono identiche, 1 se non hanno valori in comune.
+
+\begin{esempio}
+
+\textbf{Esempio} \emph{(non negli appunti del prof)}: moneta truccata \(X\) con \(\Pr[1] = 0{,}6\) contro moneta onesta \(Y\):
+\(\text{SD} = \frac{1}{2}(|0{,}6 - 0{,}5| + |0{,}4 - 0{,}5|) = 0{,}1\)
+
+\end{esempio}
+
+\section{Leftover Hash Lemma (LHL)}
+
+\begin{inbreve}
+
+Il \textbf{Leftover Hash Lemma} è il teorema che risponde alla domanda ``come si costruisce un estrattore con seme?''. La risposta: basta una famiglia di hash pairwise independent. Il seme sceglie la hash, la si applica alla fonte e si ottengono bit quasi perfettamente casuali, purché la fonte abbia un po' più min-entropia dei bit che si vogliono estrarre. Il nome viene da \emph{leftover} (avanzo): la casualità che ``avanza'' in una fonte imperfetta si trasforma con una hash in bit puliti.
+
+\end{inbreve}
+
+\subsection{Teorema}
+
+Sia \(\mathcal{H} = \{h_s : \{0,1\}^n \to \{0,1\}^\ell\}_{s \in \{0,1\}^d}\) \textbf{pairwise independent}. Allora
+
+\[
+\text{Ext}(s, x) = h_s(x)
+\]
+
+è un \((k, \varepsilon)\)-seeded extractor per
+
+\[
+k \ge \ell + \underbrace{2\log(1/\varepsilon) - 2}_{\text{min-entropy gap}}
+\]
+
+\textbf{Cosa vuol dire} \(\text{Ext}(s, x) = h_s(x)\): il seme \(s\) sceglie quale funzione hash usare, e la si applica al valore \(x\) della fonte. L'output della hash sono i bit puliti.
+
+\begin{esempio}
+
+\textbf{Esempio} con \(h(x) = a \cdot x + b \bmod 7\): il seme è la coppia \(s = (a, b)\), per esempio \((3, 5)\). Se la fonte dà \(x = 2\), l'output è \(3 \cdot 2 + 5 = 11 \bmod 7 = 4\). Nei MAC la coppia \((a, b)\) era la \textbf{chiave segreta}, qui è il \textbf{seme pubblico}: stesse funzioni, ruolo diverso.
+
+\end{esempio}
+
+\textbf{Intuizione}: per estrarre \(\ell\) bit quasi uniformi servono un po' più di \(\ell\) bit di min-entropia. Il ``prezzo'' è il \textbf{min-entropy gap}, che cresce se vogliamo \(\varepsilon\) più piccolo.
+
+\begin{esempio}
+
+\textbf{Esempio} \emph{(non negli appunti del prof)}: per estrarre \(\ell = 128\) bit con \(\varepsilon = 2^{-64}\) serve \(k \ge 128 + 128 - 2 = 254\) bit di min-entropia.
+
+\end{esempio}
+
+\subsection{Collision probability e lemma}
+
+\begin{inbreve}
+
+La collision probability è la probabilità che due estrazioni indipendenti diano lo stesso valore. L'uniforme è la distribuzione che collide di meno, e il lemma dice che se una distribuzione collide quasi quanto l'uniforme, allora è quasi uniforme.
+
+\end{inbreve}
+
+La dimostrazione usa la \textbf{probabilità di collisione} di una variabile aleatoria \(Y\) su un insieme \(\mathcal{Y}\):
+
+\[
+\text{Col}(Y) = \sum_{y \in \mathcal{Y}} \Pr[Y = y]^2 = \Pr[Y = Y']
+\]
+
+dove \(Y'\) è una \textbf{copia indipendente} di \(Y\): è la probabilità che due estrazioni indipendenti diano lo stesso valore. La distribuzione uniforme ha la collision probability più bassa possibile, \(1/|\mathcal{Y}|\).
+
+\textbf{Lemma}: se
+
+\[
+\text{Col}(Y) \le \frac{1}{|\mathcal{Y}|}(1 + 4\varepsilon^2)
+\]
+
+allora \(\text{SD}(Y; U) \le \varepsilon\), con \(U\) uniforme su \(\mathcal{Y}\).
+
+\textbf{Intuizione}: se la collision probability è quasi quella dell'uniforme, allora \(Y\) è quasi uniforme.
+
+\begin{approfondimento}{Dimostrazione del lemma (il prof la fa all'inizio della Lezione 4: lì
+c'è la versione completa, passo per passo)}
+
+Sia \(N = |\mathcal{Y}|\) e \(p_y = \Pr[Y = y]\). Per Cauchy-Schwarz (\(\sum |a_y| \le \sqrt{N \sum a_y^2}\)):
+
+\(\text{SD}(Y; U) = \frac{1}{2}\sum_y |p_y - 1/N| \le \frac{1}{2}\sqrt{N \sum_y (p_y - 1/N)^2}\)
+
+Sviluppando il quadrato: \(\sum_y (p_y - 1/N)^2 = \sum_y p_y^2 - \frac{2}{N}\sum_y p_y + \frac{1}{N} = \text{Col}(Y) - \frac{1}{N} \le \frac{4\varepsilon^2}{N}\)
+
+Quindi \(\text{SD}(Y; U) \le \frac{1}{2}\sqrt{N \cdot 4\varepsilon^2 / N} = \varepsilon\). ∎
+
+\end{approfondimento}
+
+\subsection{Dimostrazione del LHL}
+
+\begin{inbreve}
+
+Si contano le collisioni dell'output. Ci sono quelle ``per caso'', che ci sono anche nell'uniforme, e quelle dovute alla fonte che ripete lo stesso valore, che sono poche grazie alla min-entropia. Quindi l'output collide quasi quanto l'uniforme e, per il lemma, è quasi uniforme.
+
+\end{inbreve}
+
+Poniamo \(Y = (S, h(S, X))\), e sia \(Y' = (S', h(S', X'))\) una copia indipendente. Calcoliamo la collision probability:
+
+\[
+\begin{aligned}
+\text{Col}(Y) &= \Pr[Y = Y'] \\
+&= \Pr[S = S' \wedge h(S, X) = h(S', X')] \\
+&= \Pr[S = S' \wedge h(S, X) = h(S, X')] \\
+&= \underbrace{\Pr[S = S']}_{\text{Col}(S) \,=\, 2^{-d}} \cdot \Pr[h(S, X) = h(S, X')]
+\end{aligned}
+\]
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{3° passaggio}: se \(S = S'\), possiamo sostituire \(S'\) con \(S\).
+\item
+  \textbf{4° passaggio}: i seed sono indipendenti dalle sorgenti, quindi le due probabilità si separano. \(S\) è uniforme su \(2^d\) valori, quindi \(\text{Col}(S) = 2^{-d}\).
+\end{itemize}
+
+Ora spezziamo in due casi, \(X = X'\) oppure \(X \ne X'\):
+
+\[
+\begin{aligned}
+&= 2^{-d} \Big( \Pr[X = X'] \cdot 1 + \Pr[h(S, X) = h(S, X') \wedge X \ne X'] \Big) \\
+&\le 2^{-d} \Big( 2^{-k} + \Pr[h(S, X) = h(S, X') \wedge X \ne X'] \Big) \\
+&\le 2^{-d} \Big( 2^{-k} + 2^{-\ell} \Big)
+\end{aligned}
+\]
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Primo termine}: se \(X = X'\) gli hash coincidono sicuramente (probabilità 1). E \(\Pr[X = X'] = \sum_x \Pr[X = x]^2 \le \max_x \Pr[X = x] \cdot \sum_x \Pr[X = x] \le 2^{-k}\), perché \(H_\infty(X) \ge k\).
+\item
+  \textbf{Secondo termine}: per input diversi \(x \ne x'\), per pairwise independence \(\Pr_S[h_S(x) = h_S(x')] = 2^\ell \cdot 2^{-2\ell} = 2^{-\ell}\) (le coppie \((t, t)\) con valori uguali sono \(2^\ell\), ognuna con probabilità \(2^{-2\ell}\)).
+\end{itemize}
+
+Raccogliendo \(2^{-\ell}\):
+
+\[
+\begin{aligned}
+&= \frac{1}{2^{d+\ell}} \Big( 2^{\ell - k} + 1 \Big) \\
+&\le \frac{1}{|\mathcal{Y}|} \Big( 2^{2 - 2\log(1/\varepsilon)} + 1 \Big) \\
+&= \frac{1}{|\mathcal{Y}|} \Big( 1 + 4\varepsilon^2 \Big)
+\end{aligned}
+\]
+
+\begin{itemize}
+\tightlist
+\item
+  \(|\mathcal{Y}| = 2^{d+\ell}\) perché \(Y\) è una stringa di \(d + \ell\) bit.
+\item
+  Dall'ipotesi \(k \ge \ell + 2\log(1/\varepsilon) - 2\) segue \(\ell - k \le 2 - 2\log(1/\varepsilon)\).
+\item
+  \(2^{2 - 2\log(1/\varepsilon)} = 4 \cdot (2^{\log(1/\varepsilon)})^{-2} = 4\varepsilon^2\).
+\end{itemize}
+
+Per il lemma: \(\text{SD}(Y; U) \le \varepsilon\), cioè \((S, h(S, X)) \approx_\varepsilon U_{d+\ell}\). ∎
+
+\section{Riepilogo}
+
+\begin{itemize}
+\tightlist
+\item
+  \(h_{a,b}(m) = am + b \bmod p\) è pairwise independent: il sistema lineare ha una sola soluzione perché \(m \ne m'\)
+\item
+  Ogni famiglia pairwise independent dà un MAC ε-sicuro con \(\varepsilon = 1/|\mathcal{T}|\) (ottimo)
+\item
+  \textbf{Bad news}: un MAC t-time \(2^{-\lambda}\)-sicuro richiede chiavi di \((t+1)\lambda\) bit
+\item
+  \textbf{Min-entropia} \(H_\infty(X) = -\log \max_x \Pr[X = x]\): quanto è difficile indovinare \(X\) al primo colpo
+\item
+  Nessun estrattore \textbf{deterministico} funziona per tutte le sorgenti, nemmeno con \(k = n - 1\) e un solo bit di output
+\item
+  \textbf{Seeded extractor}: con un seed casuale, corto e \textbf{pubblico}, \((S, \text{Ext}(S, X)) \approx_\varepsilon U_{d+\ell}\)
+\item
+  \textbf{Distanza statistica} \(\text{SD}\): misura quanto due distribuzioni differiscono
+\item
+  \textbf{Leftover Hash Lemma}: hash pairwise independent sono estrattori, se \(k \ge \ell + 2\log(1/\varepsilon) - 2\)
+\end{itemize}

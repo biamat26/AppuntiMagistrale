@@ -29,5 +29,6 @@
 .DS_Store
 Thumbs.db
 
-# Sito MkDocs
-site/
+
+# Le figure in PDF (diagrammi) vanno tenute
+!*/figures/*.pdf

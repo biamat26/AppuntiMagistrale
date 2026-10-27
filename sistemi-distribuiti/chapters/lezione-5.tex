@@ -1,0 +1,513 @@
+\chapter{Lezione 5 -- Failure detector e leader election}
+
+\section{Di cosa parliamo}
+
+Finora i crash erano solo un'ipotesi del modello: un processo può fermarsi e nessuno lo sa. Questa lezione introduce dei moduli che \textbf{danno informazioni sui crash}:
+
+\begin{itemize}
+\tightlist
+\item
+  i \textbf{failure detector} (FD): ``secondo me \(p\) è morto'';
+\item
+  la \textbf{leader election}: ``questo processo è vivo, usalo come coordinatore''.
+\end{itemize}
+
+L'idea chiave è che questi moduli \textbf{incapsulano le ipotesi sul tempo}. Invece di ragionare su timeout e ritardi dentro ogni algoritmo (complicato e facile da sbagliare nelle dimostrazioni), si scrive una volta sola un modulo che usa il tempo, e gli algoritmi sopra usano solo le sue proprietà. Alla fine si usano FD e leader election per rendere la mutua esclusione resistente ai crash.
+
+Slide: versione 2026/27 (``Time III''), con in più gli esercizi della versione 2024/25.
+
+\section{L'astrazione failure detector}
+
+\begin{inbreve}
+
+Un failure detector è un modulo che, a ogni processo, segnala quali altri processi sono crashati. Funziona ``a ping'': se uno non risponde in tempo, lo considero morto. Più il sistema è sincrono, più le sue risposte sono affidabili.
+
+\end{inbreve}
+
+\begin{itemize}
+\tightlist
+\item
+  Funziona \textbf{solo per i crash} (crash-stop), non per i guasti bizantini: un processo bizantino può rispondere ai ping e intanto comportarsi male.
+\item
+  Si descrive con due proprietà:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{Completeness} (completezza): la capacità di \textbf{accorgersi di tutti} i crash.
+  \item
+    \textbf{Accuracy} (accuratezza): la capacità di \textbf{non sbagliare}, cioè non dichiarare morto un processo vivo.
+  \end{itemize}
+\end{itemize}
+
+Nota: soddisfare una sola delle due è banale. ``Dichiaro tutti morti'' ha completezza perfetta; ``non dichiaro mai nessuno'' ha accuratezza perfetta. Il difficile è averle insieme.
+
+\section{Perfect failure detector (P)}
+
+\subsection{Specifica}
+
+\begin{inbreve}
+
+P non sbaglia mai. Prima o poi tutti i processi corretti si accorgono di ogni crash, e se P dice che un processo è crashato, è davvero crashato.
+
+\end{inbreve}
+
+Evento: \(\langle \text{Crash} \mid p \rangle\), ``ho rilevato che \(p\) è crashato''.
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{PFD1 -- Strong completeness}: prima o poi ogni processo crashato viene rilevato, in modo permanente, da \textbf{ogni} processo corretto. → liveness
+\item
+  \textbf{PFD2 -- Strong accuracy}: se un processo viene rilevato da qualcuno, allora è davvero crashato. → safety
+\end{itemize}
+
+\textbf{Modello necessario}: sistema \textbf{sincrono}, crash, e link \emph{perfect sincroni} (perfect link + se \(p\) corretto manda \(m\) al tempo \(t\) e il destinatario non crasha entro \(t + \text{max\_delay}\), \(m\) arriva entro \(t + \text{max\_delay}\)).
+
+\textbf{In asincrono non si può}: un processo lento e uno crashato sono indistinguibili (Lezione 2). Qualunque timeout scegli, prima o poi un processo vivo ma lento lo supera e lo dichiari morto per sbaglio, violando l'accuracy.
+
+\subsection{Algoritmo ``Exclude on Timeout''}
+
+Ogni \(\Delta\) unità di tempo: chi non mi ha risposto dall'ultimo giro è morto; poi mando un nuovo ping a tutti.
+
+\begin{verbatim}
+upon event ⟨P, Init⟩ do
+    alive := Π; detected := ∅
+    starttimer(Δ)
+
+upon event ⟨Timeout⟩ do
+    forall p ∈ Π do
+        if p ∉ alive and p ∉ detected then    // non ha risposto
+            detected := detected ∪ {p}
+            trigger ⟨P, Crash | p⟩
+        trigger ⟨pl, Send | p, HEARTBEAT_REQUEST⟩
+    alive := ∅
+    starttimer(Δ)
+
+upon event ⟨pl, Deliver | q, HEARTBEAT_REQUEST⟩ do
+    trigger ⟨pl, Send | q, HEARTBEAT_REPLY⟩
+
+upon event ⟨pl, Deliver | p, HEARTBEAT_REPLY⟩ do
+    alive := alive ∪ {p}
+\end{verbatim}
+
+\textbf{Perché funziona} (con \(\Delta \ge 2 \cdot \text{max\_delay}\)):
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Strong completeness}: se \(p_1\) crasha al tempo \(t\), entro \(t + \Delta\) ricevo un nuovo giro di ping, \(p_1\) non risponde, e al timeout successivo lo rilevo. Il ritardo di rilevamento è quindi limitato (circa \(2\Delta\)).
+\item
+  \emph{Strong accuracy} (per assurdo): se rilevo \(p\) ma era vivo, o la mia richiesta non gli è arrivata entro il timeout, o la sua risposta non è arrivata a me. Ma andata + ritorno durano al massimo \(2 \cdot \text{max\_delay} \le \Delta\). Contraddizione.
+\end{itemize}
+
+\textbf{Trade-off su} \(\Delta\): più è piccolo, più in fretta rilevo i crash, ma mando più messaggi. Non può scendere sotto \(2 \cdot \text{max\_delay}\), altrimenti perdo l'accuracy.
+
+\subsection{Domande tipiche sulle slide}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Processi diversi possono rilevare lo stesso crash in momenti diversi?} Sì. La specifica dice solo ``prima o poi'': in un certo istante \(p_0\) e \(p_2\) possono già avere \(p_3\) in \texttt{detected} e gli altri no. Quanto prima è ``prima o poi'' lo dice l'algoritmo, non la specifica (con Exclude on Timeout, entro circa \(2\Delta\)).
+\item
+  \textbf{Se al tempo} \(t\) \textbf{p non è in} \texttt{detected}\textbf{, posso dire che è vivo al tempo} \(t\)\textbf{?} No.~Un processo conosce il mondo solo tramite messaggi, che impiegano tempo: al tempo \(t\) sa com'era il mondo un po' prima. Nessun FD può dire se qualcuno è vivo \textbf{adesso}: può essere crashato un istante fa.
+\end{itemize}
+
+\subsection{Migliorare P: il P a round}
+
+\begin{inbreve}
+
+Se gli orologi sono sincronizzati, non serve chiedere ``sei vivo?''. Basta che ognuno mandi ``sono vivo'' all'inizio di ogni turno: chi tace in un turno è morto. Si dimezzano i messaggi.
+
+\end{inbreve}
+
+Citazione nelle slide: ``nelle reti sincrone, \textbf{i silenzi parlano}'' (N. Santoro). Exclude on Timeout usa 2 messaggi per coppia (richiesta + risposta). Se tutti hanno un orologio sincronizzato, basta 1 messaggio.
+
+Ipotesi: sincronizzatore di clock con skew massimo \(\delta\), link con ritardo massimo \(\text{max\_delay}\) e ritardo \textbf{minimo} \(\text{min\_delay} > \delta\).
+
+Il tempo viene diviso in \textbf{round} di lunghezza \(T\), con \(T > 2(\text{max\_delay} + \delta)\) nella slide. All'inizio di ogni round ogni processo:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  dichiara crashati quelli da cui \textbf{non} ha ricevuto il BEAT nel round precedente;
+\item
+  manda BEAT a tutti quelli che considera ancora corretti.
+\end{enumerate}
+
+\textbf{Perché funziona.} Bisogna mostrare che un BEAT spedito quando il mio round è \(r\) arriva a \(p\) quando anche \(p\) è al round \(r\):
+
+\begin{itemize}
+\tightlist
+\item
+  se entro nel round \(r\) al tempo \(t\), per lo skew \(p\) ci entra tra \(t - \delta\) e \(t + \delta\);
+\item
+  \(p\) resta nel round \(r\) almeno fino a \(t - \delta + T\), che è maggiore di \(t + \delta + \text{max\_delay}\);
+\item
+  il mio BEAT arriva nell'intervallo \((t + \text{min\_delay}, t + \text{max\_delay}]\); poiché \(\text{min\_delay} > \delta\), non arriva prima che \(p\) sia entrato nel round \(r\).
+\end{itemize}
+
+Quindi: se ho mandato il BEAT ero vivo, e il BEAT arriva nel round giusto. Se \(p\) non riceve il mio BEAT, l'unico motivo è che non l'ho mandato, cioè sono crashato. Da qui completeness e accuracy.
+
+\textbf{Due processi possono rilevare lo stesso crash in round diversi?} Sì: se \(p_3\) crasha \textbf{a metà} del ciclo con cui manda i BEAT, alcuni lo ricevono e altri no. Chi non l'ha ricevuto lo rileva al round dopo; gli altri un round più tardi.
+
+\subsection{Sincrono = a round}
+
+Un modo alternativo di vedere il sincrono: il tempo è diviso in \textbf{round} logici e
+
+\begin{itemize}
+\tightlist
+\item
+  tutti i processi cambiano round nello stesso momento;
+\item
+  un messaggio mandato da un processo corretto all'inizio del round \(r\) arriva a tutti i corretti entro la fine del round \(r\).
+\end{itemize}
+
+I round sono lo strumento standard per progettare algoritmi sincroni e la misura standard del loro tempo (numero di round). Lettura opzionale: \emph{The splendors and miseries of rounds}, A. Shimi, 2019.
+
+\section{Eventually perfect failure detector (◇P)}
+
+\subsection{L'idea}
+
+\begin{inbreve}
+
+Nel modello eventualmente sincrono non si può avere un FD che non sbaglia mai. Si accetta che sbagli per un po', purché sia pronto a correggersi. Non ``rileva'' più i crash: li \textbf{sospetta}.
+
+\end{inbreve}
+
+Modello: \textbf{eventualmente sincrono}, crash, perfect link. Prima del tempo \(T\) (ignoto) il sistema si comporta in modo asincrono e il FD può sospettare processi corretti. Per questo ci sono due eventi:
+
+\begin{itemize}
+\tightlist
+\item
+  \(\langle \text{Suspect} \mid p \rangle\): sospetto che \(p\) sia crashato;
+\item
+  \(\langle \text{Restore} \mid p \rangle\): mi sono sbagliato, \(p\) non è più sospettato.
+\end{itemize}
+
+\subsection{Specifica}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{EPFD1 -- Strong completeness}: prima o poi ogni processo crashato è sospettato \textbf{per sempre} da ogni processo corretto.
+\item
+  \textbf{EPFD2 -- Eventual strong accuracy}: prima o poi \textbf{nessun} processo corretto è sospettato da un processo corretto.
+\end{itemize}
+
+Differenza con P: l'accuracy vale solo ``da un certo momento in poi''. Prima, il FD può sbagliare quanto vuole.
+
+\subsection{Algoritmo ``Increasing Timeout''}
+
+Come Exclude on Timeout, con due differenze: se un processo sospettato si rifà vivo, lo \textbf{ripristino}; e siccome il mio timeout era troppo corto, lo \textbf{allungo}.
+
+\begin{verbatim}
+upon event ⟨◇P, Init⟩ do
+    alive := Π; suspected := ∅
+    delay := Δ
+    starttimer(delay)
+
+upon event ⟨Timeout⟩ do
+    if alive ∩ suspected ≠ ∅ then       // ho sospettato qualcuno che era vivo
+        delay := delay + Δ               // il timeout era troppo corto
+    forall p ∈ Π do
+        if p ∉ alive and p ∉ suspected then
+            suspected := suspected ∪ {p}
+            trigger ⟨◇P, Suspect | p⟩
+        else if p ∈ alive and p ∈ suspected then
+            suspected := suspected \ {p}
+            trigger ⟨◇P, Restore | p⟩
+        trigger ⟨pl, Send | p, HEARTBEAT_REQUEST⟩
+    alive := ∅
+    starttimer(delay)
+
+// le risposte ai ping sono identiche a Exclude on Timeout
+\end{verbatim}
+
+\textbf{Perché funziona}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{Strong completeness}: un processo crashato smette di rispondere, quindi viene sospettato e nessuno lo ripristinerà più.
+\item
+  \emph{Eventual strong accuracy}: dopo il tempo \(T\) i messaggi arrivano entro un ritardo massimo, che esiste ma \textbf{non conosciamo}. Ogni volta che sospetto per sbaglio un processo vivo, prima o poi arriva la sua risposta, lo ripristino e allungo il timeout. Dopo un numero finito di errori il timeout supera il tempo di andata e ritorno (circa \(2 \cdot \text{MAX\_DELAY}\); la versione 2024/25 delle slide dice proprio così, quella nuova scrive \(\text{MAX\_DELAY}\)) e non sbaglio più.
+\end{itemize}
+
+\subsection{Proprietà: gli insiemi dei sospettati si allineano}
+
+\textbf{Lemma}: per due processi corretti \(p_1, p_2\) esiste un tempo (di \emph{stabilizzazione}) dopo il quale \(\text{suspected}_1 = \text{suspected}_2\).
+
+Dimostrazione (per assurdo): sia \(p\) in \(\text{suspected}_1\) ma non in \(\text{suspected}_2\) per sempre. Se \(p\) è corretto, \(p_1\) viola l'eventual strong accuracy. Se \(p\) è crashato, \(p_2\) viola la strong completeness.
+
+Da un certo punto in poi, quindi, i sospettati sono esattamente i crashati, uguali per tutti. Questo lemma serve per Ω.
+
+\section{Leader election}
+
+\subsection{Perché}
+
+\begin{inbreve}
+
+A volte non interessa sapere chi è morto, ma avere \textbf{un} processo vivo di riferimento, per esempio un coordinatore. La leader election è un modulo che indica quel processo.
+
+\end{inbreve}
+
+\subsection{Leader election (LE), con P}
+
+Evento: \(\langle \text{Leader} \mid p \rangle\), ``\(p\) è il leader''. Solo per crash-stop.
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{LE1 -- Eventual detection}: o non c'è nessun processo corretto, oppure prima o poi viene eletto leader un processo corretto.
+\item
+  \textbf{LE2 -- Accuracy}: se un processo diventa leader, tutti i leader eletti prima sono crashati.
+\end{itemize}
+
+In parole: non si cambia leader finché quello attuale è vivo.
+
+\textbf{Algoritmo ``Monarchical Leader Election''} (usa P). Ogni processo ha un \emph{rank} (es. l'ID). Il leader è il processo di rank massimo tra quelli non crashati.
+
+\begin{verbatim}
+upon event ⟨le, Init⟩ do
+    suspected := ∅; leader := ⊥
+
+upon event ⟨P, Crash | p⟩ do
+    suspected := suspected ∪ {p}
+
+upon leader ≠ maxrank(Π \ suspected) do
+    leader := maxrank(Π \ suspected)
+    trigger ⟨le, Leader | leader⟩
+\end{verbatim}
+
+\textbf{Perché funziona}: \emph{eventual detection} viene dalla strong completeness di P (prima o poi tutti i crashati sono esclusi e resta un corretto). \emph{Accuracy} viene dalla strong accuracy di P (si esclude solo chi è davvero crashato) più l'ordine totale sui rank: il leader cambia solo quando quello attuale è crashato.
+
+\textbf{Esempi ``possibile?'' nelle slide}
+
+\begin{itemize}
+\tightlist
+\item
+  Tutti hanno \(p_0\) come leader. \(p_0\) crasha; \(p_1\) se ne accorge e si elegge, mentre \(p_2\) ha ancora \(p_0\). \textbf{Possibile}: \(p_2\) non ha ancora rilevato il crash, e la specifica non chiede che succeda per tutti nello stesso momento.
+\item
+  Poi \(p_2\) elegge sé stesso mentre \(p_1\) è vivo ed era già stato eletto. \textbf{Non possibile}: viola LE2, perché \(p_1\), un leader precedente, non è crashato.
+\end{itemize}
+
+\subsection{Eventual leader election (Ω)}
+
+Se il FD non è perfetto (◇P) non si può garantire LE2. Si indebolisce la specifica.
+
+Evento: \(\langle \text{Trust} \mid p \rangle\), ``mi fido di \(p\) come leader''.
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{ELD1 -- Eventual accuracy}: da un certo momento ogni processo corretto si fida di un processo \textbf{corretto}.
+\item
+  \textbf{ELD2 -- Eventual agreement}: da un certo momento nessuna coppia di processi corretti si fida di processi corretti \textbf{diversi}.
+\end{itemize}
+
+Con Ω, per un periodo arbitrario, i leader possono cambiare a caso e ce ne possono essere \textbf{più d'uno contemporaneamente}. Quando il leader diventa unico e non cambia più si dice che si è \textbf{stabilizzato}.
+
+Le due proprietà sono indipendenti. Esempi nelle slide: un'esecuzione in cui alla fine tutti si fidano dello stesso processo, ma crashato, soddisfa l'agreement ma non l'accuracy. Un'esecuzione in cui ognuno si fida di un corretto, ma diverso, soddisfa l'accuracy ma non l'agreement.
+
+\textbf{Algoritmo ``Monarchical Eventual Leader Detection''} (usa ◇P): uguale al monarchico, ma con \(\langle \text{Suspect} \rangle\) si aggiunge a \texttt{suspected} e con \(\langle \text{Restore} \rangle\) si toglie. Ci si fida del processo di rank massimo tra i non sospettati.
+
+\textbf{Perché funziona}
+
+\begin{itemize}
+\tightlist
+\item
+  \emph{ELD1}: per la strong completeness, prima o poi \texttt{suspected} contiene tutti i crashati, quindi \(\Pi \setminus \text{suspected}\) contiene solo corretti.
+\item
+  \emph{ELD2}: per il lemma sopra, gli insiemi dei sospettati di due corretti diventano uguali, quindi \texttt{maxrank} restituisce lo stesso processo a entrambi.
+\end{itemize}
+
+\section{Tre modelli di guasto e confronto col sincrono}
+
+\subsection{Fail-stop, fail-noisy, fail-silent}
+
+\begin{inbreve}
+
+Si classificano i modelli con crash in base al failure detector disponibile: P (fail-stop), ◇P (fail-noisy), nessuno (fail-silent).
+
+\end{inbreve}
+
+\begin{longtable}[]{@{}ll@{}}
+\toprule\noalign{}
+Modello & Cosa c'è \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{Fail-stop} & crash + perfect link + \textbf{P} \\
+\textbf{Fail-noisy} & crash + perfect link + \textbf{◇P} \\
+\textbf{Fail-silent} & crash + perfect link, \textbf{nessun FD} \\
+\end{longtable}
+
+\begin{itemize}
+\tightlist
+\item
+  Fail-stop \textbf{implica} fail-noisy (P è anche un ◇P), e fail-noisy implica fail-silent (si può sempre ignorare il FD).
+\item
+  \textbf{Esecuzioni}: fail-stop \(\subset\) fail-noisy \(\subset\) fail-silent.
+\item
+  \textbf{Problemi risolvibili}: al contrario, fail-silent \(\subset\) fail-noisy \(\subset\) fail-stop. Più il modello dà, più problemi si risolvono. È lo stesso ragionamento della Lezione 3 su sincrono/asincrono.
+\end{itemize}
+
+\subsection{Fail-stop vs sincrono}
+
+Il sincrono è \textbf{più forte} del fail-stop. Nel sincrono si può costruire P (Exclude on Timeout), quindi tutto ciò che si risolve in fail-stop si risolve anche in sincrono. Il viceversa no: il fail-stop dà un FD perfetto, ma non dà limiti sui tempi.
+
+Esempi di problemi risolvibili in sincrono ma non in fail-stop (risposta del prof): \textbf{sincronizzazione degli orologi} e \textbf{timed delivery} (``se \(p\) manda \(m\) a \(q\), \(q\) lo riceve entro \(x\)''). Problemi risolvibili in fail-stop ma non in sincrono: \textbf{nessuno}.
+
+\section{Applicazione: mutua esclusione tollerante ai crash}
+
+\subsection{Lamport ME + P}
+
+\begin{inbreve}
+
+Lamport ME (Lezione 4) si blocca se un processo crasha, perché aspetta il suo ACK o il suo RELEASE per sempre. Con P si può ``dimenticare'' chi è crashato.
+
+\end{inbreve}
+
+Le proprietà vanno riscritte tenendo conto dei crash:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Mutua esclusione}: in ogni istante al massimo un processo \textbf{non crashato} è in CS.
+\item
+  \textbf{Liveness}: se un processo \textbf{corretto} chiede la CS, prima o poi entra.
+\item
+  \textbf{Fairness}: se un processo \textbf{corretto} \(p\) chiede prima di \(q\), \(q\) non entra prima di \(p\).
+\end{itemize}
+
+\textbf{Punti critici} dell'algoritmo originale: un processo crashato \textbf{non manda il RELEASE} (se era in CS, o in coda, blocca tutti) e \textbf{non manda l'ACK} (chi aspetta il suo ACK si blocca).
+
+\textbf{Patch}, alla ricezione di \(\langle \text{Crash} \mid p_j \rangle\) da P:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  aggiungo \(p_j\) a \texttt{Crashed};
+\item
+  tolgo da \texttt{Requests} le richieste di \(p_j\);
+\item
+  per entrare non aspetto più l'ACK dei processi in \texttt{Crashed}: la condizione diventa ``ACK da ogni \(p \in \Pi \setminus \text{Crashed}\)''.
+\end{enumerate}
+
+\textbf{Non basta.} Una REQ di \(p_0\) può essere ancora in viaggio quando \(p_0\) crasha e io lo rilevo. Se arriva \textbf{dopo} il rilevamento, la metto in coda e non verrà mai tolta (nessun RELEASE arriverà, e il crash l'ho già gestito): blocca le mie richieste per sempre.
+
+\textbf{Patch corretta}: in più, alla ricezione di una REQ, la si accetta \textbf{solo se il mittente non è in} \texttt{Crashed}.
+
+\subsection{Un algoritmo più semplice: P + leader election}
+
+Idea:
+
+\begin{itemize}
+\tightlist
+\item
+  con LE si elegge un \textbf{leader} che fa da coordinatore;
+\item
+  chi vuole la CS manda una richiesta al leader;
+\item
+  il leader concede la CS una richiesta alla volta, in ordine FIFO;
+\item
+  chi esce manda un RELEASE al leader;
+\item
+  se il leader rileva il crash di \(p\): se \(p\) non era in CS toglie la sua richiesta, se era in CS fa come se avesse rilasciato.
+\end{itemize}
+
+\textbf{Problema: cambio di leader.} Solo il vecchio leader sapeva chi era in CS. Se quel processo è crashato va bene; se è vivo, risponderà. Quindi il nuovo leader fa una \textbf{fase new\_leader}: chiede a tutti i processi non rilevati come crashati se sono in CS e aggiorna il suo stato. Solo dopo serve nuove richieste. I processi che avevano richieste pendenti le rimandano al nuovo leader.
+
+\section{Esercizi e homework}
+
+\begin{approfondimento}{T minimo per il P a round (soluzione proposta)}
+
+Dalla dimostrazione, serve che \(p\) sia ancora nel round \(r\) quando arriva il BEAT, cioè \(t - \delta + T > t + \delta + \text{max\_delay}\), quindi
+
+\[
+T > \text{max\_delay} + 2\delta
+\]
+
+Il valore della slide, \(T > 2(\text{max\_delay} + \delta)\), è sufficiente ma più grande del necessario. Serve inoltre \(\text{min\_delay} > \delta\), perché il BEAT non arrivi prima che \(p\) sia entrato nel round \(r\).
+
+\end{approfondimento}
+
+\begin{approfondimento}{Timeout di ◇P con ritardo massimo sconosciuto: come aumentarlo e
+diminuirlo? (soluzione proposta)}
+
+\textbf{Stabilizzare il prima possibile}: invece di aggiungere \(\Delta\) a ogni errore, \textbf{raddoppiare} il timeout. Se il valore giusto è \(D\), con incrementi fissi servono circa \(D/\Delta\) errori, raddoppiando solo \(\log_2(D/\Delta)\).
+
+\textbf{Latenza bassa sui crash veri}: un timeout troppo grande fa accorgere tardi dei crash. Si può \textbf{diminuire lentamente} il timeout quando per molti giri non ci sono stati errori, e misurare gli RTT reali per tenerlo vicino al massimo osservato (più un margine). Il compromesso classico è \textbf{aumento veloce e diminuzione lenta}, come il controllo di congestione di TCP (al contrario).
+
+\end{approfondimento}
+
+\begin{approfondimento}{Mutua esclusione tollerante ai guasti in fail-silent e fail-noisy?
+(considerazioni, non dimostrazioni)}
+
+\textbf{Fail-silent: no.} Se il processo in CS smette di rispondere, non c'è modo di sapere se è crashato o solo lento. Aspettarlo per sempre viola la liveness; dare la CS a un altro rischia di avere due processi vivi in CS e viola la mutua esclusione.
+
+\textbf{Fail-noisy: sembra di no.} ◇P può sbagliare per un tempo arbitrario. Se sospetta per errore il processo in CS e la CS viene data a un altro, la mutua esclusione (safety) è violata, e una violazione di safety non si recupera anche se poi ◇P si corregge. Servirebbe un FD che non sbaglia mai su chi è vivo, cioè P.
+
+\end{approfondimento}
+
+\begin{approfondimento}{Esercizio 2.8 del libro: un FD che non è ◇P può far violare una safety?
+(soluzione proposta)}
+
+No.~Le proprietà di ◇P sono tutte ``prima o poi'', quindi \textbf{qualunque comportamento finito} del FD (anche ``non sospetto nessuno'') può essere l'inizio di un'esecuzione in cui ◇P è corretto. Una violazione di safety si vede in un prefisso finito. Se A violasse la safety con un FD ``sbagliato'', la stessa violazione apparirebbe anche in un'esecuzione in cui il FD è un vero ◇P (stesso prefisso), contro l'ipotesi che A sia corretto. Il FD sbagliato può rompere solo la \textbf{liveness}.
+
+\end{approfondimento}
+
+\begin{approfondimento}{Esercizio 2.9 del libro: abstraction la cui liveness si rompe se il FD
+non rispetta le proprietà (soluzione proposta)}
+
+Esempio già visto: \textbf{leader election monarchica con P}. Se il FD non rispetta la strong completeness (es. non rileva mai nessun crash) e il leader crasha, nessuno elegge un nuovo leader: viola LE1 (eventual detection), che è una proprietà di liveness.
+
+\end{approfondimento}
+
+\begin{approfondimento}{Esercizio d'esame (settembre 2021): perfect link su un link con al più k
+perdite (soluzione del prof, slide 2024/25)}
+
+\textbf{Link ``bounded k-loss''}: no duplication, no creation, e se \(p\) manda \(T > k\) messaggi, \(q\) ne consegna almeno \(T - k\). In pratica il link perde \textbf{al massimo k messaggi in tutto}. L'\emph{overhead} \(O\) è quanti messaggi in più servono: per far consegnare \(X\) messaggi ne mando al massimo \(X + O\). Lo stubborn ha overhead infinito.
+
+\textbf{Q4.1 -- Perfect link con overhead finito.} Mando ogni messaggio \(k+1\) volte (almeno una copia arriva, perché se ne perdono al massimo \(k\)). Il ricevente scarta i duplicati con l'insieme \texttt{delivered}. Per \(X\) messaggi spedisco \((k+1)X\), quindi overhead \(kX\).
+
+\textbf{Q4.2 -- Overhead minimo.} Per \textbf{un} messaggio servono almeno \(k+1\) invii (l'avversario può perderne \(k\)), quindi \(O = k\). Per un \textbf{lotto} di \(X > k\) messaggi si fa meglio con gli ACK:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  mando ognuno degli \(X\) messaggi \textbf{una volta};
+\item
+  il ricevente, per ogni messaggio consegnato, manda un ACK \(k+1\) volte (così arriva sicuramente);
+\item
+  quando ho ricevuto ACK per \(X - k\) messaggi (al massimo \(k\) sono andati persi), rimando i non confermati, al massimo \(k\), ognuno \(k+1\) volte.
+\end{enumerate}
+
+Totale messaggi del mittente: \(X + k(k+1)\). L'overhead \(k(k+1)\) \textbf{non dipende da} \(X\).
+
+\textbf{Q4.3 -- Link unidirezionale} (il ricevente non può rispondere). Si può ancora fare il perfect link con \(k+1\) copie per messaggio, ma senza ACK non si sa cosa è andato perso: overhead \(kX\), come per i singoli messaggi.
+
+\end{approfondimento}
+
+\section{Riepilogo}
+
+\begin{itemize}
+\tightlist
+\item
+  I \textbf{failure detector} incapsulano le ipotesi sul tempo e funzionano solo per i crash. Due proprietà: \textbf{completeness} (li becco tutti) e \textbf{accuracy} (non sbaglio).
+\item
+  \textbf{P} (sincrono): strong completeness + strong accuracy. Si fa con \emph{Exclude on Timeout} (\(\Delta \ge 2 \cdot \text{max\_delay}\)), o con il \emph{P a round} che usa la metà dei messaggi grazie agli orologi sincronizzati.
+\item
+  \textbf{◇P} (eventualmente sincrono): strong completeness + \textbf{eventual} strong accuracy. \emph{Increasing Timeout}: sospetta, ripristina se sbagliato e allunga il timeout. Gli insiemi dei sospettati dei corretti prima o poi coincidono.
+\item
+  \textbf{Leader election} (con P): prima o poi un corretto è leader, e si cambia leader solo se quello vecchio è crashato. \textbf{Ω} (con ◇P): prima o poi tutti i corretti si fidano dello stesso processo corretto. Entrambi si fanno con \emph{maxrank} dei non sospettati.
+\item
+  \textbf{Modelli}: fail-stop (P) ⇒ fail-noisy (◇P) ⇒ fail-silent. I problemi risolvibili vanno al contrario. Il sincrono è più forte del fail-stop.
+\item
+  \textbf{Lamport ME tollerante ai crash}: con P si ignorano i crashati, ma bisogna anche \textbf{scartare le REQ dei crashati che arrivano in ritardo}. In alternativa: un leader coordinatore, con una fase new\_leader quando il leader cambia.
+\end{itemize}

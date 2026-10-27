@@ -1,0 +1,931 @@
+\chapter{Lezione 3 -- FTTx e reti ottiche passive (PON)}
+
+\section{Di cosa parliamo}
+
+La lezione 2 ha mostrato che il rame ha un limite fisico: più è lungo, meno banda porta. La soluzione è portare la \textbf{fibra ottica} sempre più vicino all'utente (\textbf{FTTx}). Questa lezione spiega \textbf{perché} serve la fibra, \textbf{come} si costruisce una rete d'accesso in fibra economica (la \textbf{PON}, rete ottica passiva), i componenti ottici che servono (fibra, laser, fotodiodi, splitter), come si condivide la fibra tra tanti utenti (TDMA), gli standard (APON, BPON, EPON, GPON), il futuro (WDM-PON) e i costi.
+
+\section{Perché FTTx}
+
+\subsection{Banda e distanza delle tecnologie d'accesso}
+
+\begin{inbreve}
+
+Ogni tecnologia d'accesso ha una ``zona'' di funzionamento fatta di velocità e distanza. Solo la fibra copre tutto: velocità fino a 10 Gbit/s e distanze di decine di km.
+
+\end{inbreve}
+
+Dal grafico \emph{access/backhaul} (velocità vs distanza):
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{xDSL}: da circa 100 Mbit/s su poche decine di metri a 1 Mbit/s verso i 5 km.
+\item
+  \textbf{Optical wireless} (laser in aria libera): fino a 10 Gbit/s ma solo fino a circa 1 km.
+\item
+  \textbf{LMDS} (\emph{Local Multipoint Distribution Service}, radio a microonde punto-multipunto): circa 1--100 Mbit/s fino a qualche km.
+\item
+  \textbf{Microwave} (ponti radio): circa 100 Mbit/s su 1--15 km.
+\item
+  \textbf{Fibra}: da 100 Mbit/s a 10 Gbit/s, su qualunque distanza (15 km e oltre).
+\end{itemize}
+
+\textbf{Backhaul} = il collegamento che porta il traffico dai nodi d'accesso (es. un DSLAM o una stazione radio) verso la rete core.
+
+\subsection{La rete d'accesso in rame: struttura fisica}
+
+\begin{inbreve}
+
+Dalla centrale parte un cavo primario enorme (migliaia di coppie) verso l'armadio; dall'armadio partono cavi secondari più piccoli verso i box vicino agli edifici; dal box parte il doppino di ogni casa.
+
+\end{inbreve}
+
+\begin{center}\includegraphics[width=0.95\linewidth,height=0.4\textheight,keepaspectratio]{lezione-3-1}\end{center}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Rete primaria} (\emph{feeder}): obiettivo \textbf{condivisione alta} e \textbf{costi minimi}. Cavi da 2000--2400 coppie, posati in tubi o canalizzazioni.
+\item
+  \textbf{Rete secondaria} (\emph{distribution}): obiettivo \textbf{flessibilità} e \textbf{ramificazione}. Cavi da 10--100 coppie, interrati o aerei (su pali).
+\item
+  Mettere più livelli di armadi in cascata è possibile ma raro.
+\end{itemize}
+
+\textbf{Rete Telecom Italia in rame} (dati della slide):
+
+\begin{itemize}
+\tightlist
+\item
+  628 \textbf{SGU} (\emph{Stadi di Gruppo Urbano}, centrali di commutazione) e 10.313 \textbf{SL} (\emph{Stadi di Linea}, le centrali locali dove ci sono DSLAM e \textbf{permutatore});
+\item
+  140.000 armadi, circa 5,5 milioni di distributori/terminazioni (1,5 milioni di box interni agli edifici, 3,9 milioni esterni);
+\item
+  circa 530.000 km di cavo e 110 milioni di km-coppia;
+\item
+  i cavi della rete primaria sono \textbf{pressurizzati} (aria in pressione per tenere fuori l'umidità).
+\end{itemize}
+
+\textbf{Lunghezza dei doppini}: dal grafico, in Italia quasi tutti i doppini sono sotto i 4--5 km e circa il 70\% sotto i 2 km: la rete italiana è \textbf{più corta} di quella USA e giapponese. Questo rende il VDSL dagli armadi (FTTCab) molto efficace in Italia.
+
+\section{Principi dei sistemi in fibra ottica}
+
+\subsection{Attenuazione della fibra}
+
+\begin{inbreve}
+
+La luce in fibra perde potenza molto lentamente, ma quanto dipende dalla lunghezza d'onda. Ci sono tre ``finestre'' dove la fibra attenua poco e si trasmette lì.
+
+\end{inbreve}
+
+\begin{itemize}
+\tightlist
+\item
+  Per le lunghe distanze si usa fibra \textbf{monomodale} (\textbf{SMF}, \emph{Single Mode Fiber}), standard \textbf{ITU G.652}.
+\item
+  Attenuazione in funzione della lunghezza d'onda \(\lambda\):
+\end{itemize}
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule\noalign{}
+Finestra & \(\lambda\) & Attenuazione (circa) \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Prima & 850 nm & circa 2 dB/km \\
+Seconda & 1310 nm & circa 0,35 dB/km \\
+Terza & 1550 nm & circa 0,2 dB/km (minimo) \\
+\end{longtable}
+
+\begin{itemize}
+\tightlist
+\item
+  Nella fibra standard (\textbf{G.652, STD}) c'è il \textbf{water peak}: un picco di attenuazione intorno a 1383 nm, dovuto a residui di acqua (ioni OH) nel vetro, che rende inutilizzabile la banda \textbf{1360--1480 nm}.
+\item
+  La fibra \textbf{G.652c/d (ZWP, zero water peak)} elimina il picco: tutta la banda da 1300 a 1600 nm è utilizzabile, quindi ci stanno più canali.
+\end{itemize}
+
+\subsection{Dispersione}
+
+\begin{inbreve}
+
+Un impulso di luce che parte ``stretto'' arriva ``allargato''. Se si allarga troppo, invade il bit successivo e i bit si confondono. Questo limita il prodotto velocità × distanza.
+
+\end{inbreve}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Dispersione cromatica}: un laser non emette una sola lunghezza d'onda ma un piccolo intervallo; lunghezze d'onda diverse viaggiano a velocità leggermente diverse nel vetro. Risultato: l'impulso si \textbf{allarga} (\emph{pulse broadening}).
+\item
+  Più lo spettro del laser è largo, più dispersione.
+\end{itemize}
+
+Tipi di fibra (e dispersione \textbf{modale}, dovuta ai diversi percorsi della luce):
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Fibra
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Nucleo
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Come viaggia la luce
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Impulso in uscita
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Multimodo step index & circa 200 µm & Tanti raggi rimbalzano con angoli diversi: percorsi di lunghezza diversa & Molto allargato \\
+Multimodo graded index & 50--100 µm & Indice di rifrazione che cala verso il bordo: i raggi curvano e arrivano quasi insieme & Poco allargato \\
+Monomodo (SMF) & circa 10 µm & Un solo modo, praticamente in linea retta & Quasi identico (resta solo la cromatica) \\
+\end{longtable}
+
+(Il diametro esterno del rivestimento, \emph{cladding}, è 125 µm in entrambe le fibre standard.)
+
+\subsection{Laser (sorgenti)}
+
+\begin{inbreve}
+
+Il trasmettitore è un diodo laser. Quello economico (Fabry-Perot) emette più righe ed è ``sporco''; quello costoso (DFB) emette una riga sola, quindi soffre meno la dispersione.
+
+\end{inbreve}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Fabry-Perot (FP)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Distributed Feedback (DFB)
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Costo & Economico & Più caro \\
+Spettro & Più righe (multimodo longitudinale), rumoroso & Una riga stretta \\
+Dispersione cromatica & Molto sensibile & Poco sensibile \\
+Uso & 1310 nm (dove la dispersione della G.652 è quasi nulla) & 1550 nm (o 1310 nm) \\
+\end{longtable}
+
+Struttura: entrambi hanno una zona di \textbf{guadagno} tra due specchi; nel FP gli specchi sono le facce tagliate del cristallo (\emph{cleave}), nel DFB c'è un \textbf{reticolo} lungo il laser che seleziona una sola \(\lambda\) (e una faccia ha un rivestimento antiriflesso, \emph{AR coating}).
+
+\subsection{Fotodiodi (ricevitori)}
+
+\begin{inbreve}
+
+Il ricevitore trasforma la luce in corrente. Il PIN è economico e sente fino a circa −22 dBm; l'APD amplifica internamente e sente segnali più deboli (circa −30 dBm), ma costa molto di più.
+
+\end{inbreve}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{PIN}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    sensibilità circa \textbf{−22 dBm} (la potenza minima che riesce a ricevere correttamente);
+  \item
+    in \textbf{silicio} per le \(\lambda\) corte (850 nm), in \textbf{InGaAs} per le lunghe (1310/1550 nm).
+  \end{itemize}
+\item
+  \textbf{APD} (\emph{Avalanche Photodiode}):
+
+  \begin{itemize}
+  \tightlist
+  \item
+    sensibilità circa \textbf{−30 dBm} (effetto valanga: ogni fotone genera molti elettroni);
+  \item
+    usati per distanze lunghe a velocità di Gbit/s;
+  \item
+    molto più costosi.
+  \end{itemize}
+\end{itemize}
+
+\textbf{Ricorda}: dBm = potenza in decibel rispetto a 1 mW. 0 dBm = 1 mW; −30 dBm = 1 µW. Una sensibilità ``più negativa'' è migliore.
+
+\subsection{Splitter passivi}
+
+\begin{inbreve}
+
+Lo splitter ottico divide la luce di una fibra su più fibre, senza alimentazione. Il prezzo è la potenza: ogni divisione in due dimezza il segnale, cioè toglie 3 dB.
+
+\end{inbreve}
+
+\begin{itemize}
+\tightlist
+\item
+  L'elemento base (1×2) è fatto di \textbf{due fibre fuse insieme}; uno dei due ingressi non si usa.
+\item
+  Uno splitter \textbf{1×N} è una cascata di 1×2: per \(N = 2^k\) servono \(k\) livelli.
+\item
+  Ogni divisione in due: \(10 \log_{10}(0{,}5) \approx -3\) dB.
+\end{itemize}
+
+\[
+\text{Perdita} \approx 3 \text{ dB} \times \log_2(N_{ONU})
+\]
+
+\begin{itemize}
+\tightlist
+\item
+  Valori reali di uno splitter 1×2: \textbf{3,7 dB} convenzionale, \textbf{3,4 dB} low-loss (più dei 3 dB ideali per le perdite in eccesso).
+\end{itemize}
+
+\textbf{Esempio}: 1×32 → \(\log_2 32 = 5\) livelli → circa 15 dB ideali, circa 18,5 dB con splitter convenzionali.
+
+\subsection{Power budget}
+
+\begin{inbreve}
+
+Il power budget è quanta attenuazione totale può sopportare il collegamento: differenza tra la potenza che esce dal trasmettitore e la potenza minima che serve al ricevitore. Splitter, fibra e connettori devono starci dentro.
+
+\end{inbreve}
+
+\[
+\text{Budget [dB]} = P_{TX} \text{ [dBm]} - S_{RX} \text{ [dBm]}
+\]
+
+Ipotesi della slide:
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule\noalign{}
+& TX power & RX sensitivity \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+ONU (FP + PIN, economica) & 0 dBm & −22 dBm \\
+OLT (DFB + APD, costosa) & 1 dBm & −30 dBm \\
+\end{longtable}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Upstream} (ONU → OLT, a 1310 nm): \(0 - (-30) = 30\) dB.
+\item
+  \textbf{Downstream} (OLT → ONU, a 1490 nm): \(1 - (-22) = 23\) dB; la slide riporta \textbf{22 dB} (arrotondamento/margine).
+\item
+  Logica di progetto: gli apparati costosi (DFB, APD) si mettono nell'\textbf{OLT}, che è uno solo e condiviso; le ONU, che sono tante, usano componenti economici.
+\end{itemize}
+
+\textbf{Esempio di verifica} (\emph{complemento}): downstream con splitter 1×32 (circa 17 dB) + 10 km di fibra a 0,3 dB/km (3 dB) = 20 dB, sotto i 22 dB disponibili: funziona, con circa 2 dB di margine. Con 1×64 (circa 21 dB di splitter) non ci si starebbe più: ecco perché split ratio e distanza sono limitati.
+
+\section{Posa della fibra}
+
+\begin{inbreve}
+
+Il costo vero della fibra non è il vetro, è lo scavo. Per ridurlo si usano tecniche leggere come la microtrincea e il soffiaggio.
+
+\end{inbreve}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Minitrincea/microtrincea}: un taglio nell'asfalto largo circa \textbf{5 cm} e profondo \textbf{25--30 cm}; dentro si mette un tubo con il cavo in fibra, poi materiale di riempimento, binder e un tappetino d'asfalto. Costo circa \textbf{30--40 k€/km}: molto meno di uno scavo tradizionale.
+\item
+  \textbf{Soffiaggio} (\emph{fiber blowing}): la fibra viene spinta dentro un minitubo già posato usando aria compressa; comodo anche dentro gli edifici.
+\end{itemize}
+
+\section{Architetture FTTx}
+
+\begin{inbreve}
+
+Si sposta il DSLAM (o il punto in cui finisce la fibra) sempre più vicino all'utente: prima in centrale, poi nell'armadio, poi nel secondo armadio, poi nell'edificio, infine in casa.
+
+\end{inbreve}
+
+Distanze tipiche: centrale → primo armadio 500--1000 m, primo → secondo armadio 100--300 m, secondo armadio → edificio 50--200 m.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Architettura
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Dove sta il DSLAM / ONU
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Cosa resta in rame
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+a) Attuale (FTTE) & DSLAM in centrale & Tutto, dalla centrale a casa \\
+b) Fiber to the cabinet & DSLAM nel primo armadio & Dal primo armadio a casa \\
+c) Fiber to the curb & DSLAM nel secondo armadio & Dal secondo armadio a casa \\
+d) Fiber to the building & DSLAM (D) nell'edificio & Solo il cablaggio interno \\
+e) Fiber to the home & -- & Niente: fibra fino a ogni appartamento \\
+\end{longtable}
+
+In tutte le architetture con fibra, in centrale il DSLAM viene sostituito da uno \textbf{switch/router} che manda il traffico in fibra.
+
+\subsection{Come portare la fibra a più case}
+
+Tre modi:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{a) Punto-punto}: una fibra dedicata dalla centrale a ogni casa. Massime prestazioni, ma tantissime fibre e porte in centrale.
+\item
+  \textbf{b) Curb switch}: una fibra fino a uno \textbf{switch attivo} vicino alle case, che poi distribuisce (\textbf{AON}). Serve alimentazione sul campo.
+\item
+  \textbf{c) PON}: una fibra fino a uno \textbf{splitter ottico passivo}, che la divide verso le case. Nessun apparato alimentato sul campo, poche fibre in centrale.
+\end{itemize}
+
+\subsection{Capacità d'accesso (Telecom Italia)}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Architettura
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Tecnologia
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Downstream
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Upstream
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+FTTE & ADSL2+ dalla centrale (rame 200--3000 m + 100--700 m) & 3--20 Mbit/s & sotto 1 Mbit/s \\
+FTTCab & VDSL2 profilo 17 MHz dall'ONU nell'armadio & 25--50 Mbit/s & 2--10 Mbit/s \\
+FTTB & VDSL2 profilo 30 MHz dall'ONU nell'edificio & 50--100 Mbit/s & 25--40 Mbit/s \\
+FTTH & Ottica fino a casa & 0,1--1 Gbit/s & 0,1--1 Gbit/s \\
+\end{longtable}
+
+\subsection{Esempio: Fastweb (2000), il primo FTTH in Europa}
+
+\begin{inbreve}
+
+Fastweb non ha usato una PON, ma una rete \textbf{Gigabit Ethernet} attiva: switch IP in ogni edificio, collegati tra loro ad anello verso il core.
+
+\end{inbreve}
+
+\begin{itemize}
+\tightlist
+\item
+  Architettura \textbf{daisy chain}: gli switch GbE sono collegati \textbf{in catena ad anello} che parte e torna al core (se un link si rompe, il traffico gira dall'altra parte); ogni switch serve un gruppo di case.
+\item
+  \textbf{FTTH residenziale}: fibra fino a un \textbf{IP switch} nello scantinato dell'edificio; da lì a ogni appartamento, dove l'\textbf{HAG} (\emph{Home Access Gateway}) collega PC, TV (IPTV) e telefono (VoIP).
+\item
+  \textbf{FTTB business}: fibra fino a un \textbf{router} nella sala tecnica dell'edificio, che collega la LAN aziendale e il centralino telefonico (\textbf{PABX}).
+\end{itemize}
+
+\subsection{Distribuzione nell'edificio}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Building Optical Distribution Point} (spesso in un box su palo o in facciata): collega la fibra in arrivo alle singole fibre degli appartamenti o uffici.
+\item
+  Contiene e protegge connessioni, giunzioni e, a seconda del progetto, gli \textbf{splitter ottici}.
+\item
+  È \textbf{passivo}: non richiede alimentazione.
+\end{itemize}
+
+\section{PON: funzionamento di base}
+
+\begin{inbreve}
+
+In una PON un unico apparato in centrale (OLT) parla con fino a 32--64 utenti (ONT) attraverso uno splitter passivo. In discesa l'OLT trasmette a tutti; in salita gli utenti parlano a turno, ognuno nel suo intervallo di tempo.
+
+\end{inbreve}
+
+\begin{center}\includegraphics[width=0.95\linewidth,height=0.4\textheight,keepaspectratio]{lezione-3-2}\end{center}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Downstream}: l'\textbf{OLT} trasmette in \textbf{broadcast} su circa \textbf{1490--1510 nm} (``1,5xx nm'').
+\item
+  \textbf{Upstream}: le \textbf{ONT} trasmettono \textbf{a burst} su \textbf{1310 nm}, ognuna nel suo \textbf{time slot} assegnato.
+\item
+  Le due direzioni usano \(\lambda\) diverse sulla \textbf{stessa fibra} (WDM a due lunghezze d'onda).
+\item
+  Esempio FSAN BPON: upstream 155 Mbit/s, downstream 155/622 Mbit/s; fino a \textbf{32 ONT}, ognuna può servire più utenti.
+\item
+  (La terza \(\lambda\), 1550 nm, è tipicamente usata per il video broadcast analogico/RF, \emph{complemento}.)
+\end{itemize}
+
+\textbf{Elementi di una PON} (schema completo):
+
+\begin{itemize}
+\tightlist
+\item
+  In \textbf{centrale}: l'\textbf{OLT}, collegato verso la rete a un nodo ATM (interfacce VB5.1/VB5.2), a una rete dati/CDN e alla PSTN/ISDN (interfacce V5.1/V5.2).
+\item
+  \textbf{Rete primaria}: fibra fino a un \textbf{diramatore 1:N} (lo splitter).
+\item
+  \textbf{Rete secondaria}: fibre verso ONU in \textbf{cabinet}, \textbf{curb} o \textbf{building}.
+\item
+  Dall'ONU si prosegue con \textbf{VDSL} su coppia in rame fino all'\textbf{NT} dell'utente, a cui si collegano la rete domestica e il \textbf{set-top box (STB)}.
+\end{itemize}
+
+\section{Condividere la fibra: TDMA vs WDMA}
+
+\begin{inbreve}
+
+In discesa non c'è problema, parla solo l'OLT. In salita invece tanti ONU parlano verso uno solo e i loro segnali si sommano nello splitter: se trasmettono insieme, collidono. Serve una regola di accesso: o turni di tempo (TDMA) o colori diversi (WDMA).
+
+\end{inbreve}
+
+\subsection{Spiegato semplice: l'aula}
+
+Immagina un'\textbf{aula}: l'\textbf{OLT} è il professore, le \textbf{ONU} sono gli studenti, lo \textbf{splitter} è la stanza che li collega.
+
+\textbf{Downstream (OLT → ONU): parla il professore}
+
+\begin{itemize}
+\tightlist
+\item
+  La voce del professore arriva \textbf{a tutti}. Lo splitter fa proprio questo: \textbf{copia} la luce dell'OLT su tutte le fibre, verso tutte le case.
+\item
+  Il professore dice: ``Mario, il tuo voto è 28. Luca, il tuo voto è 25.'' Tutti sentono tutto, ma ognuno \textbf{tiene solo la frase con il suo nome}.
+\item
+  Nella PON: l'OLT manda pacchetti con l'indirizzo della ONU destinataria; ogni ONU li riceve tutti e tiene solo i suoi.
+\item
+  \textbf{Nessun problema}: parla una persona sola. È un \textbf{broadcast} (uno parla, tutti sentono), in una rete \textbf{punto-multipunto}.
+\end{itemize}
+
+\textbf{Upstream (ONU → OLT): parlano gli studenti}
+
+\begin{itemize}
+\tightlist
+\item
+  Se gli studenti parlano \textbf{tutti insieme}, il professore sente solo confusione.
+\item
+  Nella PON lo splitter, al contrario, fa da \textbf{imbuto}: unisce la luce di tutte le ONU in un'unica fibra verso l'OLT. Se due ONU trasmettono nello stesso momento, le loro luci \textbf{si sommano} e all'OLT arriva un segnale illeggibile: è la \textbf{collisione}.
+\item
+  È una rete \textbf{multipunto-punto}.
+\item
+  \textbf{Perché le ONU non si sentono tra loro?} Lo splitter manda la luce di una ONU \textbf{solo verso l'OLT}, non verso le altre ONU. Una ONU non può ``ascoltare'' se un'altra sta parlando e aspettare da sola: è come se gli studenti fossero in cabine insonorizzate che comunicano solo con il professore.
+\end{itemize}
+
+\textbf{La soluzione: il professore assegna i turni (TDMA)}
+
+\begin{itemize}
+\tightlist
+\item
+  ``Mario, parli tu da 0 a 2 secondi. Luca, tu da 2 a 4. Giulia, tu da 4 a 6.'' Nessuno si sovrappone.
+\item
+  Nella PON l'OLT assegna a ogni ONU un \textbf{time slot}; ogni ONU accumula i suoi dati e li manda \textbf{solo nel suo turno}. È il \textbf{TDMA} (\emph{Time Division Multiple Access}).
+\end{itemize}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Chi parla
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Problema
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Soluzione
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Downstream & Solo l'OLT & Nessuno & Broadcast, ogni ONU prende il suo \\
+Upstream & Tante ONU & Si sommano nello splitter (collisioni) e non si sentono tra loro & L'OLT assegna i turni (TDMA) \\
+\end{longtable}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Downstream} = rete \textbf{punto-multipunto}: l'OLT gestisce tutta la banda.
+\item
+  \textbf{Upstream} = rete \textbf{multipunto-punto}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    le ONU trasmettono solo verso l'OLT e \textbf{non possono comunicare direttamente} tra loro;
+  \item
+    una ONU \textbf{non sente} le trasmissioni delle altre (lo splitter manda la loro luce verso l'OLT, non verso le altre ONU), quindi non può fare carrier sense come in Ethernet classica;
+  \item
+    i dati di ONU diverse possono \textbf{collidere} nello splitter/combiner.
+  \end{itemize}
+\item
+  Soluzioni:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{TDMA} (\emph{Time Division Multiple Access}): ogni ONU trasmette in istanti diversi;
+  \item
+    \textbf{WDMA} (\emph{Wavelength Division Multiple Access}): ogni ONU trasmette su una \(\lambda\) diversa.
+  \end{itemize}
+\end{itemize}
+
+\subsection{TDM-PON vs WDM-PON}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+TDM-PON
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+WDM-PON
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Stato & Standardizzate & Proposte in letteratura / dimostrate \\
+Lunghezze d'onda & Poche (2 o 3) & Una (o due) per ONU \\
+Componenti & Economici e maturi (splitter, laser) & Dispositivi WDM (es. AWG) \\
+Power budget & Limitato: max 20 km, split ratio max 64 & Lunga portata e più banda \\
+Traffico & Broadcast in discesa, TDMA in salita & Canale dedicato per ONU \\
+Esempi & APON/BPON, EPON, GPON & CPON, LARNET, RITENET, SUCCESS-DWA \\
+\end{longtable}
+
+\subsection{Downstream: scheduling TDM}
+
+\begin{itemize}
+\tightlist
+\item
+  L'OLT mette il traffico di ogni ONU in \textbf{time slot} (multiplazione TDM).
+\item
+  Lo splitter copia \textbf{tutto} il flusso su tutte le uscite: ogni ONU riceve tutto (A B C B) e tiene solo i suoi slot.
+\item
+  Gli slot vanno da circa \textbf{µs a ms}.
+\item
+  Conseguenza per la sicurezza (\emph{complemento}): ogni ONU ``vede'' fisicamente il traffico degli altri, per questo gli standard PON cifrano il downstream.
+\end{itemize}
+
+\subsection{Upstream: scheduling TDMA}
+
+\begin{itemize}
+\tightlist
+\item
+  Tutte le ONU condividono lo \textbf{stesso canale} upstream; collisioni possibili nello splitter.
+\item
+  Gli standard PON usano \textbf{TDMA}: il tempo in salita viene diviso in slot e assegnato alle ONU, così i burst arrivano all'OLT uno dopo l'altro senza sovrapporsi (A, B, C, B).
+\item
+  Per farlo, l'OLT deve conoscere la distanza di ogni ONU e compensare i diversi ritardi di propagazione (\emph{ranging}, \emph{complemento}).
+\end{itemize}
+
+\subsection{Ricezione dei burst upstream}
+
+\begin{inbreve}
+
+Le ONU sono a distanze diverse (es. 1, 3, 7 km), quindi i loro burst arrivano all'OLT con potenze diverse. Il ricevitore deve riadattarsi a ogni burst: è un ricevitore ``burst mode''.
+
+\end{inbreve}
+
+\begin{itemize}
+\tightlist
+\item
+  I frame arrivano all'OLT con \textbf{potenze diverse} (una ONU a 7 km arriva più debole di una a 1 km).
+\item
+  È difficile recuperare il \textbf{sincronismo} (\emph{clock and data recovery}, CDR) e decidere cosa è 0 e cosa è 1.
+\item
+  Serve un \textbf{burst mode receiver} (complesso) nell'OLT: con un \textbf{AGC} (\emph{Automatic Gain Control}) reimposta la \textbf{soglia 0/1} all'inizio di ogni burst.
+\end{itemize}
+
+\section{Gli standard PON}
+
+\subsection{Evoluzione}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Standard
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Periodo
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Velocità
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Ente / trasporto
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+APON & circa 1990--1996 & 54 Mbit/s & FSAN/ITU, celle ATM \\
+APON & circa 1997--2000 & 155 Mbit/s & FSAN/ITU, celle ATM \\
+BPON (Broadband PON) & circa 2001--2004 & 622 Mbit/s & ITU G.983, ATM \\
+EPON (Ethernet PON) & circa 2004--2006 & 1,25 Gbit/s & IEEE 802.3ah, Ethernet \\
+GPON (Gigabit PON) & circa 2005--2008 & 2,5 Gbit/s & ITU G.984, GEM (Ethernet, ATM, TDM) \\
+10G EPON & dopo & 10 Gbit/s & IEEE 802.3av \\
+\end{longtable}
+
+(Ente e numero di raccomandazione per BPON/GPON/10G EPON sono un \emph{complemento}.)
+
+\subsection{EPON (Ethernet PON)}
+
+\begin{inbreve}
+
+EPON porta la PON nel mondo Ethernet: tutto viaggia in normali trame Ethernet, il che la rende semplice ed economica.
+
+\end{inbreve}
+
+\begin{itemize}
+\tightlist
+\item
+  Standardizzata da \textbf{IEEE 802.3ah EFM} (\emph{Ethernet in the First Mile}), lavori dal 2001, ratificata nel \textbf{2004}.
+\item
+  Si colloca nella famiglia IEEE 802: livello 1 e MAC di \textbf{802.3 (Ethernet)}, sotto 802.1 (bridging) e 802.2 (LLC). È un nuovo livello fisico Ethernet accanto a 10 Mb/s, 100 Mb/s, 1 Gb/s e 10 Gb/s.
+\item
+  Tutti i pacchetti sono \textbf{incapsulati in trame Ethernet}: supporta pacchetti di \textbf{lunghezza variabile} (niente celle fisse come ATM).
+\item
+  Piano di lunghezze d'onda simile a BPON.
+\item
+  Bit rate massimo \textbf{1 Gbit/s MAC-MAC} (1,25 Gbit/s a livello fisico per la codifica \textbf{8b/10b}: ogni 8 bit se ne trasmettono 10, quindi \(1 \times 10/8 = 1{,}25\)).
+\item
+  Split minimo: \textbf{16}.
+\item
+  Portata massima:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{10 km} con laser \textbf{FP} nelle ONU (limitata dalla dispersione in G.652);
+  \item
+    \textbf{20 km} con laser \textbf{DFB} nelle ONU.
+  \end{itemize}
+\item
+  Configurazioni ammesse: \textbf{albero}, \textbf{anello}, \textbf{albero con trunk ridondante} (doppia fibra OLT-splitter), \textbf{bus}.
+\end{itemize}
+
+\textbf{Downstream EPON}:
+
+\begin{itemize}
+\tightlist
+\item
+  Come una rete a \textbf{mezzo condiviso}: l'OLT trasmette in broadcast trame 802.3 (header, payload, FCS); ogni ONU tiene solo quelle destinate a lei e le passa al suo utente.
+\end{itemize}
+
+\textbf{Upstream EPON}:
+
+\begin{itemize}
+\tightlist
+\item
+  Le ONU sono \textbf{sincronizzate} su un riferimento temporale comune.
+\item
+  \textbf{Arbitraggio centralizzato} nell'OLT: l'OLT concede (\emph{grant}) a ogni ONU un \textbf{time slot}.
+\item
+  Ogni ONU accumula le trame dei suoi utenti in un \textbf{buffer} e, nel suo slot, ne trasmette \textbf{diverse} di fila.
+\item
+  (Il protocollo che gestisce richieste e concessioni è \textbf{MPCP}, \emph{Multi-Point Control Protocol}, con messaggi REPORT e GATE; \emph{complemento}.)
+\end{itemize}
+
+\subsection{Overhead dei burst: BPON, GPON, EPON}
+
+\begin{inbreve}
+
+Ogni burst upstream ha un ``preambolo'' che serve al ricevitore per agganciarsi. EPON lo fa in modo semplice e lento (tempi lunghi, componenti economici); BPON e GPON con tempi molto più stretti.
+
+\end{inbreve}
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule\noalign{}
+Standard & Guard & Preamble & Delimiter & Totale \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+BPON & min 4 bit & tip. 12 bit & tip. 8 bit & 24 bit \\
+GPON & min 25,6 ns & tip. 35,2 ns & tip. 16,0 ns & min 76,8 ns \\
+\end{longtable}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Guard}: tempo di silenzio tra un burst e l'altro, per evitare sovrapposizioni.
+\item
+  \textbf{Preamble}: sequenza nota che serve a regolare guadagno e clock.
+\item
+  \textbf{Delimiter}: segnala l'inizio dei dati.
+\end{itemize}
+
+\textbf{EPON}: tempi molto più larghi, fino a \textbf{400 ns} di accensione laser + \textbf{400 ns} per AGC e CDR + \textbf{400 ns} di spegnimento laser. L'accensione di un burst può sovrapporsi allo spegnimento del precedente.
+
+\textbf{Trade-off}: EPON spreca più tempo per burst ma accetta componenti lenti e quindi economici: secondo la slide costa circa il \textbf{10\%} di BPON/GPON.
+
+\subsection{Meccanismi di protezione}
+
+\begin{inbreve}
+
+Per non lasciare senza servizio tutti gli utenti di una PON se si rompe qualcosa, si duplicano parti della rete (protezione 1+1: un percorso di lavoro e uno di riserva).
+
+\end{inbreve}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Tipo B, 1+1 dell'OLT}: due transceiver nell'OLT e due fibre feeder fino allo splitter (con 2 ingressi). Le ONU non sono duplicate.
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Economico; protegge \textbf{feeder} e \textbf{transceiver OLT}, la parte condivisa da tutti.
+  \end{itemize}
+\item
+  \textbf{Tipo C, 1+1 dell'intera PON}: due transceiver nell'OLT, due splitter, due fibre di discesa e due transceiver in ogni ONU.
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Il più sicuro e il più costoso; protegge feeder, drop e transceiver.
+  \end{itemize}
+\end{itemize}
+
+\subsection{Carrier Ethernet per EPON}
+
+\begin{itemize}
+\tightlist
+\item
+  L'idea: trattare il traffico a \textbf{livello 2} (Ethernet) invece che a livello 3 (IP), creando \textbf{percorsi specifici} per garantire la \textbf{QoS} dall'utente attraverso la rete.
+\item
+  Tecnologie: \textbf{VLAN tag}, \textbf{VPLS} (\emph{Virtual Private LAN Service}), \textbf{Q-in-Q} (doppio tag VLAN, 802.1ad), \textbf{MAC-in-MAC} (802.1ah), \textbf{PBT} (\emph{Provider Backbone Transport}).
+\end{itemize}
+
+\section{Il futuro: WDM-PON}
+
+\begin{inbreve}
+
+Invece di dividere la luce in potenza (splitter) si divide per colore. Ogni ONU ha la sua lunghezza d'onda: è come avere una fibra dedicata, ma su un'unica fibra fisica.
+
+\end{inbreve}
+
+\begin{itemize}
+\tightlist
+\item
+  Al posto dello splitter c'è un \textbf{AWG 1×N} (\emph{Arrayed Waveguide Grating}): un \textbf{filtro} che fa da \textbf{router ottico}, mandando ogni \(\lambda\) su un'uscita diversa.
+\item
+  L'OLT ha una \textbf{sorgente modulata WDM} che trasmette \(\lambda_1 \dots \lambda_N\) in discesa e un \textbf{array di ricevitori / demux ottico} per \(\lambda_{N+1} \dots \lambda_{2N}\) in salita.
+\item
+  L'ONU \(i\) riceve su \(\lambda_i\) e trasmette su \(\lambda_{N+i}\).
+\item
+  Caratteristiche:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    numero di ONU \textbf{limitato dal numero di} \(\lambda\);
+  \item
+    topologia logica \textbf{punto-punto} (nessuna condivisione, nessuna collisione, niente broadcast);
+  \item
+    \textbf{lunga portata}, quasi come un collegamento punto-punto: l'AWG perde molto meno di uno splitter con molte uscite.
+  \end{itemize}
+\end{itemize}
+
+\subsection{Evoluzione della fotonica}
+
+Tabella distanza vs tempo dal grafico:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Accesso} (fino a 1 km): ADSL2+ (2008) → VDSL/2 e FTTP → VDSL2 e FTTB (2010) → FTTH → FTTH con \textbf{WDM} (2015).
+\item
+  \textbf{Metro/core} (1 km -- 1000+ km): da GbE ed SDH con MPLS e VPLS, verso T-MPLS e Provider Backbone Transport, poi OTN, conversione di lunghezza d'onda, \textbf{optical burst switching} e \textbf{optical packet switching}: la commutazione scende progressivamente dal livello 3 al livello 2 al livello 1 (ottico).
+\end{itemize}
+
+\section{Mercato e costi}
+
+\subsection{Situazione internazionale (EXFO, 2007)}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{USA}: cavi in media lunghi (il DSL rende meno); grandi investimenti degli operatori via cavo, che hanno una quota rilevante della banda larga; \textbf{nessun obbligo di unbundling} per le nuove infrastrutture in fibra (incentiva gli investimenti).
+\item
+  \textbf{Brasile, Colombia, Argentina, Cile}: meno di 300.000 utenti FTTH.
+\item
+  \textbf{Australia, Nuova Zelanda, Kuwait, Russia, EAU, Pakistan}: meno di 2 milioni di utenti FTTH.
+\end{itemize}
+
+\textbf{Unbundling} (\emph{unbundling del local loop}): obbligo per l'operatore storico di affittare la propria rete d'accesso ai concorrenti, che vi collegano i loro apparati (vedi i CLEC e la collocation della lezione 1).
+
+\subsection{Costi FTTx (CAPEX relativo, TIM)}
+
+\begin{inbreve}
+
+Più la fibra si avvicina all'utente, più costa, e quasi tutto il costo è infrastruttura (scavi, posa), non elettronica.
+
+\end{inbreve}
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule\noalign{}
+Architettura & Rame residuo & CAPEX relativo (FTTE = 1) \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+FTTE & 300--3000 m & circa 1 \\
+FTTCab & 100--700 m & circa 5--6 \\
+FTTB & 20--150 m & circa 10 \\
+FTTH & 0 & circa 17--18 \\
+\end{longtable}
+
+\begin{itemize}
+\tightlist
+\item
+  Il CAPEX è diviso in \textbf{elettronica}, \textbf{infrastruttura} e \textbf{CPE} (apparati del cliente): in FTTB e FTTH la parte dominante è l'\textbf{infrastruttura}.
+\item
+  \textbf{CAPEX} = \emph{Capital Expenditure}, spese di investimento (costruire la rete), contrapposte all'OPEX (spese operative di esercizio).
+\end{itemize}
+
+\section{Domande di ripasso}
+
+\begin{approfondimento}{Calcola la perdita di uno splitter 1x64}
+
+Ideale: \(3 \times \log_2 64 = 3 \times 6 = 18\) dB. Con splitter 1x2 reali da 3,7 dB: \(6 \times 3{,}7 \approx 22\) dB, già oltre i 22 dB di budget downstream: ecco perché 64 è il massimo split ratio per le TDM-PON.
+
+\end{approfondimento}
+
+\begin{approfondimento}{Perché nell'OLT si usano DFB e APD e nelle ONU FP e PIN?}
+
+L'OLT è uno e condiviso tra tante ONU, quindi può permettersi componenti costosi: DFB (spettro stretto, poca dispersione) e APD (sensibilità −30 dBm). Le ONU sono tante (una per utente), quindi devono costare poco: FP e PIN. Il budget upstream (30 dB) viene dalla sensibilità dell'APD.
+
+\end{approfondimento}
+
+\begin{approfondimento}{Perché in upstream serve TDMA e in downstream no?}
+
+In downstream trasmette solo l'OLT (punto-multipunto): basta il broadcast, ogni ONU prende i suoi dati. In upstream trasmettono molte ONU verso una (multipunto-punto); i segnali si sommano nello splitter, le ONU non si sentono a vicenda e quindi collidono se non si alternano in slot assegnati dall'OLT.
+
+\end{approfondimento}
+
+\begin{approfondimento}{Cos'è un burst mode receiver e perché serve?}
+
+Un ricevitore che a ogni burst ricalcola guadagno (AGC) e soglia 0/1 e recupera il clock (CDR). Serve perché le ONU sono a distanze diverse e i loro burst arrivano all'OLT con potenze diverse.
+
+\end{approfondimento}
+
+\begin{approfondimento}{Perché EPON a 1 Gbit/s trasmette a 1,25 Gbit/s?}
+
+Per la codifica 8b/10b: ogni 8 bit di dati diventano 10 bit sulla linea (per bilanciare 0 e 1 e aiutare il recupero del clock), quindi \(1 \times 10/8 = 1{,}25\) Gbit/s.
+
+\end{approfondimento}
+
+\begin{approfondimento}{Differenza tra splitter (TDM-PON) e AWG (WDM-PON)}
+
+Lo splitter divide la potenza: ogni uscita riceve tutte le lunghezze d'onda ma con potenza ridotta di circa 3 dB per divisione. L'AWG instrada per lunghezza d'onda: ogni uscita riceve solo la sua \(\lambda\) con poca perdita, così ogni ONU ha un canale dedicato e la portata aumenta.
+
+\end{approfondimento}
+
+\begin{approfondimento}{Protezione tipo B vs tipo C}
+
+B: duplica solo transceiver OLT e fibra feeder (la parte comune a tutti), economico. C: duplica tutto, anche splitter, drop e transceiver delle ONU: massima affidabilità, costo massimo.
+
+\end{approfondimento}
+
+\section{Riepilogo}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Perché FTTx}: il rame perde banda con la distanza; solo la fibra copre velocità fino a 10 Gbit/s su qualunque distanza.
+\item
+  \textbf{Fibra}: SMF G.652, finestre a 850/1310/1550 nm, water peak 1360--1480 nm (eliminato dalla ZWP); la dispersione allarga gli impulsi.
+\item
+  \textbf{Componenti}: laser FP (economico, 1310 nm) vs DFB (spettro stretto, 1550 nm); fotodiodi PIN (−22 dBm) vs APD (−30 dBm); splitter: circa 3 dB per divisione, \(3 \log_2 N\) dB.
+\item
+  \textbf{Power budget} = \(P_{TX} - S_{RX}\): 30 dB upstream, 22 dB downstream.
+\item
+  \textbf{FTTE → FTTCab → FTTC → FTTB → FTTH}: più velocità, molto più costo (FTTH circa 17 volte FTTE, quasi tutto in scavi). Microtrincea circa 30--40 k€/km.
+\item
+  \textbf{PON}: OLT + splitter passivo + ONT; downstream broadcast a 1490 nm, upstream TDMA a burst a 1310 nm; OLT con burst mode receiver.
+\item
+  \textbf{Standard}: APON → BPON (622 Mbit/s) → EPON (1,25 Gbit/s, IEEE 802.3ah, trame Ethernet, max 20 km) → GPON (2,5 Gbit/s) → 10G EPON.
+\item
+  \textbf{Protezione}: tipo B (OLT + feeder) e tipo C (tutto).
+\item
+  \textbf{WDM-PON}: AWG al posto dello splitter, una \(\lambda\) per ONU, punto-punto logico e lunga portata.
+\end{itemize}

@@ -1,0 +1,406 @@
+\chapter{Lezione 2 -- Teorema di Shannon e MAC}
+
+\section{Teorema di Shannon: il prezzo della segretezza perfetta}
+
+Nella lezione 1 abbiamo visto che l'OTP è perfettamente segreto ma ha limiti pesanti. Shannon dimostra che non è colpa dell'OTP: \textbf{ogni} schema perfettamente segreto deve avere gli stessi limiti.
+
+\subsection{Teorema}
+
+\begin{inbreve}
+
+Per avere segretezza perfetta servono almeno tante chiavi quanti messaggi, cioè una chiave lunga almeno quanto il messaggio. Vale per qualunque cifrario, non solo per l'OTP.
+
+\end{inbreve}
+
+Per ogni SKE (schema di cifratura a chiave simmetrica) con segretezza perfetta:
+
+\[
+|\mathcal{K}| \ge |\mathcal{M}|
+\]
+
+Cioè servono almeno tante chiavi quanti sono i messaggi. Con chiavi e messaggi fatti di bit: la chiave deve essere lunga \textbf{almeno quanto il messaggio}.
+
+\subsection{Dimostrazione (per assurdo)}
+
+\begin{inbreve}
+
+Se le chiavi sono meno dei messaggi, Eve prova a decifrare il cifrato con tutte le chiavi e ottiene meno candidati dei messaggi possibili. Qualche messaggio viene escluso, quindi Eve ha imparato qualcosa.
+
+\end{inbreve}
+
+Sia \(\Pi\) un qualunque SKE perfettamente segreto. Fissiamo la \textbf{distribuzione uniforme} su \(\mathcal{M}\) (la definizione deve valere per ogni distribuzione, quindi possiamo sceglierne una comoda). Prendiamo un qualunque \(c \in \mathcal{C}\) con \(\Pr[C = c] > 0\).
+
+Consideriamo l'insieme di tutti i messaggi che \(c\) potrebbe nascondere:
+
+\[
+\mathcal{M}' = \{\text{Dec}(k, c) : k \in \mathcal{K}\}
+\]
+
+Supponiamo per assurdo che \(|\mathcal{K}| < |\mathcal{M}|\).
+
+\begin{itemize}
+\tightlist
+\item
+  \(|\mathcal{M}'| \le |\mathcal{K}|\): ogni chiave produce un solo messaggio (Dec è deterministica), quindi i messaggi diversi in \(\mathcal{M}'\) sono al massimo quante le chiavi.
+\item
+  Quindi \(|\mathcal{M}'| \le |\mathcal{K}| < |\mathcal{M}|\), cioè \(|\mathcal{M}'| < |\mathcal{M}|\).
+\end{itemize}
+
+Allora esiste un messaggio \(m \in \mathcal{M} \setminus \mathcal{M}'\): un messaggio che \(c\) non può nascondere con nessuna chiave.
+
+\begin{nota}
+
+\textbf{Attenzione alla notazione}: nelle formule compaiono tre simboli simili, con significati diversi.
+
+\begin{itemize}
+\tightlist
+\item
+  \(\mathcal{M}\) (corsiva) è l'\textbf{insieme} di tutti i messaggi possibili; \(\mathcal{M}'\) è il suo sottoinsieme dei candidati per \(c\).
+\item
+  \(M\) (dritta), dentro \(\Pr[M = m]\), \textbf{non è un insieme}: è ``il messaggio che Alice manda davvero'', che Eve non conosce (una variabile aleatoria, come ``il risultato del dado'').
+\item
+  \(m\) (minuscola) è \textbf{un singolo messaggio}: quello escluso, che sta in \(\mathcal{M}\) ma non in \(\mathcal{M}'\).
+\end{itemize}
+
+Quindi \(\Pr[M = m]\) si legge ``la probabilità che Alice abbia mandato proprio \(m\)'', e riguarda solo quel messaggio, non tutto l'insieme.
+
+\end{nota}
+
+\begin{verbatim}
+┌───────────────────────────┐
+│ M            × m          │
+│        ┌──────────┐       │
+│        │    M'    │       │
+│        └──────────┘       │
+└───────────────────────────┘
+\end{verbatim}
+
+Ora confrontiamo:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{A priori}: \(\Pr[M = m] = 1/|\mathcal{M}| > 0\) (distribuzione uniforme)
+\item
+  \textbf{A posteriori}: \(\Pr[M = m \mid C = c] = 0\). Infatti, se \(c\) fosse la cifratura di \(m\) con qualche chiave \(k\), per correttezza \(\text{Dec}(k, c) = m\), e quindi \(m\) starebbe in \(\mathcal{M}'\). Quindi \textbf{nessuna chiave} trasforma \(m\) in \(c\), e con la formula della probabilità condizionata:
+\end{itemize}
+
+\[
+\Pr[M = m \mid C = c] = \frac{\Pr[M = m \wedge C = c]}{\Pr[C = c]} = \frac{0}{\Pr[C = c]} = 0
+\]
+
+Il numeratore è 0 perché ``Alice manda \(m\) \textbf{e} il cifrato è \(c\)'' non succede mai; il denominatore è positivo perché abbiamo scelto un \(c\) con \(\Pr[C = c] > 0\).
+
+A priori e a posteriori sono diversi: contraddizione con la segretezza perfetta. ∎
+
+\textbf{Intuizione}: con meno chiavi che messaggi, Eve può prendere \(c\) e decifrarlo con tutte le chiavi possibili. I messaggi che non escono mai sono esclusi: vedere \(c\) le ha insegnato qualcosa.
+
+\subsection{Takeaway}
+
+La segretezza perfetta costa troppo, quindi \textbf{faremo qualcosa di diverso}.
+
+\textbf{Obiettivo}: Alice e Bob condividono \textbf{una} chiave di lunghezza \textbf{indipendente} dalla lunghezza del messaggio. \emph{(Per riuscirci bisognerà rinunciare alla sicurezza contro avversari con potenza di calcolo illimitata.)}
+
+\section{Esercizio: segretezza perfetta come gioco}
+
+\begin{inbreve}
+
+Un altro modo di definire la segretezza perfetta. Si sfida Eve a capire quale tra due messaggi è stato cifrato: lo schema è sicuro se nessuna strategia di Eve si comporta diversamente a seconda del messaggio cifrato.
+
+\end{inbreve}
+
+Definizione alternativa di segretezza perfetta tramite un \textbf{gioco} (esperimento) tra un \textbf{avversario} \(A\) e un \textbf{challenger} \(C\).
+
+\(\text{GAME}_A(b, m_0, m_1)\) con \(b \in \{0,1\}\) e \(m_0, m_1 \in \mathcal{M}\):
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \(C\) sceglie \(k \leftarrow \mathcal{K}\) uniformemente
+\item
+  \(C\) manda ad \(A\) il cifrato \(c = \text{Enc}(k, m_b)\)
+\item
+  \(A\) risponde con \(b' \in \{0,1\}\), il suo tentativo di indovinare quale messaggio è stato cifrato
+\end{enumerate}
+
+\begin{verbatim}
+Avversario A                         Challenger C
+                                     k ← K
+      ←──────── c = Enc(k, m_b) ────────
+      ──────── b' ∈ {0,1} ─────────→
+\end{verbatim}
+
+\textbf{Definizione}: \(\Pi\) è perfettamente segreto se \(\forall A\), \(\forall m_0, m_1 \in \mathcal{M}\):
+
+\[
+\Big| \Pr[b' = 1 : \text{GAME}_A(0, m_0, m_1)] - \Pr[b' = 1 : \text{GAME}_A(1, m_0, m_1)] \Big| = 0
+\]
+
+Notazione: \(\Pr[b' = 1 : \text{GAME}]\) è la probabilità che \(A\) risponda 1 giocando quel gioco.
+
+\textbf{Formulazione alternativa}: \(\text{GAME}_A(0, m_0, m_1) \equiv \text{GAME}_A(1, m_0, m_1)\), cioè i due giochi sono \textbf{identicamente distribuiti}.
+
+\textbf{Intuizione}: se la risposta di \(A\) dipendesse da \(b\), vorrebbe dire che \(A\) riesce a distinguere la cifratura di \(m_0\) da quella di \(m_1\). La definizione chiede che nessun avversario ci riesca.
+
+\subsection{Spiegazione semplice}
+
+\textbf{L'idea}: mettiamo alla prova Eve. Le facciamo vedere un cifrato e le chiediamo \textbf{quale di due messaggi} c'è dentro. Se il cifrario è sicuro, non deve riuscire a capirlo.
+
+\textbf{Le regole}: si scelgono due messaggi, per esempio \(m_0\) = ``SÌ'' e \(m_1\) = ``NO''. Poi:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \(C\) (l'arbitro) sceglie una chiave a caso.
+\item
+  \(C\) cifra \textbf{uno dei due} messaggi e dà il cifrato \(c\) ad \(A\) (Eve).
+\item
+  \(A\) guarda \(c\) e risponde \textbf{0} (``secondo me era \(m_0\)'') oppure \textbf{1} (``secondo me era \(m_1\)'').
+\end{enumerate}
+
+\textbf{GAME(0) e GAME(1)}: la \(b\) dice quale messaggio viene cifrato. In \textbf{GAME(0)} \(C\) cifra sempre \(m_0\), in \textbf{GAME(1)} cifra sempre \(m_1\). \(A\) non sa in quale versione si trova.
+
+\textbf{La condizione di sicurezza}: il cifrario è sicuro se \(A\) si comporta \textbf{allo stesso modo} in entrambe le versioni, cioè risponde ``1'' con la stessa probabilità sia in GAME(0) sia in GAME(1). Se le sue risposte cambiano a seconda del messaggio cifrato, vuol dire che dal cifrato riesce a capire qualcosa.
+
+\begin{esempio}
+
+\textbf{Esempio: cifrario rotto.} Chiave di 1 bit, messaggi di 2 bit: se \(k = 1\) si invertono entrambi i bit, se \(k = 0\) restano uguali. Prendiamo \(m_0 = 00\) e \(m_1 = 01\).
+
+\begin{itemize}
+\item
+  In \textbf{GAME(0)} si cifra 00, quindi \(c\) è 00 oppure 11: bit sempre \textbf{uguali}.
+\item
+  In \textbf{GAME(1)} si cifra 01, quindi \(c\) è 01 oppure 10: bit sempre \textbf{diversi}.
+\end{itemize}
+
+\(A\) usa la strategia ``se i bit di \(c\) sono uguali rispondo 0, se sono diversi rispondo 1''. In GAME(0) risponde 1 con probabilità \textbf{0}, in GAME(1) con probabilità \textbf{1}. La differenza è 1: \(A\) vince sempre, quindi il cifrario \textbf{non} è sicuro.
+
+\end{esempio}
+
+\begin{esempio}
+
+\textbf{Esempio: OTP.} Chiave di 2 bit, sempre \(m_0 = 00\) e \(m_1 = 01\).
+
+\begin{itemize}
+\item
+  In \textbf{GAME(0)} \(c = 00 \oplus k\): uno qualsiasi tra 00, 01, 10, 11, ognuno con probabilità 1/4.
+\item
+  In \textbf{GAME(1)} \(c = 01 \oplus k\): di nuovo uno qualsiasi tra 00, 01, 10, 11, ognuno con probabilità 1/4.
+\end{itemize}
+
+\(A\) vede cifrati distribuiti \textbf{esattamente allo stesso modo} nei due giochi, quindi qualunque strategia usi risponde 1 con la stessa probabilità in entrambi. La differenza è 0: l'OTP è sicuro.
+
+\end{esempio}
+
+\textbf{In una frase}: il gioco chiede ``Eve, guardando il cifrato, riesce a distinguere se dentro c'era \(m_0\) o \(m_1\)?''. Se per ogni coppia di messaggi e per ogni strategia la risposta è no, il cifrario è perfettamente segreto. È la stessa idea di ``a priori = a posteriori'', detta in un altro modo.
+
+\textbf{Esercizio}: dimostrare che questa definizione è equivalente alla segretezza perfetta.
+
+\begin{approfondimento}{Soluzione proposta (non negli appunti del prof)}
+
+\textbf{PS ⇒ gioco.} Per la (iii) della lezione 1, \(\text{Enc}(K, m_0)\) e \(\text{Enc}(K, m_1)\) hanno la stessa distribuzione. \(A\) vede solo \(c\), quindi nei due giochi riceve un input con la stessa distribuzione e la sua risposta \(b'\) ha la stessa distribuzione. La differenza è 0.
+
+\textbf{Gioco ⇒ PS} (per contrapposizione). Se \(\Pi\) non è perfettamente segreto, per la (iii) esistono \(m_0, m_1, c\) con \(\Pr[\text{Enc}(K, m_0) = c] \ne \Pr[\text{Enc}(K, m_1) = c]\). Costruiamo l'avversario \(A\): ``se ricevo \(c\) rispondo 1, altrimenti 0''. Allora \(\Pr[b' = 1 : \text{GAME}_A(0)] = \Pr[\text{Enc}(K, m_0) = c]\) e \(\Pr[b' = 1 : \text{GAME}_A(1)] = \Pr[\text{Enc}(K, m_1) = c]\), che sono diverse: la differenza non è 0 e la definizione col gioco è violata.
+
+\end{approfondimento}
+
+\section{Message Authentication Codes (MAC)}
+
+\begin{inbreve}
+
+Un MAC serve a \textbf{autenticare} un messaggio, cioè a garantire che venga davvero da chi conosce la chiave e che non sia stato modificato. Alice attacca al messaggio un \textbf{tag} che solo chi ha la chiave sa calcolare, e Bob lo ricalcola per verificarlo. Non nasconde il messaggio.
+
+\end{inbreve}
+
+Nella lezione 1 ci siamo occupati di \textbf{confidenzialità}. Ora passiamo all'\textbf{integrità}: Eve non deve poter modificare il messaggio senza che Bob se ne accorga.
+
+\subsection{Schema}
+
+Alice e Bob condividono una chiave \(k \in \mathcal{K}\).
+
+\begin{verbatim}
+Alice (k)                                       Bob (k)
+m → [Tag] → τ                                   m → [Tag] → τ*
+                ────── (m, τ) ──────→                  τ* = τ ?
+\end{verbatim}
+
+\begin{itemize}
+\tightlist
+\item
+  Alice calcola il \textbf{tag} \(\tau = \text{Tag}(k, m)\) e manda la coppia \((m, \tau)\), \textbf{in chiaro}: il MAC non nasconde il messaggio, lo autentica.
+\item
+  Bob ricalcola \(\text{Tag}(k, m)\) e controlla che coincida con \(\tau\).
+\end{itemize}
+
+\[
+\text{Tag}: \mathcal{K} \times \mathcal{M} \to \mathcal{T}
+\]
+
+Tag è \textbf{deterministica}: stessa chiave e stesso messaggio danno sempre lo stesso tag. È quello che permette a Bob di ricalcolarlo e confrontarlo.
+
+\subsection{Sicurezza: cosa vuole fare Eve}
+
+\textbf{Obiettivo di Eve}: produrre una coppia \((m', \tau')\), \textbf{senza conoscere} \(k\), tale che \(\tau' = \text{Tag}(k, m')\). Si chiama \emph{forgery} (falsificazione).
+
+Rendiamo Eve più forte: conosce già una coppia \textbf{valida} \((m, \tau)\), cioè con \(\text{Tag}(k, m) = \tau\) (ad esempio perché l'ha intercettata). Deve comunque essere difficile falsificare un \(\tau'\) valido per un \(m' \ne m\).
+
+\begin{nota}
+
+Perché \(m' \ne m\)? Rimandare la stessa coppia \((m, \tau)\) è sempre possibile, quindi non conta come falsificazione.
+
+\end{nota}
+
+\subsection{Definizione: sicurezza statistica (one-time)}
+
+\begin{inbreve}
+
+Un MAC è ε-sicuro se Eve, anche dopo aver visto un messaggio con il suo tag, riesce a indovinare il tag di un altro messaggio al massimo con probabilità \(\varepsilon\), piccolissima.
+
+\end{inbreve}
+
+Sia Tag un MAC su \(\mathcal{K}, \mathcal{M}, \mathcal{T}\). Diciamo che è \textbf{ε-statisticamente sicuro} (\emph{one-time}) se \(\forall m, m' \in \mathcal{M}\) con \(m \ne m'\) e \(\forall \tau, \tau' \in \mathcal{T}\):
+
+\[
+\Pr[\text{Tag}(K, m') = \tau' \mid \text{Tag}(K, m) = \tau] \le \varepsilon
+\]
+
+con \(K\) uniforme su \(\mathcal{K}\).
+
+\textbf{Intuizione}: anche sapendo il tag di \(m\), indovinare il tag di un altro messaggio riesce al massimo con probabilità \(\varepsilon\).
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Statistica}: vale contro avversari con potenza di calcolo illimitata, come la segretezza perfetta di Shannon.
+\item
+  \textbf{One-time}: Eve vede una sola coppia valida, quindi la chiave va usata per autenticare un solo messaggio.
+\end{itemize}
+
+Valori tipici di \(\varepsilon\): \(2^{-80}\), \(2^{-128}\).
+
+\subsection{Esercizi}
+
+\textbf{Esercizio 1.} La ε-sicurezza è impossibile per \(\varepsilon = 0\).
+
+\begin{approfondimento}{Soluzione proposta (non negli appunti del prof)}
+
+Fissiamo \(m \ne m'\) e un \(\tau\) con \(\Pr[\text{Tag}(K, m) = \tau] > 0\). Il tag di \(m'\) sarà pur qualcosa, quindi sommando su tutti i \(\tau' \in \mathcal{T}\) le probabilità condizionate \(\Pr[\text{Tag}(K, m') = \tau' \mid \text{Tag}(K, m) = \tau]\) si ottiene 1. Sono \(|\mathcal{T}|\) termini, quindi almeno uno vale \(\ge 1/|\mathcal{T}| > 0\). Ne segue \(\varepsilon \ge 1/|\mathcal{T}|\).
+
+In pratica: Eve può sempre tirare a indovinare un tag a caso.
+
+\end{approfondimento}
+
+\textbf{Esercizio 2.} L'OTP usato come MAC è insicuro: \(\text{Tag}(k, m) = \tau = m \oplus k\).
+
+\begin{approfondimento}{Soluzione proposta (non negli appunti del prof)}
+
+Eve conosce \((m, \tau)\) e ricava la chiave: \(k = m \oplus \tau\). Poi per qualunque \(m' \ne m\) calcola \(\tau' = m' \oplus k\). Riesce con probabilità 1, quindi lo schema non è ε-sicuro per nessun \(\varepsilon < 1\).
+
+Esempio: \(m = 1010\), \(\tau = 0011\), quindi \(k = 1001\). Per \(m' = 1111\): \(\tau' = 1111 \oplus 1001 = 0110\).
+
+Morale: l'OTP è perfetto per la confidenzialità ma inutile per l'integrità.
+
+\end{approfondimento}
+
+\textbf{Esercizio 3.} Consideriamo un gioco come prima:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \(A\) manda un messaggio \(m \in \mathcal{M}\) al challenger
+\item
+  Il challenger sceglie \(k \leftarrow \mathcal{K}\) e risponde con \(\tau = \text{Tag}(k, m)\)
+\item
+  \(A\) produce una coppia \((m', \tau')\)
+\end{enumerate}
+
+\begin{verbatim}
+Avversario A                         Challenger C
+      ──────── m ∈ M ──────────→
+                                     k ← K
+      ←──────── τ = Tag(k, m) ───────
+      ──────── (m', τ') ─────────→
+\end{verbatim}
+
+\(A\) \textbf{vince} (WIN) se: (i) \(m' \ne m\) e (ii) \(\text{Tag}(k, m') = \tau'\).
+
+Richiesta: \(\forall A\), \(\Pr[\text{WIN}] \le \varepsilon\).
+
+\begin{approfondimento}{Soluzione proposta (non negli appunti del prof)}
+
+\textbf{Definizione ⇒ gioco.} Per un \(A\) deterministico, \(m\) è fissato e la coppia \((m', \tau')\) dipende solo dal \(\tau\) ricevuto. Spezzando sui possibili \(\tau\) (probabilità totale): \(\Pr[\text{WIN}] = \sum_\tau \Pr[\text{Tag}(K, m) = \tau] \cdot \Pr[\text{Tag}(K, m') = \tau' \mid \text{Tag}(K, m) = \tau]\). Ogni probabilità condizionata è al più \(\varepsilon\) e le altre sommano a 1, quindi \(\Pr[\text{WIN}] \le \varepsilon\). Se \(A\) è probabilistico, si fa la media sulle sue scelte casuali e il limite resta.
+
+\textbf{Il viceversa in generale no}: la definizione chiede il limite per \textbf{ogni} \(\tau\), il gioco solo \textbf{in media} sui \(\tau\). Un tag rarissimo che rende facile la falsificazione viola la definizione ma pesa pochissimo nel gioco.
+
+\end{approfondimento}
+
+\section{Costruire MAC: funzioni hash pairwise independent}
+
+\begin{inbreve}
+
+Si sceglie a caso una funzione da una famiglia (cioè si sceglie una chiave a caso). Ogni input dà \textbf{il suo} output. La famiglia è \textbf{pairwise independent} se, \textbf{conoscendo l'output su un input, non si sa nulla dell'output su un altro input}: può essere qualunque valore, compreso lo stesso, ognuno con la stessa probabilità. È come lanciare due dadi separati: a volte escono uguali, ma il primo non dice niente sul secondo. Nel MAC l'output è il tag: Eve vede il tag di un messaggio e non impara nulla sul tag di un altro.
+
+\end{inbreve}
+
+\begin{esempio}
+
+\textbf{Esempio}: \(h(m) = a \cdot m + b \bmod 3\). Se sai \(h(0) = 2\), allora \(b = 2\), ma \(a\) resta ignoto: \(h(1) = a + 2\) vale 2, 0 o 1 a seconda di \(a\), ognuno con probabilità 1/3. Con \(h(m) = m + k \bmod 3\) invece, da \(h(0) = 2\) ricavi \(k = 2\) e quindi \(h(1) = 0\) con certezza: \textbf{non} è pairwise independent.
+
+\end{esempio}
+
+Costruiremo i MAC usando un particolare tipo di \textbf{funzioni hash}.
+
+\subsection{Definizione}
+
+Una famiglia \(\mathcal{H} = \{h_k : \mathcal{M} \to \mathcal{T}\}_{k \in \mathcal{K}}\) è \textbf{pairwise independent} se \(\forall m, m' \in \mathcal{M}\) con \(m \ne m'\), la coppia
+
+\[
+(h(K, m),\ h(K, m'))
+\]
+
+con \(K\) uniforme su \(\mathcal{K}\), è \textbf{uniforme} su \(\mathcal{T}^2 = \mathcal{T} \times \mathcal{T}\).
+
+Notazione: \(h(k, m) = h_k(m)\).
+
+\textbf{Intuizione}: i valori della funzione su due input diversi si comportano come due valori scelti a caso e indipendenti. Conoscere \(h_K(m)\) non dice nulla su \(h_K(m')\).
+
+Questo suggerisce di usare:
+
+\[
+\text{Tag}(k, m) = h(k, m) = h_k(m)
+\]
+
+\begin{approfondimento}{Perché funziona (anticipazione, non negli appunti del prof)}
+
+Se la coppia è uniforme su \(\mathcal{T}^2\), ogni coppia \((\tau, \tau')\) ha probabilità \(1/|\mathcal{T}|^2\), e da sola \(h(K, m) = \tau\) ha probabilità \(1/|\mathcal{T}|\). Quindi:
+
+\(\Pr[h(K, m') = \tau' \mid h(K, m) = \tau] = \dfrac{1/|\mathcal{T}|^2}{1/|\mathcal{T}|} = \dfrac{1}{|\mathcal{T}|}\)
+
+Il MAC è ε-sicuro con \(\varepsilon = 1/|\mathcal{T}|\), il minimo possibile per l'esercizio 1. Con tag di 128 bit: \(\varepsilon = 2^{-128}\).
+
+\textbf{Esempio di famiglia pairwise independent}: \(p\) primo, \(\mathcal{K} = \mathbb{Z}_p \times \mathbb{Z}_p\), \(\mathcal{M} = \mathcal{T} = \mathbb{Z}_p\), \(h_{a,b}(m) = a \cdot m + b \bmod p\). Per \(m \ne m'\) e una qualunque coppia \((\tau, \tau')\), il sistema \(a m + b = \tau\), \(a m' + b = \tau'\) ha una sola soluzione \((a, b)\): sottraendo si ottiene \(a(m - m') = \tau - \tau'\), e \(m - m'\) è invertibile modulo \(p\). Quindi ogni coppia esce con probabilità \(1/p^2\).
+
+\end{approfondimento}
+
+\section{Riepilogo}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Shannon}: ogni schema perfettamente segreto ha \(|\mathcal{K}| \ge |\mathcal{M}|\), quindi chiavi lunghe almeno quanto i messaggi
+\item
+  Obiettivo d'ora in poi: una chiave di lunghezza indipendente dal messaggio
+\item
+  La segretezza perfetta si può definire con un gioco: nessun avversario distingue la cifratura di \(m_0\) da quella di \(m_1\)
+\item
+  \textbf{MAC}: Alice manda \((m, \tau)\) in chiaro con \(\tau = \text{Tag}(k, m)\), Bob ricalcola e confronta
+\item
+  \textbf{ε-sicurezza statistica one-time}: visto un tag valido, falsificarne un altro riesce al più con probabilità \(\varepsilon\); \(\varepsilon = 0\) è impossibile
+\item
+  L'OTP come MAC è completamente insicuro
+\item
+  Hash \textbf{pairwise independent} → MAC con \(\text{Tag}(k, m) = h_k(m)\)
+\end{itemize}

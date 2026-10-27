@@ -1,0 +1,1016 @@
+\chapter{Lezione 1 -- Aree funzionali della rete: accesso, core, backbone}
+
+\section{Di cosa parliamo}
+
+Una rete di telecomunicazioni non è un blocco unico: si divide in \textbf{aree funzionali}, ognuna con un compito diverso. Questa lezione introduce la mappa generale che il corso userà sempre: la \textbf{rete d'accesso} (l'ultimo tratto verso l'utente), la \textbf{rete metropolitana/regionale} e la \textbf{rete core/backbone} (la dorsale che collega tutto). Poi passa in rassegna le tecnologie d'accesso (rame, fibra, wireless, satellite), con numeri reali della rete Telecom Italia/TIM.
+
+\section{La mappa della rete}
+
+\begin{inbreve}
+
+Dall'utente verso il centro della rete si attraversano tre strati. La rete d'accesso porta l'utente fino al primo nodo dell'operatore; la rete metropolitana raccoglie il traffico di una città o regione; il backbone collega le città tra loro ad altissima velocità.
+
+\end{inbreve}
+
+\begin{center}\includegraphics[width=0.95\linewidth,height=0.4\textheight,keepaspectratio]{lezione-1-1}\end{center}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Access node}: il primo apparato dell'operatore che l'utente incontra (DSLAM, OLT, stazione radio base).
+\item
+  \textbf{POP} (\emph{Point of Presence}): il punto in cui la rete metropolitana entra nel backbone; è un nodo ``multiservizio'' dove stanno router, BRAS, apparati per la rete mobile, ecc.
+\item
+  \textbf{Metropolitan area}: la rete che collega gli access node di un'area urbana al POP.
+\item
+  \textbf{Backbone}: il centro della rete, fatto di router potenti connessi a maglia.
+\end{itemize}
+
+\section{Rete d'accesso (access network)}
+
+\begin{inbreve}
+
+È la parte di rete che collega l'abbonato al suo fornitore di servizio. È il ``tratto finale'' (o primo, visto dall'utente): il doppino, la fibra o il collegamento radio che arriva a casa tua.
+
+\end{inbreve}
+
+\begin{itemize}
+\tightlist
+\item
+  Si contrappone alla \textbf{rete core}.
+\item
+  Si può dividere ulteriormente in:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{feeder plant} (o rete di distribuzione primaria): dalla centrale agli armadi stradali;
+  \item
+    \textbf{drop plant} (o \emph{edge network}): dagli armadi alle singole case.
+  \end{itemize}
+\item
+  Ruolo: collega operatori e fornitori di servizi con le persone e le aziende che servono.
+\item
+  Storicamente fatta di \textbf{linee in rame} per il telefono; oggi lo stesso rame porta anche la banda larga (\textbf{DSL}) insieme alla voce.
+\item
+  Gli operatori investono molto nella \textbf{fibra ottica} per l'accesso fisso, grazie alla sua velocità e stabilità.
+\end{itemize}
+
+\section{Rete core e edge}
+
+\subsection{Core network}
+
+\begin{inbreve}
+
+La rete core è il ``centro'' della rete. Raccoglie il traffico che arriva da tutte le reti d'accesso e lo smista ad alta velocità verso la destinazione, che sia un altro utente dello stesso operatore o un'altra rete.
+
+\end{inbreve}
+
+\begin{nota}
+
+\textbf{Analogia}: se la rete d'accesso sono le strade di quartiere che portano a casa tua, la rete core è l'autostrada. Ha pochi ingressi, enorme capacità e collega tutte le città tra loro.
+
+\end{nota}
+
+\begin{itemize}
+\tightlist
+\item
+  Topologia tipicamente a \textbf{maglia} (\emph{mesh}): ci sono più cammini tra due nodi, quindi la rete resiste ai guasti.
+\item
+  Fornisce connessioni \textbf{any-to-any} tra i dispositivi della rete.
+\item
+  Fatta di \textbf{switch} (es. ATM, \emph{Asynchronous Transfer Mode}) oppure di \textbf{router IP}.
+\item
+  Poggia su un \textbf{backbone ottico}.
+\item
+  Internet si può vedere come un gigantesco core network: in realtà è fatto di tanti operatori, ognuno con il suo core, \textbf{interconnessi} tra loro.
+\end{itemize}
+
+\subsection{Edge (bordo della rete)}
+
+\begin{inbreve}
+
+L'edge è il confine tra il core e le reti degli utenti. È lì che si fanno le operazioni ``intelligenti'' (classificare il traffico, scegliere il percorso), così il core può limitarsi a inoltrare velocemente.
+
+\end{inbreve}
+
+\begin{itemize}
+\tightlist
+\item
+  L'edge può svolgere funzioni che il core \textbf{non} fa.
+\item
+  \textbf{Esempio con MPLS} (\emph{Multiprotocol Label Switching}): l'edge switch esamina ogni pacchetto e, in base alle sue proprietà (destinazione, tipo di traffico, \ldots), sceglie un \textbf{percorso} attraverso la rete e gli attacca un'\textbf{etichetta} (\emph{label}).
+\item
+  Il core poi \textbf{commuta} i pacchetti guardando solo l'etichetta, invece di fare \textbf{routing hop-by-hop} (cioè decidere a ogni router guardando l'indirizzo IP). È molto più veloce.
+\item
+  Paradigma: \textbf{core ``stupido'' ed edge ``intelligente''}: la scelta del percorso la decide l'edge.
+\end{itemize}
+
+\section{Tipi di accesso}
+
+\begin{inbreve}
+
+Ci si può collegare alla rete in tanti modi diversi, a seconda del mezzo fisico: cavo (rame, coassiale, fibra, rete elettrica), onde radio (Wi-Fi, cellulare, 5G) o satellite. Ognuno ha un compromesso tra velocità, copertura, mobilità e costo.
+
+\end{inbreve}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Tipo
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Mezzo
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Vantaggi
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Usi tipici
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Wired (cablato) & Cavi fisici & Affidabile, stabile, veloce & Ethernet, fibra, DSL \\
+Wireless & Onde radio & Mobilità, flessibilità, facile da installare & Wi-Fi, Bluetooth, cellulare \\
+Satellitare & Satelliti in orbita & Copertura vastissima, zone remote & Internet rurale, comunicazioni globali \\
+Fibra ottica & Fibre di vetro/plastica, luce & Banda altissima, bassa latenza, sicura & Internet veloce, data center \\
+DSL & Doppino telefonico & Diffusissimo, economico & Casa, piccole aziende \\
+Cavo & Cavo coassiale & Veloce; infrastruttura condivisa & Banda larga residenziale, TV via cavo \\
+Cellulare & Reti mobili & Connessione in movimento & Smartphone, dati mobili \\
+Powerline & Impianto elettrico & Nessun cavo nuovo & Rete domestica, estendere il Wi-Fi \\
+5G & Rete mobile di 5ª generazione & Velocissima, bassa latenza, IoT, AR/VR & Applicazioni emergenti, smart city \\
+\end{longtable}
+
+Nota sul \textbf{cavo coassiale}: ``infrastruttura condivisa'' significa che più utenti dello stesso ramo si dividono la banda (al contrario del doppino DSL, che è dedicato a un solo abbonato).
+
+\section{Esempio: la rete Telecom Italia}
+
+\begin{inbreve}
+
+Un operatore reale mette insieme tutto: accesso fisso (ADSL, VDSL, fibra) e mobile (HSPA, LTE) convergono su una rete metropolitana ottica, che arriva ai POP e da lì al backbone nazionale.
+
+\end{inbreve}
+
+Tre livelli:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Access network} (aree metropolitane):
+
+  \begin{itemize}
+  \tightlist
+  \item
+    ADSL2+ (circa 10 Mbit/s) dagli \textbf{IP-DSLAM} (circa 4.000);
+  \item
+    \textbf{FTTC} con VDSL2 (circa 50 Mbit/s) da \textbf{IP-MSAN} (l'ONU nell'armadio);
+  \item
+    \textbf{FTTH/FTTB} (100 Mbit/s) tramite \textbf{GPON};
+  \item
+    mobile HSPA/LTE/WiMAX (circa 10 Mbit/s).
+  \end{itemize}
+\item
+  \textbf{Regional/metropolitan network}: anelli \textbf{ottici a pacchetto} (\emph{optical packet metro}) che raccolgono il traffico.
+\item
+  \textbf{Multiservice edge node (POP)}: contiene gli apparati di bordo:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    per il mobile: MSC-S, xGSN, RNC (lato \textbf{RAN/CN}, rete radio e core mobile);
+  \item
+    per la banda larga fissa (\textbf{BBAN edge}): \textbf{DPI} (\emph{Deep Packet Inspection}), \textbf{BRAS} (\emph{Broadband Remote Access Server}, termina le sessioni PPP degli utenti), \textbf{PE} (\emph{Provider Edge} router, il bordo MPLS);
+  \item
+    storage.
+  \end{itemize}
+\item
+  \textbf{Backbone network}: l'\textbf{optical packet backbone}, un anello di router ad alta capacità.
+\end{itemize}
+
+\section{Terminologia storica (USA)}
+
+\begin{inbreve}
+
+Nella telefonia americana si distingue chi gestisce le chiamate locali (LEC) da chi gestisce quelle a lunga distanza (IXC). Questi termini si incontrano ancora spesso.
+
+\end{inbreve}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Exchange area}: area servita da una centrale; si distingue traffico \textbf{locale} e a \textbf{lunga distanza}.
+\item
+  \textbf{LEC} (\emph{Local Exchange Carrier}): operatore della telefonia locale.
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{ILEC} (\emph{Incumbent LEC}): l'operatore storico, ex monopolista (in Italia il corrispondente è Telecom Italia/TIM).
+  \item
+    \textbf{CLEC} (\emph{Competitive LEC}): operatore concorrente, nato dopo la liberalizzazione.
+  \end{itemize}
+\item
+  \textbf{CO} (\emph{Central Office}): la centrale telefonica.
+\item
+  \textbf{Trunk}: collegamenti tra centrali, in fibra ottica.
+\item
+  \textbf{LATA} (\emph{Local Access and Transport Area}): area geografica di traffico locale.
+\item
+  \textbf{IXC} (\emph{Inter-exchange Carrier}): operatore che trasporta il traffico \textbf{tra LATA diverse} (lunga distanza).
+\end{itemize}
+
+Nello schema del prof:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{dominio LEC} = \textbf{rete d'accesso (locale)}: telefoni → \emph{distribution network} → \textbf{Remote Terminal (RT)} o \textbf{central end office} → \emph{feeder network} → \textbf{central tandem office} (centrale di transito);
+\item
+  poi una \textbf{rete regionale} fino al \textbf{POP} dell'IXC;
+\item
+  \textbf{dominio IXC} = \textbf{rete a lunga distanza}: anello di \textbf{tandem switch}.
+\end{itemize}
+
+\subsection{Esempi fisici}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Distribution frame} (permutatore): il telaio in centrale dove i doppini vengono collegati \textbf{uno per uno} agli apparati della centrale.
+\item
+  \textbf{Collocation space}: spazio nella centrale dove i \textbf{CLEC} possono installare i loro apparati. È ciò che permette la concorrenza: un operatore alternativo affitta il doppino dell'incumbent (\emph{unbundling}) e lo collega al suo DSLAM in centrale.
+\end{itemize}
+
+\section{La rete di distribuzione in rame}
+
+\begin{inbreve}
+
+Dalla centrale locale partono cavi grossi verso gli armadi stradali; dagli armadi partono cavi più piccoli verso i distributori (vicino agli edifici); dai distributori parte il doppino del singolo abbonato. È una struttura ad albero.
+
+\end{inbreve}
+
+\begin{center}\includegraphics[width=0.95\linewidth,height=0.4\textheight,keepaspectratio]{lezione-1-2}\end{center}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Centrale locale} → \textbf{armadio ripartilinea} (cabinet) → \textbf{distributore} → \textbf{abbonato} (borchia, cioè la presa a muro).
+\end{itemize}
+
+\subsection{Numeri della rete d'accesso Telecom Italia (2007)}
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule\noalign{}
+Elemento & Quantità & Unità \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Borchie d'utente (prese) & 33.576.000 & numero \\
+Distributori & 3.893.000 & numero \\
+Armadi ripartilinea & 142.500 & numero \\
+Cavi a coppie simmetriche & 105.700.000 & km-circuito \\
+Cavi (tracciato) & 575.000 & km \\
+Palificazioni & 8.893.000 & pali \\
+Infrastrutture di posa & 20.000 & km di tubazioni \\
+\end{longtable}
+
+Differenza tra le due righe sui cavi: il \textbf{tracciato} (575.000 km) è la lunghezza dei percorsi fisici; i \textbf{km-circuito} (105,7 milioni) contano ogni coppia separatamente (un cavo da 100 coppie lungo 1 km vale 100 km-circuito).
+
+\section{Accesso in rame}
+
+\begin{inbreve}
+
+La rete in rame dell'operatore storico porta sia la banda larga (ADSL, VDSL) sia il telefono. Il suo punto di forza è che c'è già ovunque; il suo limite è che è stata progettata per la voce, non per i dati.
+
+\end{inbreve}
+
+\begin{itemize}
+\tightlist
+\item
+  Fornisce banda larga (\textbf{ADSL, VDSL}) e telefono tradizionale; la voce può migrare verso IP mantenendo la stessa qualità.
+\item
+  \textbf{Vantaggio principale}: diffusione capillare. Riusare l'infrastruttura esistente è molto competitivo, soprattutto nelle aree ben coperte.
+\item
+  Di solito è gestita dall'\textbf{operatore incumbent}, spesso (storicamente) a proprietà pubblica.
+\item
+  \textbf{Problemi}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    è cresciuta un pezzo alla volta nel corso di decenni: l'architettura \textbf{non è ottimizzata} per le tecnologie attuali;
+  \item
+    se si costruisse oggi una rete da zero, \textbf{non} sarebbe in rame e avrebbe un progetto molto diverso;
+  \item
+    è pensata per il \textbf{POTS} (telefono), mentre il traffico è sempre più \textbf{IP}: in alcune zone ci sono problemi di capacità e di qualità del servizio.
+  \end{itemize}
+\end{itemize}
+
+\section{Accesso in fibra (FTTx)}
+
+\subsection{Accesso ottico}
+
+\begin{inbreve}
+
+La fibra sarà (ed è già) la scelta principale per l'accesso fisso nei prossimi anni, perché porta velocità altissime in modo affidabile.
+
+\end{inbreve}
+
+Sistemi citati:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{GE-PON} (\emph{Gigabit Ethernet PON}): per utenti residenziali;
+\item
+  \textbf{GPON} (\emph{Gigabit PON}): per aziende (in Italia è usata anche per le case);
+\item
+  \textbf{COF} (\emph{Code Division Multiplexing over Fiber}): per lunghe distanze.
+\end{itemize}
+
+\textbf{PON} = \emph{Passive Optical Network} (sezione 9.3).
+
+\subsection{FTTx: fin dove arriva la fibra}
+
+\begin{inbreve}
+
+FTTx = \emph{Fiber To The x}. La x dice \textbf{fin dove} arriva la fibra; dopo quel punto il segnale prosegue su rame (o radio). Più la x è vicina all'utente, più la connessione è veloce.
+
+\end{inbreve}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{FTTH} -- Home (fino in casa)
+\item
+  \textbf{FTTC} -- Curb (fino al marciapiede/armadio)
+\item
+  \textbf{FTTN} -- Node o Neighborhood (fino a un nodo di quartiere)
+\item
+  \textbf{FTTP} -- Premises (fino alla proprietà dell'utente)
+\item
+  \textbf{FTTB} -- Building o Business (fino all'edificio)
+\item
+  \textbf{FTTU} -- User
+\item
+  \textbf{FTTZ} -- Zone
+\item
+  \textbf{FTTO} -- Office
+\item
+  \textbf{FTTD} -- Desk (fino alla scrivania)
+\end{itemize}
+
+\subsection{Architettura di riferimento}
+
+\begin{inbreve}
+
+In centrale c'è l'OLT, il trasmettitore ottico dell'operatore. Da lì la fibra si dirama (rete ODN) fino alle ONU/ONT vicine o dentro le case. Se la fibra non arriva in casa, l'ONU converte il segnale e prosegue in rame con xDSL.
+
+\end{inbreve}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{OLT} (\emph{Optical Line Terminal}): terminale ottico in centrale, lato operatore.
+\item
+  \textbf{ODN} (\emph{Optical Distribution Network}): la rete di fibre e splitter tra OLT e utenti.
+\item
+  \textbf{ONU} (\emph{Optical Network Unit}): converte da ottico a elettrico in un punto intermedio (armadio, edificio). Se dopo c'è rame, l'ONU contiene un modem \textbf{xDSL} che parla con l'\textbf{NT} dell'utente sul doppino (\emph{cp}, coppia in rame).
+\item
+  \textbf{ONT} (\emph{Optical Network Termination}): l'ONU quando sta \textbf{dentro casa} dell'utente (FTTH). \textbf{NT} = \emph{Network Termination}, il punto di terminazione della rete.
+\end{itemize}
+
+\subsection{AON vs PON}
+
+\begin{inbreve}
+
+Due modi per distribuire la fibra. \textbf{AON}: ogni utente ha la sua fibra, oppure c'è un nodo attivo (alimentato) che smista. \textbf{PON}: una fibra si divide passivamente in tante con splitter ottici, senza apparati alimentati in mezzo.
+
+\end{inbreve}
+
+\textbf{AON} (\emph{Active Optical Network}), detta anche \textbf{Point-to-Point (P2P)}:
+
+\begin{itemize}
+\item
+  \begin{enumerate}
+  \def\labelenumi{(\alph{enumi})}
+  \tightlist
+  \item
+    una fibra \textbf{dedicata} dalla centrale a ogni utente/armadio/edificio, oppure
+  \end{enumerate}
+\item
+  \begin{enumerate}
+  \def\labelenumi{(\alph{enumi})}
+  \setcounter{enumi}{1}
+  \tightlist
+  \item
+    una fibra fino a un \textbf{nodo attivo} (switch alimentato) che poi distribuisce con fibre dedicate.
+  \end{enumerate}
+\item
+  Pro: banda dedicata, semplice. Contro: tante fibre in centrale, apparati attivi da alimentare e mantenere.
+\end{itemize}
+
+\textbf{PON} (\emph{Passive Optical Network}):
+
+\begin{itemize}
+\tightlist
+\item
+  una fibra dalla centrale arriva a uno \textbf{splitter/combiner ottico passivo} (nessuna alimentazione) che divide la potenza ottica su più fibre, con topologia \textbf{ad albero}.
+\item
+  Pro: meno fibre e nessun apparato attivo sul campo, quindi costi bassi. Contro: la banda della fibra iniziale è \textbf{condivisa} tra gli utenti dello stesso albero.
+\end{itemize}
+
+In entrambe, gli ultimi metri possono essere FTTCab/FTTC (poi rame da meno di 300 m fino a 4 km), FTTH o FTTB.
+
+\subsection{FTTE, FTTCab, FTTCurb}
+
+\begin{inbreve}
+
+Più vicino all'utente si mette l'ONU, più corto è il rame, più alta la velocità.
+
+\end{inbreve}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Architettura
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Dove finisce la fibra
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Tratto in rame (TIM)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Tecnologia sul rame
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+FTTE (Exchange) & Centrale (CO) & 1,2 -- 1,5 km & ADSL \\
+FTTCab (Cabinet) & ONU nell'armadio stradale & 200 -- 300 m & VDSL \\
+FTTCurb & ONU sul marciapiede/palo & 50 -- 150 m & VDSL \\
+\end{longtable}
+
+Le foto della slide 24 mostrano gli \textbf{armadi stradali} (con i doppini attestati sulle morsettiere), una \textbf{muffola/box ottico} in posa e un \textbf{box su palo} (tipico del FTTCurb).
+
+\subsection{FTTP: FTTB e FTTH}
+
+\begin{inbreve}
+
+Nel FTTP la fibra arriva fino alla proprietà dell'utente. Nel FTTB si ferma alla base dell'edificio (poi rame o radio negli ultimi metri); nel FTTH entra in ogni appartamento.
+
+\end{inbreve}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{FTTB} (\emph{Building}): fibra fino a un'\textbf{ONU} nell'edificio; dentro l'edificio si prosegue con \textbf{VDSL, Ethernet o wireless}.
+\item
+  \textbf{FTTH} (\emph{Home}): fibra fino a un elemento ottico (splitter) nell'edificio e poi fibra fino a un'\textbf{ONT} in ogni appartamento.
+\end{itemize}
+
+\subsection{Accesso cablato: quadro complessivo (Telecom Italia)}
+
+Distanze e numero di nodi lungo il percorso:
+
+\begin{longtable}[]{@{}lllll@{}}
+\toprule\noalign{}
+& Exchange & Cabinet & Curb & Premises \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Quanti (circa) & 10 mila & 140 mila & 5 milioni & 22 milioni \\
+\end{longtable}
+
+Distanze: centrale → armadio 1--1,2 km; armadio → curb 200--300 m; curb → casa 50--70 m; in totale 1,2--1,5 km.
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Soluzione
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+In centrale
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Collegamento
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+A casa
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Banda larga attuale & DSLAM / aggregazione ATM & Rame fino a casa: ADSL/ADSL2+ & Modem DSL \\
+FTTCab & Aggregazione & Fibra fino al DSLAM nell'armadio, poi rame VDSL/VDSL2 & Modem DSL + set-top + home gateway \\
+FTTCurb & Aggregazione & Fibra (GE/EPON/GPON) fino all'ONU sul curb, poi rame VDSL2 & Modem DSL + set-top + home gateway \\
+FTTH & OLT & Fibra (GE/EPON/GPON) fino a casa & ONT + set-top + home gateway \\
+\end{longtable}
+
+\section{Quanta banda serve}
+
+\begin{inbreve}
+
+Servizi diversi chiedono velocità diverse, sia in download sia in upload. ADSL basta per navigare; per video HD, storage remoto o TV 3D serve fibra.
+
+\end{inbreve}
+
+Dal grafico TIM (stime, in Mbit/s):
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{ADSL/2+} basta per: web surfing, videochiamate, SDTV VoD, peer-to-peer, SDTV live.
+\item
+  \textbf{FTTCab VDSL2} serve per: gaming e didattica a distanza, web hosting, telemedicina (che chiedono anche \textbf{upload} alto).
+\item
+  \textbf{FTTB VDSL2}: HDTV VoD.
+\item
+  \textbf{FTTH}: remote storage (molto upload e download, fino a 50+ Mbit/s per lato) e TV 3D di nuova generazione (circa 100 Mbit/s in download).
+\end{itemize}
+
+Idea chiave: l'\textbf{upload} diventa importante con servizi come hosting, storage, telemedicina; ed è proprio l'upload il punto debole di ADSL.
+
+\subsection{Evoluzione: dal rame alla fibra}
+
+Il passaggio avviene per gradi:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{FTTE}: tutta la rete d'accesso in rame (fibra solo fino alla centrale).
+\item
+  Mix: \textbf{FTTCab} in alcune zone, \textbf{FTTB} e \textbf{FTTH} in altre, FTTE nel resto.
+\item
+  \textbf{FTTH} ovunque: l'accesso è tutto in fibra.
+\end{enumerate}
+
+\subsection{Numeri di oggi}
+
+\begin{itemize}
+\tightlist
+\item
+  Dati aperti su \href{https://rete.gruppotim.it/}{rete.gruppotim.it}: mappa delle centrali con OLT (pronte per la fibra), collegamenti in fibra e in ponte radio. Nella zona di Roma: copertura ADSL 100\% delle abitazioni, copertura \textbf{NGAN} (\emph{Next Generation Access Network}) 91,8\%, 4G nel 91,7\% dei comuni.
+\item
+  Altre fonti: \href{https://www.fibercop.it/en/}{fibercop.it} (la società che oggi gestisce la rete d'accesso ex TIM), \href{https://bandaultralarga.italia.it/}{bandaultralarga.italia.it}.
+\item
+  Mappe per regione (dati SOStariffe, fine 2022):
+
+  \begin{itemize}
+  \tightlist
+  \item
+    copertura \textbf{FTTH}: bassa, circa 3--20\% per regione (es. Lazio circa 9,5\%);
+  \item
+    copertura \textbf{FTTC}: circa 47--76\% (es. Lazio circa 52,7\%);
+  \item
+    \textbf{digital divide}: quota di popolazione \textbf{non} raggiunta da 30 Mbit/s: Italia 77,7\% contro una media europea del 36\%.
+  \end{itemize}
+\end{itemize}
+
+\section{Accesso wireless}
+
+\begin{inbreve}
+
+L'accesso radio è quello su cui ci sono più aspettative per una rete ``ovunque'': niente cavi, mobilità, e sempre più velocità.
+
+\end{inbreve}
+
+Tecnologie:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{WLL} (\emph{Wireless Local Loop}): sostituisce il doppino con un collegamento radio tra una stazione base (collegata alla centrale o via satellite) e unità fisse presso gli abbonati, a cui si collegano telefono, fax, modem. Utile dove posare cavi costa troppo.
+\item
+  \textbf{3G} (reti mobili di terza generazione).
+\item
+  \textbf{WiMAX} (IEEE 802.16).
+\item
+  Obiettivo: comunicazioni continue e banda larga, con accesso \textbf{fisso e mobile in un unico sistema}.
+\end{itemize}
+
+\subsection{Architettura 2G e 3G}
+
+\begin{inbreve}
+
+La rete mobile ha una parte radio (antenne e i loro controllori) e una parte core (centrali che gestiscono chiamate, dati e database degli utenti).
+
+\end{inbreve}
+
+\textbf{Parte radio (RAN)}:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{2G (GSM)}: \textbf{BTS} (\emph{Base Transceiver Station}, l'antenna) controllate da una \textbf{BSC} (\emph{Base Station Controller}).
+\item
+  \textbf{3G (UMTS)}: \textbf{Node B} (l'antenna) controllati da un \textbf{RNC} (\emph{Radio Network Controller}). Il telefono è la \textbf{MS} (\emph{Mobile Station}) = \textbf{ME} (\emph{Mobile Equipment}, il terminale) + \textbf{USIM} (la SIM).
+\item
+  Interfacce 3G: \textbf{Uu} (radio, telefono ↔ Node B), \textbf{Iub} (Node B ↔ RNC), \textbf{Iur} (RNC ↔ RNC).
+\item
+  Il territorio è diviso in \textbf{celle}; più celle formano l'area di un RNC.
+\end{itemize}
+
+\textbf{Parte core}:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Circuit Switched (CS)}, per la voce: \textbf{MSC} (\emph{Mobile Switching Center}), con i database \textbf{HLR} (\emph{Home Location Register}: profilo e posizione di tutti gli abbonati) e \textbf{VLR} (\emph{Visitor Location Register}: utenti attualmente nell'area di quell'MSC). Collegamento RNC ↔ MSC: \textbf{Iu-CS}.
+\item
+  \textbf{Packet Switched (PS)}, per i dati: \textbf{SGSN} (\emph{Serving GPRS Support Node}) e \textbf{GGSN} (\emph{Gateway GPRS Support Node}, il gateway verso Internet), collegati dall'interfaccia \textbf{Gn}. Collegamento RNC ↔ SGSN: \textbf{Iu-PS}.
+\end{itemize}
+
+Numeri (rete TIM, slide):
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+GSM (2G)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+UMTS (3G)
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Siti (tralicci) & 14.000 & 8.030 \\
+Stazioni radio & 13.865 BTS (13.863 macro + 1.150 micro nello schema) & 8.030 Node B (8.000 macro + 50 micro) \\
+Controllori & 463 BSC & 70 RNC \\
+Trasmettitori & 90.090 & -- \\
+Celle & 24.522 (900 MHz) + 7.551 (1800 MHz) & 22.094 \\
+Canali & 556.264 (900 MHz) + 164.458 (1800 MHz) & 834.752 \\
+Frequenze & 900 e 1800 MHz & 10 MHz a 2100 MHz \\
+\end{longtable}
+
+\subsection{Rete 5G}
+
+\begin{inbreve}
+
+Nel 5G il core è diviso in funzioni software separate. Il \textbf{piano di controllo} (chi sei, dove sei, che sessione hai) è separato dal \textbf{piano utente} (dove passano davvero i tuoi dati).
+
+\end{inbreve}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{UE} (\emph{User Equipment}): il terminale.
+\item
+  \textbf{gNB}: la stazione radio base 5G (fa parte della \textbf{5G RAN}).
+\item
+  \textbf{5G Core (5GC)}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{AMF} (\emph{Access and Mobility Management Function}): gestisce accesso e mobilità (registrazione, handover). Piano di controllo.
+  \item
+    \textbf{SMF} (\emph{Session Management Function}): crea e gestisce le sessioni dati. Piano di controllo.
+  \item
+    \textbf{UPF} (\emph{User Plane Function}): inoltra i pacchetti dell'utente verso Internet. Piano utente.
+  \end{itemize}
+\item
+  Interfacce: \textbf{N2} (gNB ↔ AMF, controllo), \textbf{N3} (gNB ↔ UPF, dati), \textbf{N4} (SMF ↔ UPF, l'SMF configura l'UPF), \textbf{N6} (UPF ↔ Internet).
+\end{itemize}
+
+\subsection{Copertura mobile in Italia}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://www.tim.it/fisso-e-mobile/mobile/mappa-copertura-mobile}{Mappa copertura TIM}
+\item
+  \href{https://www.opensignal.com/coverage-maps}{OpenSignal coverage maps}: mappe costruite in \textbf{crowdsourcing} dalle misure dell'app installata sugli smartphone degli utenti (la mappa di Roma mostra zone verdi di segnale forte e rosse di segnale debole). Il prof suggerisce di provare l'app.
+\end{itemize}
+
+\subsection{Evoluzione degli standard mobili}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 6\tabcolsep) * \real{0.2500}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Periodo
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Famiglia 3GPP (GSM)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Famiglia 3GPP2 (CDMA)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+IEEE
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Prima del 2000 & GSM/PDC, GPRS/PDC-P, EDGE & IS-95 & -- \\
+2000--2010 & UMTS, HSDPA, HSUPA & CDMA2000, 1X/nX EV-DO & Mobile WiMAX (dal 2007) \\
+Dal 2010 & LTE & UMB & WiMAX phase 2, 3 \\
+\end{longtable}
+
+(Storicamente ha vinto LTE; UMB e WiMAX mobile sono stati abbandonati.)
+
+\subsection{Famiglie wireless per estensione}
+
+\begin{inbreve}
+
+Le reti wireless si classificano per raggio di copertura, dal piccolissimo (attorno al corpo) al regionale.
+
+\end{inbreve}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Tipo
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Copertura
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Standard
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+PAN (Personal) & Pochi metri & IEEE 802.15 (WiMedia, Bluetooth) \\
+LAN (Local) & Casa, ufficio & IEEE 802.11 (Wi-Fi) \\
+MAN (Metropolitan) & Città & IEEE 802.16 (WiMAX fisso e mobile, ``wireless DSL'') \\
+RAN (Regional) & Regione & IEEE 802.22 (WRAN, usa le frequenze TV libere) \\
+\end{longtable}
+
+Tendenza: con il servizio \textbf{anytime, anywhere, anyone}, alla telefonia cellulare e al Wi-Fi si aggiunge la richiesta di \textbf{banda larga mobile} e comunicazioni senza interruzioni.
+
+\subsection{Evoluzione del Wi-Fi}
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule\noalign{}
+Nome & Standard & Anno & Velocità max \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Wi-Fi 1 & 802.11 & 1997 & 2 Mbit/s \\
+Wi-Fi 2 & 802.11b & 1999 & 11 Mbit/s \\
+Wi-Fi 3 & 802.11g & 2003 & 54 Mbit/s \\
+Wi-Fi 4 & 802.11n & 2008 & 600 Mbit/s \\
+Wi-Fi 5 & 802.11ac & 2014 & 6,9 Gbit/s \\
+Wi-Fi 6 & 802.11ax & 2019 & 9,6 Gbit/s \\
+\end{longtable}
+
+Oltre alla velocità cresce il numero di utenti serviti contemporaneamente (Wi-Fi 6 è pensato per ambienti affollati).
+
+\section{Accesso satellitare: LEO}
+
+\begin{inbreve}
+
+I satelliti LEO orbitano bassi (poche centinaia di km), quindi il segnale fa un viaggio breve e la latenza è bassa. Ma ogni satellite copre una zona piccola e si muove velocemente: ne servono migliaia per coprire la Terra.
+
+\end{inbreve}
+
+\textbf{LEO} (\emph{Low Earth Orbit}):
+
+\begin{itemize}
+\tightlist
+\item
+  quota circa \textbf{500--2000 km};
+\item
+  periodo orbitale breve, circa \textbf{90--120 minuti};
+\item
+  \textbf{bassa latenza} rispetto ai satelliti GEO;
+\item
+  servono \textbf{grandi costellazioni} per una copertura continua;
+\item
+  applicazioni: accesso a Internet, osservazione della Terra, IoT, navigazione;
+\item
+  bande \textbf{Ku} (12--18 GHz) e \textbf{Ka} (circa 26,5--40 GHz; la slide riporta per errore 12--18 GHz anche per la Ka).
+\end{itemize}
+
+\textbf{Vantaggi}: latenza circa 20--40 ms (contro 500+ ms del GEO), alta banda potenziale, copertura globale anche in zone rurali e remote.
+
+\textbf{Sfide}: migliaia di satelliti necessari, costi di lancio e manutenzione alti, rischio \textbf{detriti spaziali} e vita breve dei satelliti (circa 5--7 anni).
+
+\subsection{LEO vs GEO}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 4\tabcolsep) * \real{0.3333}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+LEO
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+GEO (geostazionario)
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Quota & 500 -- 2000 km & circa 35.786 km \\
+Latenza & circa 20 -- 40 ms & circa 500+ ms \\
+Copertura & Servono grandi costellazioni & Un satellite copre circa 1/3 della Terra \\
+Vita & circa 5 -- 7 anni & circa 15 anni \\
+\end{longtable}
+
+\textbf{Perché la latenza GEO è così alta} (\emph{complemento}): il segnale va utente → satellite → stazione a terra, cioè circa \(2 \times 35.786\) km. Alla velocità della luce (\(3 \cdot 10^5\) km/s) sono circa 240 ms solo andata; andata e ritorno di una richiesta superano i 480 ms. Un GEO è ``fermo'' nel cielo perché ruota con la Terra (periodo 24 h).
+
+\subsection{Esempio: Starlink}
+
+\begin{itemize}
+\tightlist
+\item
+  Costellazione LEO di \textbf{SpaceX}, oltre 5.000 satelliti lanciati (dato 2025).
+\item
+  Obiettivo: banda larga globale per case, aziende e mezzi in movimento (navi, aerei).
+\item
+  Terminale utente: piccola antenna (``Dishy''); latenza 20--40 ms.
+\end{itemize}
+
+\section{Tecnologie e velocità nel tempo}
+
+\begin{longtable}[]{@{}llll@{}}
+\toprule\noalign{}
+Fisso & Velocità tipica & Mobile & Velocità tipica \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+Dial-up & circa 64 kbit/s & GSM & circa 10 kbit/s \\
+ADSL free & 256 -- 640 kbit/s & EDGE & circa 100 kbit/s \\
+ADSL flat & 2 -- 6 Mbit/s & UMTS & circa 300 kbit/s \\
+ADSL2+ & 10 -- 20 Mbit/s & HSPA 1 / 2 / 2+ & 3 / 7 / 14 Mbit/s \\
+VDSL2 & 50 -- 100 Mbit/s & -- & -- \\
+\end{longtable}
+
+\section{Il backbone Telecom Italia}
+
+\subsection{Topologia logica: OPB}
+
+\begin{inbreve}
+
+Il backbone IP di TIM (OPB, \emph{Optical Packet Backbone}) è fatto di 32 POP. Quattro, a Roma e Milano, formano il ``cuore'' collegato a 10 Gbit/s; gli altri si appoggiano a questi.
+
+\end{inbreve}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{32 PoP} in tutto:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{Inner core}: 4 PoP (2 a Roma, 2 a Milano), collegati a \textbf{10 Gbit/s (STM-64)};
+  \item
+    \textbf{Outer core}: 28 PoP, collegati a 10 Gbit/s (STM-64), \textbf{2,5 Gbit/s (STM-16)} o \textbf{155 Mbit/s (STM-1)}.
+  \end{itemize}
+\item
+  Ogni PoP è in \textbf{dual homing}: collegato a due nodi dell'inner core (es. Roma e Milano), così sopravvive al guasto di uno dei due.
+\item
+  Circa 100 router Cisco GSR (\emph{Gigabit Switch Router}).
+\item
+  Capacità: circa 80 Gbit/s interni, 13 Gbit/s verso la ``Big Internet'', 12 Gbit/s di peering pubblici e privati.
+\item
+  I link sono usati al \textbf{50\%}: margine per assorbire il traffico se un collegamento si guasta (il dual homing ha senso solo se il link superstite regge il traffico dell'altro).
+\end{itemize}
+
+\textbf{STM-n} (\emph{Synchronous Transport Module}, gerarchia SDH): STM-1 = 155 Mbit/s, STM-16 = 2,5 Gbit/s, STM-64 = 10 Gbit/s (ogni livello è un multiplo di STM-1).
+
+\subsection{Topologia fisica}
+
+\begin{itemize}
+\tightlist
+\item
+  La rete IP poggia sulla \textbf{rete di trasporto ottica} (OTN).
+\item
+  Nodi con \textbf{ODXC} (\emph{Optical Digital Cross Connect}): commutano interi flussi ottici.
+\item
+  Collegamenti in \textbf{DWDM} (\emph{Dense Wavelength Division Multiplexing}: molte lunghezze d'onda, cioè molti canali, sulla stessa fibra) o fibra ottica.
+\item
+  Topologia a \textbf{maglia} che copre tutta Italia (TO, MI, VE, BO, FI, RM, NA, BA, Lamezia, PA, CT, \ldots).
+\end{itemize}
+
+\textbf{Differenza logica vs fisica}: la topologia logica dice quali router IP si ``vedono'' direttamente; la fisica dice dove passano davvero le fibre. Un singolo link logico Roma--Milano può attraversare fisicamente più nodi ottici.
+
+\subsection{Infrastrutture globali}
+
+\begin{itemize}
+\tightlist
+\item
+  \href{http://www.submarinecablemap.com/}{submarinecablemap.com}: mappa dei \textbf{cavi sottomarini} che collegano i continenti; la quasi totalità del traffico intercontinentale passa da qui, non dai satelliti.
+\end{itemize}
+
+\section{Gartner hype cycle}
+
+\begin{inbreve}
+
+Un modello che descrive come cresce l'attenzione verso una nuova tecnologia: prima entusiasmo eccessivo, poi delusione, poi maturità e adozione reale. Serve a non confondere l'hype con l'utilità effettiva.
+
+\end{inbreve}
+
+Cinque fasi (aspettative in funzione del tempo):
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Technology trigger}: ricerca, prime startup e primi finanziamenti, prodotti di prima generazione costosi e da personalizzare.
+\item
+  \textbf{Peak of inflated expectations}: hype mediatico, tanti fornitori, attività oltre gli early adopter.
+\item
+  \textbf{Trough of disillusionment}: stampa negativa, fallimenti e consolidamento dei fornitori; meno del 5\% del pubblico potenziale ha adottato davvero.
+\item
+  \textbf{Slope of enlightenment}: prodotti di seconda e terza generazione, metodologie e best practice.
+\item
+  \textbf{Plateau of productivity}: adozione di massa (20--30\% del pubblico potenziale).
+\end{enumerate}
+
+\textbf{Hype cycle 2024} (tecnologie emergenti, agosto 2024):
+
+\begin{itemize}
+\tightlist
+\item
+  in salita (innovation trigger): Large Action Models, robot umanoidi, digital twin, \textbf{6G}, cybersecurity mesh architecture, sistemi multi-agente, AI supercomputing, agenti autonomi, reinforcement learning, AGI, federated learning;
+\item
+  vicino al picco: \textbf{homomorphic encryption}, prompt engineering, AI TRiSM, GitOps, superapps, AI per l'ingegneria del software;
+\item
+  in discesa verso la disillusione: \textbf{generative AI}, WebAssembly, cloud-native.
+\end{itemize}
+
+\section{Domande di ripasso}
+
+\begin{approfondimento}{Che differenza c'è tra rete d'accesso e rete core?}
+
+L'accesso collega il singolo abbonato al primo nodo dell'operatore (rame, fibra, radio): è capillare, con tantissimi collegamenti a bassa capacità. Il core è la dorsale: pochi nodi potenti a maglia, collegamenti ad altissima capacità, connessioni any-to-any.
+
+\end{approfondimento}
+
+\begin{approfondimento}{Perché si dice `core stupido, edge intelligente'?}
+
+Con MPLS l'edge esamina i pacchetti, sceglie il percorso e assegna un'etichetta; il core commuta solo in base all'etichetta, senza routing hop-by-hop. Le decisioni sono al bordo, il centro è veloce e semplice.
+
+\end{approfondimento}
+
+\begin{approfondimento}{Differenza tra AON e PON?}
+
+AON (P2P): fibra dedicata per utente o nodo attivo alimentato che distribuisce. PON: splitter ottici passivi, topologia ad albero, banda condivisa tra gli utenti dello stesso ramo, nessun apparato alimentato sul campo, costi più bassi.
+
+\end{approfondimento}
+
+\begin{approfondimento}{FTTE, FTTCab, FTTH: quanto rame resta?}
+
+FTTE: 1,2--1,5 km di rame (ADSL). FTTCab: 200--300 m (VDSL). FTTCurb: 50--150 m (VDSL). FTTH: nessuno, fibra fino all'ONT in casa.
+
+\end{approfondimento}
+
+\begin{approfondimento}{Perché un satellite LEO ha latenza molto più bassa di uno GEO?}
+
+Perché è circa 20--70 volte più vicino alla Terra (500--2000 km contro 35.786 km): la propagazione è molto più breve. In cambio copre un'area piccola e si muove, quindi servono migliaia di satelliti.
+
+\end{approfondimento}
+
+\begin{approfondimento}{Perché i link del backbone TIM sono usati solo al 50\%?}
+
+Per la protezione: con il dual homing, se un collegamento si guasta il traffico passa sull'altro, che deve poter reggere anche il carico del primo.
+
+\end{approfondimento}
+
+\section{Riepilogo}
+
+\begin{itemize}
+\tightlist
+\item
+  Rete = \textbf{accesso} (utente → primo nodo) + \textbf{metro/regionale} + \textbf{core/backbone} (dorsale a maglia, any-to-any).
+\item
+  \textbf{Edge intelligente, core veloce} (MPLS: l'edge sceglie il percorso, il core commuta per etichetta).
+\item
+  \textbf{Tipi di accesso}: rame (DSL), coassiale, fibra, powerline, Wi-Fi, cellulare/5G, satellite.
+\item
+  \textbf{Rame}: c'è ovunque, ma è pensato per la voce e non ottimizzato per IP. Struttura: centrale → armadio → distributore → presa.
+\item
+  \textbf{Fibra (FTTx)}: OLT → ODN → ONU/ONT. \textbf{AON} (punto-punto o nodo attivo) vs \textbf{PON} (splitter passivi, banda condivisa). FTTE / FTTCab / FTTCurb / FTTB / FTTH: più vicina la fibra, più corto il rame, più velocità.
+\item
+  \textbf{Mobile}: 2G (BTS/BSC), 3G (Node B/RNC, MSC per la voce, SGSN/GGSN per i dati), 5G (gNB + AMF/SMF/UPF, controllo separato dai dati).
+\item
+  \textbf{Satellite LEO}: bassa quota e latenza (20--40 ms), servono grandi costellazioni (Starlink); GEO: un satellite copre 1/3 della Terra ma latenza 500+ ms.
+\item
+  \textbf{Backbone TIM}: 32 PoP, inner core Roma/Milano a 10 Gbit/s, dual homing, link al 50\%; sotto c'è la rete ottica DWDM.
+\end{itemize}
