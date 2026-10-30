@@ -1,0 +1,185 @@
+% Chiarimenti sulla Lezione 5 (sezioni 5.4-5.6): risposte alle domande fatte durante lo studio.
+
+\chapter{Chiarimenti sulla Lezione 5}
+
+\textit{Questo capitolo non è negli appunti del prof: raccoglie spiegazioni più semplici delle parti difficili della Lezione 5, dalla costruzione dei PRG in poi.}
+
+\section{La mappa: cosa vogliamo ottenere}
+
+\begin{inbreve}
+L'obiettivo di tutta la seconda metà della Lezione 5 è uno solo: costruire un \textbf{PRG che allunga di quanto vuoi}, partendo da una \textbf{OWF}. Ci si arriva in due passaggi: prima da una OWF a un PRG che allunga di \textbf{1 bit} (hard-core bit), poi da 1 bit a \textbf{tanti bit} (stretch amplification).
+\end{inbreve}
+
+\begin{verbatim}
+OWP + hard-core bit  --(passaggio 1)-->  G (+1 bit)  --(passaggio 2)-->  G^l (+l bit)
+\end{verbatim}
+
+\begin{itemize}
+  \item \textbf{Passaggio 1} (sezione hard-core bit): da una one-way permutation \(f\) e un suo hard-core bit \(h\) si ottiene \(G(s) = f(s) \,\|\, h(s)\): entrano \(n\) bit, ne escono \(n+1\).
+  \item \textbf{Passaggio 2} (stretch amplification): applicando \(G\) più volte di fila si ottiene \(G^\ell\): entrano \(\lambda\) bit, ne escono \(\lambda + \ell\).
+\end{itemize}
+
+Il prof li presenta in ordine inverso (prima il passaggio 2, poi il passaggio 1): per questo all'inizio sembra che ``manchi'' il \(G\) piccolo. Il teorema dello stretch amplification è un ``se \(G\) esiste, allora \(G^\ell\) esiste'': non dice da dove prendere \(G\). Lo dice la sezione sull'hard-core bit.
+
+\textbf{f\_BAD non fa parte della catena}: risponde a una domanda laterale (esiste un hard-core bit valido per tutte le OWF? No).
+
+\section{Il meccanismo di \texorpdfstring{\(G^\ell\)}{G\^{}l}}
+
+\begin{inbreve}
+\(G^\ell\) è il generatore ``lungo'': applica il generatore piccolo \(G\) più volte di fila. A ogni giro \(G\) restituisce un bit in più del seme: quel bit si mette da parte, il resto diventa il nuovo seme.
+\end{inbreve}
+
+\(G\) prende 3 bit e ne dà 4. Seme iniziale \texttt{101} (valori di \(G\) inventati, solo per vedere il meccanismo):
+
+\begin{center}
+\begin{tabular}{ccccc}
+\toprule
+Giro & Entra & \(G\) restituisce & Rimetti dentro & Metti da parte \\
+\midrule
+1 & \texttt{101} & \texttt{011}\textbf{\texttt{0}} & \texttt{011} & \textbf{0} \\
+2 & \texttt{011} & \texttt{110}\textbf{\texttt{1}} & \texttt{110} & \textbf{1} \\
+3 & \texttt{110} & \texttt{000}\textbf{\texttt{1}} & \texttt{000} & \textbf{1} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Uscita: i bit messi da parte (0, 1, 1) più l'ultimo seme (\texttt{000}) = \texttt{011000}, cioè 6 bit partendo da 3. Con \(\ell\) giri se ne ottengono \(3 + \ell\).
+
+\begin{nota}
+\textbf{G non restituisce valori a caso}: è una funzione \textbf{deterministica}, stesso seme stessa uscita (è quello che permette a Bob di ricalcolare la chiave di Alice). L'uscita è \textbf{determinata dal seme, ma sembra casuale} a chi non conosce il seme: è il significato di ``pseudocasuale''.
+\end{nota}
+
+\section{Perché \texorpdfstring{\(G^\ell\)}{G\^{}l} è sicuro: l'idea}
+
+\begin{inbreve}
+Sappiamo solo che \textbf{un giro} di \(G\) sembra casuale. Il giro 2 è solo un calcolo fatto sull'uscita del giro 1: se quella sembra casuale, il giro 2 parte da un seme che sembra casuale e quindi dà anche lui bit che sembrano casuali. E così via per ogni giro.
+\end{inbreve}
+
+Con 2 giri, passo per passo:
+\begin{enumerate}
+  \item L'uscita del giro 1 sembra casuale (\(G\) è un PRG).
+  \item Quindi il giro 2 riceve un seme che sembra casuale.
+  \item \(G\) con un seme casuale dà bit che sembrano casuali (\(G\) è un PRG, di nuovo).
+  \item Quindi anche il giro 2 dà bit che sembrano casuali.
+  \item Quindi tutti i bit dell'uscita sembrano casuali.
+\end{enumerate}
+
+\subsection{Cosa sono gli ibridi (e cosa non sono)}
+
+\begin{nota}
+\textbf{Gli ibridi non li usa nessuno}: il generatore vero \(G^\ell\) usa \textbf{sempre} \(G\) a ogni giro. Gli ibridi sono distribuzioni \textbf{immaginarie} che esistono solo dentro la dimostrazione, come ``gradini'' per passare da \(H_0\) (l'uscita vera di \(G^\ell\)) a \(H_\ell\) (bit davvero casuali), cambiando un giro alla volta. Come i paesi intermedi che servono a dimostrare che due città sono collegate a piedi: non sono la meta.
+\end{nota}
+
+\subsection{Chi è A, chi è B}
+
+\begin{nota}
+Nella riduzione \(A\) e \(B\) sono \textbf{avversari} (programmi che attaccano), non schemi:
+\begin{itemize}
+  \item \(G\) = il PRG che allunga di 1 bit, \textbf{sicuro per ipotesi};
+  \item \(G^\ell\) = il PRG nuovo, di cui \textbf{vogliamo dimostrare} la sicurezza;
+  \item \(A\) = avversario che (per assurdo) rompe \(G^\ell\);
+  \item \(B\) = avversario costruito usando \(A\), che rompe \(G\).
+\end{itemize}
+Chi sa rompere \(G^\ell\) saprebbe rompere \(G\); ma \(G\) non si può rompere, quindi nemmeno \(G^\ell\).
+\end{nota}
+
+\textbf{Perché \(B\) non può semplicemente passare la sua stringa ad \(A\)} (i ``???'' del prof): \(B\) riceve dal challenger \(\lambda+1\) bit, mentre \(A\) sa giudicare solo stringhe di \(\lambda+\ell\) bit. Se \(B\) ``allunga'' la stringa calcolando gli altri giri con \(G\), ottiene una stringa \textbf{mista} (un pezzo forse casuale, il resto pseudocasuale), che non è né ``tutto pseudocasuale'' né ``tutto casuale''. Queste stringhe miste sono proprio gli ibridi: per questo serve l'argomento ibrido.
+
+\section{Perché \texorpdfstring{\(G^\ell\)}{G\^{}l} è sicuro: la dimostrazione rigorosa con 2 giri}
+
+\textbf{Cosa è cosa.}
+\begin{itemize}
+  \item \(G : \{0,1\}^\lambda \to \{0,1\}^{\lambda+1}\): il generatore piccolo. \textbf{Ipotesi}: \(G\) è un PRG.
+  \item \(U_k\): \(k\) bit davvero casuali.
+  \item \(s_0 \leftarrow U_\lambda\): il seme iniziale.
+  \item \((s_1, b_1) = G(s_0)\): uscita del giro 1, spezzata in nuovo seme \(s_1\) (\(\lambda\) bit) e bit messo da parte \(b_1\).
+  \item \((s_2, b_2) = G(s_1)\): uscita del giro 2.
+  \item \(G^2(s_0) = (b_1, b_2, s_2)\): uscita del generatore lungo, \(\lambda+2\) bit.
+\end{itemize}
+
+\textbf{Tesi}: \(G^2(U_\lambda) \approx_c U_{\lambda+2}\), cioè per ogni avversario efficiente \(A\) il vantaggio \(|\Pr[A \text{ dice } 1 \text{ su } X] - \Pr[A \text{ dice } 1 \text{ su } Y]|\) è trascurabile.
+
+\textbf{Gli ibridi.}
+\begin{center}
+\begin{tabular}{llll}
+\toprule
+ & Giro 1: \((s_1, b_1)\) & Giro 2: \((s_2, b_2)\) & Uscita \\
+\midrule
+\(H_0\) & \(= G(s_0)\), \(s_0 \leftarrow U_\lambda\) & \(= G(s_1)\) & \((b_1, b_2, s_2)\) \\
+\(H_1\) & \(\leftarrow U_{\lambda+1}\) (casuale) & \(= G(s_1)\) & \((b_1, b_2, s_2)\) \\
+\(H_2\) & \(\leftarrow U_{\lambda+1}\) (casuale) & \(\leftarrow U_{\lambda+1}\) (casuale) & \((b_1, b_2, s_2)\) \\
+\bottomrule
+\end{tabular}
+\end{center}
+\(H_0 = G^2(U_\lambda)\) e \(H_2 = U_{\lambda+2}\). Sia \(p_i\) la probabilità che \(A\) dica 1 su \(H_i\).
+
+\textbf{\(H_0 \approx_c H_1\)} (passaggi 1--2). Per assurdo \(|p_0 - p_1|\) non trascurabile. \(B\) riceve \(z\) di \(\lambda+1\) bit (\(z = G(U_\lambda)\) oppure \(z \leftarrow U_{\lambda+1}\)), spezza \(z = (s_1, b_1)\), calcola \((s_2, b_2) = G(s_1)\), dà ad \(A\) la stringa \((b_1, b_2, s_2)\) e risponde come \(A\). Se \(z = G(U_\lambda)\) la stringa è distribuita come \(H_0\); se \(z\) è casuale, come \(H_1\). Quindi \(B\) rompe \(G\) con vantaggio \(|p_0 - p_1|\): contraddizione.
+
+\textbf{\(H_1 \approx_c H_2\)} (passaggi 3--4). Per assurdo \(|p_1 - p_2|\) non trascurabile. \(B\) riceve \(z\), sceglie \(b_1 \leftarrow U_1\), spezza \(z = (s_2, b_2)\), dà ad \(A\) \((b_1, b_2, s_2)\) e risponde come \(A\). Se \(z = G(U_\lambda)\) la stringa è distribuita come \(H_1\); se \(z\) è casuale, come \(H_2\). Contraddizione come prima.
+
+\textbf{\(H_0 \approx_c H_2\)} (passaggio 5). Per la disuguaglianza triangolare:
+\[
+|p_0 - p_2| \le |p_0 - p_1| + |p_1 - p_2| \le \text{negl} + \text{negl} = \text{negl}
+\]
+Quindi \(G^2\) è un PRG. \(\blacksquare\)
+
+\textbf{Con \(\ell\) giri}: \(\ell+1\) ibridi, ognuno con un giro casuale in più; sommando \(|p_0 - p_\ell| \le \ell \cdot \text{negl}\), che resta trascurabile solo se \(\ell\) è polinomiale.
+
+\section{Hard-core bit, spiegato semplice}
+
+\begin{inbreve}
+Un bit \(h(x)\) è \textbf{hard-core} per una OWF \(f\) se, vedendo solo \(f(x)\), non si riesce a indovinare \(h(x)\) meglio che tirando una moneta (50\%).
+\end{inbreve}
+
+\textbf{Il gioco.} Si sceglie \(x\) a caso, Eve vede solo \(f(x)\) e deve indovinare il bit \(h(x)\). Tirando una moneta indovina il 50\% delle volte; \(h\) è hard-core se nessuna strategia efficiente fa meglio di così (se non di una quantità trascurabile).
+
+\begin{esempio}
+\textbf{Esempi di bit che NON sono hard-core}, con \(f(p, q) = p \cdot q = 3233\):
+\begin{itemize}
+  \item ``\(p\) è dispari?'': i primi grandi sono tutti dispari, quindi si risponde ``sì'' e si indovina il 100\% delle volte.
+  \item ``l'ultimo bit di \(p \cdot q\)'': si legge direttamente da 3233 (è dispari, quindi 1).
+\end{itemize}
+Un bit hard-core è uno su cui \(f(x)\) non dà nessun indizio: 0 e 1 restano ugualmente probabili. Il teorema di Goldreich-Levin (Lezione 6) ne dà uno per ogni OWF: lo XOR di un sottoinsieme casuale dei bit di \(x\).
+\end{esempio}
+
+\textbf{Perché ``one-way'' non basta}: una OWF garantisce solo che non si ricava \textbf{tutto} \(x\), non che non si ricavi \textbf{qualche bit}. L'hard-core bit è un bit garantito nascosto.
+
+\section{Il PRG da una one-way permutation}
+
+\begin{inbreve}
+Una \textbf{permutazione} è una funzione da \(\{0,1\}^n\) a \(\{0,1\}^n\) in cui ogni uscita viene da un solo ingresso: rimescola le stringhe senza perderne nessuna. Quindi se \(x\) è casuale, anche \(f(x)\) è casuale.
+\end{inbreve}
+
+\begin{esempio}
+Con \(n = 2\): \(f(00) = 10\), \(f(01) = 00\), \(f(10) = 11\), \(f(11) = 01\). Ogni stringa compare esattamente una volta tra le uscite, quindi con \(x\) uniforme ogni uscita ha probabilità \(1/4\).
+\end{esempio}
+
+\(G(s) = f(s) \,\|\, h(s)\), con \(f\) one-way permutation e \(h\) suo hard-core bit, è un PRG che allunga di 1 bit:
+\begin{itemize}
+  \item \(f(s)\) è davvero casuale (\(f\) è una permutazione, \(s\) è casuale);
+  \item \(h(s)\) sembra casuale anche guardando \(f(s)\) (è hard-core).
+\end{itemize}
+
+\section{f\_BAD}
+
+\begin{inbreve}
+Domanda: esiste un unico \(h\) hard-core per \textbf{tutte} le OWF? No: qualunque \(h\) scegli, c'è una OWF (\(f_{\text{BAD}}\)) per cui \(h\) non funziona, perché \(f_{\text{BAD}}\) scrive \(h(x)\) in chiaro.
+\end{inbreve}
+
+\(f_{\text{BAD}}(x) = f(x) \,\|\, h(x)\), con \(f\) OWF qualunque. Esempio con \(h\) = ``primo bit di \(x\)'' e \(x = 101\): \(f_{\text{BAD}}(101) = f(101) \,\|\, \mathbf{1}\).
+\begin{itemize}
+  \item \(h\) \textbf{non} è hard-core per \(f_{\text{BAD}}\): si legge nell'ultimo bit dell'uscita.
+  \item \(f_{\text{BAD}}\) \textbf{è comunque una OWF}: chi la inverte trova \(x'\) con \(f(x') = f(x)\), cioè inverte \(f\), che è one-way (dimostrazione completa all'inizio della Lezione 6).
+\end{itemize}
+Quindi l'hard-core bit va scelto in base alla funzione, come gli estrattori della Lezione 3.
+
+\section{Perché proprio le OWF}
+
+\begin{inbreve}
+OWF \(\Leftrightarrow\) PRG. Le OWF \textbf{bastano} per costruire i PRG (hard-core bit + stretch amplification) e \textbf{servono}: ogni PRG è già una OWF. Sono l'ipotesi minima.
+\end{inbreve}
+
+\begin{itemize}
+  \item \textbf{Intuizione}: un PRG deve essere facile da calcolare per chi ha il seme e impossibile da ``risalire'' per chi vede l'uscita: è esattamente la definizione di OWF.
+  \item \textbf{Ogni PRG è una OWF}: se si sapesse invertire \(G\), si distinguerebbe la sua uscita da bit casuali (per un'uscita di \(G\) un seme esiste sempre, per una stringa casuale almeno metà delle volte no). Quindi \(G\) sarebbe rotto.
+\end{itemize}
