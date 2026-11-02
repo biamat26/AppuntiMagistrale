@@ -50,3 +50,102 @@ Garanzia & nessuna: dipende da \(f\) & sempre, per qualunque OWF \(f\) \\
 \begin{nota}
 \textbf{Attenzione}: dopo Goldreich-Levin \textbf{non} si calcola un bit diverso apposta per ogni funzione. La ricetta è \textbf{sempre la stessa} (\(\langle x, r \rangle\)); cambiano la funzione (si usa \(g\), costruita da \(f\)) e il fatto che la domanda \(r\) sia casuale. È la casualità di \(r\) a fare la differenza: una OWF può lasciar scappare \textbf{qualche} bit di \(x\), ma non abbastanza da ricostruirlo tutto, e un XOR di bit scelti a caso quasi sempre ne contiene qualcuno che \(f\) non rivela.
 \end{nota}
+
+\section{Che cos'è f\_BAD (con la moltiplicazione)}
+
+\begin{inbreve}
+\(f_{\text{BAD}}\) è una OWF costruita apposta per mostrare che \textbf{nessun bit fissato} è nascosto in tutte le OWF: calcola \(f(x)\) e ci attacca in fondo il bit \(h(x)\) scritto in chiaro. Il bit è visibile, ma la funzione resta one-way.
+\end{inbreve}
+
+\begin{esempio}
+\(f(p, q) = p \cdot q\), \(x = (61, 53)\), \(h(x) = 1\) se \(p > q\). Allora \(f_{\text{BAD}}(61, 53) = (3233,\ 1)\). Eve legge che \(p > q\), ma per trovare 61 e 53 deve comunque fattorizzare 3233.
+\end{esempio}
+
+\section{Perché f\_BAD è una OWF: la riduzione spiegata}
+
+\begin{itemize}
+  \item \(A\) = avversario che (per assurdo) inverte \(f_{\text{BAD}}\); \(B\) = avversario che costruiamo per invertire \(f\).
+  \item \(B\) riceve \(y = f(x)\), ma ad \(A\) serve \(f(x) \,\|\, h(x)\) e \(B\) non conosce \(h(x)\) (non conosce \(x\)). Allora lo \textbf{tira a indovinare}: un bit casuale \(\tilde{b}\).
+  \item Metà delle volte indovina: \(A\) riceve esattamente \(f_{\text{BAD}}(x)\) e risponde con \(x'\) tale che \(f(x') = y\). Quindi \(B\) vince.
+  \item \(\Pr[B \text{ vince}] \ge \frac{1}{2} \Pr[A \text{ vince}]\): se \(A\) vince con \(1/\text{poly}\), \(B\) vince con \(\frac{1}{2} \cdot 1/\text{poly}\), ancora \(1/\text{poly}\). Contraddizione con \(f\) one-way.
+\end{itemize}
+
+\begin{nota}
+\textbf{Il trucco}: quando nella riduzione manca un pezzo, lo si tira a indovinare. Si perde solo un fattore costante (qui \(\frac{1}{2}\)), e la riduzione funziona lo stesso.
+\end{nota}
+
+\section{Goldreich-Levin: perché Eve non indovina \texorpdfstring{\(\langle x, r \rangle\)}{<x,r>}}
+
+\begin{inbreve}
+Per assurdo: se Eve sapesse rispondere a \textbf{ogni} domanda \(r\), le si chiederebbero i bit di \(x\) uno per uno e si invertirebbe \(f\). Siccome \(f\) è one-way, non può.
+\end{inbreve}
+
+\textbf{Le domande con un solo 1 chiedono un singolo bit.} \(\langle x, r \rangle\) = XOR dei bit di \(x\) nelle posizioni dove \(r\) vale 1. Con \(x = 101\):
+\begin{itemize}
+  \item \(\langle 101, 100 \rangle\): \(r\) ha 1 solo in posizione 1, quindi il risultato è \(x_1 = 1\);
+  \item \(\langle 101, 010 \rangle = x_2 = 0\);
+  \item \(\langle 101, 001 \rangle = x_3 = 1\).
+\end{itemize}
+Le risposte in fila danno \(1, 0, 1\), cioè \(x = 101\). (Per ripasso, con più di un 1: \(\langle 101, 101 \rangle = x_1 \oplus x_3 = 1 \oplus 1 = 0\).)
+
+\textbf{Perché è solo un'intuizione}: una Eve vera indovina solo un po' più del 50\%, e solo su \(r\) casuali (sulle domande speciali con un solo 1 potrebbe sbagliare sempre). La dimostrazione completa deve ``spremere'' \(x\) anche da quel piccolo vantaggio, ed è difficile.
+
+\section{Battere Shannon con un PRG: chi è la chiave}
+
+\begin{inbreve}
+\(\text{Enc}(k, m) = G(k) \oplus m\): un OTP in cui la chiave lunga è \(G(k)\), calcolata con il PRG da una chiave corta \(k\). Shannon vieta chiavi corte solo per la segretezza \textbf{perfetta} (avversari illimitati); contro avversari efficienti \(G(k)\) sembra casuale.
+\end{inbreve}
+
+\begin{itemize}
+  \item \(k\) (la chiave vera, corta, condivisa da Alice e Bob): \textbf{davvero casuale}.
+  \item \(G(k)\) (la chiave lunga messa in XOR col messaggio): \textbf{pseudocasuale}, calcolata da \(k\).
+\end{itemize}
+
+\begin{esempio}
+\(G : 3 \text{ bit} \to 6 \text{ bit}\) (valori inventati), \(k = 101\), \(G(101) = 110010\). Alice cifra \(m = 011011\): \(c = 110010 \oplus 011011 = 101001\). Bob ricalcola \(G(101) = 110010\) (\(G\) è deterministica) e fa \(101001 \oplus 110010 = 011011 = m\). Messaggio di 6 bit, chiave di 3.
+\end{esempio}
+
+\section{La definizione di sicurezza: Lezione 2 contro Lezione 6}
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+ & Lezione 2 (perfetta) & Lezione 6 (computazionale) \\
+\midrule
+Chi è Eve & potenza infinita & efficiente (PPT) \\
+Differenza ammessa & esattamente 0 & trascurabile \\
+Chi sceglie \(m_0, m_1\) & fissati & li sceglie Eve \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{nota}
+La definizione col gioco vale per \textbf{qualunque} schema: non parla di PRG né di pseudocasualità. Il PRG entra solo nel teorema, che dimostra che lo schema specifico \(G(k) \oplus m\) supera il gioco.
+\end{nota}
+
+\section{Il teorema: chi è B nella riduzione}
+
+\begin{inbreve}
+Ci sono due giochi e due attaccanti. \textbf{Eve} (\(A\)) attacca lo schema di cifratura. \(B\) è un programma \textbf{che costruiamo noi} per attaccare il \textbf{PRG}: usa Eve come aiutante, travestendosi da suo challenger.
+\end{inbreve}
+
+\begin{verbatim}
+Eve (A)                        B                        challenger del PRG
+                                 <------ z (6 bit) ------
+  ------ m0, m1 ------>
+  <--- c = z xor m0 ---
+  ------ risposta ---->
+                                 ------- risposta ------->
+\end{verbatim}
+
+\begin{enumerate}
+  \item Il challenger del PRG dà a \(B\) una stringa \(z\) (es. 110010): o \(G(k)\), o davvero casuale. \(B\) non sa quale.
+  \item \(B\) fa partire Eve, che gli manda \(m_0, m_1\) (es. 000000 e 111111).
+  \item \(B\) usa \(z\) come chiave: dà a Eve \(c = z \oplus m_0\).
+  \item \(B\) gira al challenger la risposta di Eve.
+\end{enumerate}
+
+Se \(z = G(k)\), Eve sta giocando esattamente \(G_0\) (lo schema vero); se \(z\) è casuale, esattamente \(H_0\) (l'OTP vero). Se Eve notasse la differenza, \(B\) saprebbe da dove viene \(z\): romperebbe il PRG. Quindi \(G_0 \approx_c H_0\), e allo stesso modo \(G_1 \approx_c H_1\). In mezzo \(H_0 \equiv H_1\) per la segretezza perfetta dell'OTP:
+\[
+G_0 \ \approx_c\ H_0 \ \equiv\ H_1 \ \approx_c\ G_1 \qquad (\text{negl} + 0 + \text{negl} = \text{negl})
+\]

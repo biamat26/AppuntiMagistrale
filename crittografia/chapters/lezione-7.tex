@@ -1,0 +1,320 @@
+\chapter{Lezione 7 -- Funzioni pseudocasuali e sicurezza CPA}
+
+\emph{Segue gli appunti del prof. Le parti aggiunte per capire meglio sono segnate ``non negli appunti del prof''. Usa i concetti della Lezione 3 (collision probability, distanza statistica), della Lezione 5 (PRG, ibridi, riduzioni) e della Lezione 6 (cifratura con PRG, game hopping).}
+
+\section{Il problema: cifrare tanti messaggi con la stessa chiave}
+
+\begin{inbreve}
+Lo schema della Lezione 6, \(\text{Enc}(k, m) = G(k) \oplus m\), è sicuro solo per \textbf{un} messaggio: con due messaggi e la stessa chiave, \(c_1 \oplus c_2 = m_1 \oplus m_2\). Per cifrare \textbf{tanti} messaggi con \textbf{una sola} chiave corta serve uno strumento nuovo: le \textbf{funzioni pseudocasuali} (PRF).
+\end{inbreve}
+
+\section{Funzioni pseudocasuali (PRF)}
+
+\subsection{Definizione informale (del prof)}
+
+\begin{inbreve}
+Una \textbf{PRF} è una famiglia di funzioni indicizzata da una chiave \(k\). Scelta la chiave a caso, la funzione \(F_k\) si comporta come una funzione \textbf{completamente casuale}: chi la interroga su degli input e vede gli output non riesce a capire se sta parlando con \(F_k\) o con una funzione scelta a caso tra tutte quelle possibili.
+\end{inbreve}
+
+Una PRF è una \textbf{famiglia di funzioni}
+\[
+\mathcal{F} = \{ F_k : \{0,1\}^n \to \{0,1\}^n \}_{k \in \{0,1\}^\lambda}
+\]
+
+\begin{nota}
+\textbf{Cosa sono le cose}
+\begin{itemize}
+  \item \(k\) = la chiave, \(\lambda\) bit. Ogni chiave sceglie una funzione della famiglia: \(F_k\).
+  \item \(F_k\) = una funzione che prende \(n\) bit e restituisce \(n\) bit. È \textbf{deterministica}: stesso input, stesso output.
+  \item \(R : \{0,1\}^n \to \{0,1\}^n\) = una \textbf{funzione uniformemente casuale}: anche lei deterministica, ma \textbf{scelta a caso tra tutte} le funzioni possibili da \(\{0,1\}^n\) a \(\{0,1\}^n\).
+\end{itemize}
+\end{nota}
+
+\textbf{Sicurezza (del prof)}: per \(k \leftarrow U_\lambda\) scelta a caso, \textbf{nessun avversario efficiente} \(A\) riesce a distinguere campioni di \(F_k(\cdot)\) da campioni di una funzione uniformemente casuale \(R\).
+
+\begin{esempio}
+\textbf{Cos'è una funzione casuale} \emph{(non negli appunti del prof)}. Con \(n = 2\), una funzione da \(\{0,1\}^2\) a \(\{0,1\}^2\) è una \textbf{tabella} con 4 righe:
+
+\begin{center}
+\begin{tabular}{cc}
+\toprule
+\(x\) & \(R(x)\) \\
+\midrule
+00 & 11 \\
+01 & 01 \\
+10 & 11 \\
+11 & 00 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\(R\) si sceglie riempiendo ogni riga con un valore a caso. È deterministica (\(R(10)\) vale sempre 11), ma la tabella è casuale. Le tabelle possibili sono \(4^4 = 256\); in generale sono \((2^n)^{2^n}\), un numero enorme. Una famiglia PRF ne ha solo \(2^\lambda\) (una per chiave): deve ``sembrare'' una tabella casuale pur essendo una delle poche della famiglia.
+\end{esempio}
+
+\begin{nota}
+\textbf{PRG contro PRF} \emph{(non negli appunti del prof)}: un PRG dà \textbf{una} stringa lunga che sembra casuale. Una PRF dà una tabella enorme (\(2^n\) righe) che sembra casuale, ma non serve calcolarla tutta: si calcola solo la riga che serve, \(F_k(x)\), quando serve. È come un PRG ad ``accesso casuale''.
+\end{nota}
+
+\subsection{Definizione formale (del prof)}
+
+\(\mathcal{F}\) è una \textbf{famiglia PRF} se
+\[
+\text{GAME}^{\text{real}}_{\mathcal{F}, A}(\lambda) \ \approx_c\ \text{GAME}^{\text{ideal}}_{\mathcal{F}, A}(\lambda)
+\]
+
+\begin{verbatim}
+               GAME^real  /  GAME^ideal
+A                                     C
+                                      real:  k ← U_λ
+                                      ideal: R ← R(n,n)  (tutte le funzioni)
+  ┌──────────── x ∈ {0,1}^n ─────────→
+  │                                   real:  y = F_k(x)
+  │                                   ideal: y = R(x)
+  └←─────────── y ∈ {0,1}^n ──────────   (ripetuto quante volte A vuole)
+  ──────────────── b' ───────────────→
+\end{verbatim}
+
+\begin{itemize}
+  \item Nel gioco \textbf{reale} il challenger sceglie una chiave \(k\) a caso e risponde alle domande di \(A\) con \(F_k(x)\).
+  \item Nel gioco \textbf{ideale} il challenger sceglie una funzione \(R\) a caso tra \textbf{tutte} quelle da \(\{0,1\}^n\) a \(\{0,1\}^n\) (l'insieme \(\mathcal{R}(n, n)\)) e risponde con \(R(x)\).
+  \item \(A\) fa quante domande vuole (\textbf{repeat}), sempre un numero polinomiale perché è efficiente, poi risponde \(b'\).
+\end{itemize}
+
+\textbf{Osservazione (del prof)}: il gioco ideale richiede \textbf{tempo esponenziale}, cioè il challenger è illimitato: la tabella di \(R\) ha \(2^n\) righe.
+
+\begin{nota}
+\emph{(Non negli appunti del prof.)} Non è un problema, perché il challenger è un oggetto matematico, non un algoritmo che qualcuno deve eseguire. Si può comunque simulare in modo efficiente con il \textbf{lazy sampling}: si sceglie il valore \(R(x)\) a caso solo quando \(A\) chiede \(x\) per la prima volta, e lo si ricorda per le domande successive. \(A\) fa poche domande, quindi la tabella resta piccola.
+\end{nota}
+
+\subsection{Esercizio: nessuna PRF è sicura contro avversari illimitati}
+
+\begin{approfondimento}{Soluzione proposta (non negli appunti del prof)}
+Come per i PRG (Lezione 5). \(A\) chiede \(F(x_1), \dots, F(x_t)\) su \(t\) input diversi e poi prova \textbf{tutte} le \(2^\lambda\) chiavi: risponde ``reale'' se esiste una chiave \(k\) con \(F_k(x_i) = y_i\) per ogni \(i\).
+\begin{itemize}
+  \item Nel gioco reale una chiave così esiste sempre (quella vera): \(A\) risponde ``reale'' con probabilità 1.
+  \item Nel gioco ideale le risposte sono \(t\) stringhe casuali di \(n\) bit. Una chiave fissata le indovina tutte con probabilità \(2^{-tn}\); per lo union bound, qualche chiave ci riesce con probabilità al più \(2^\lambda \cdot 2^{-tn}\). Con \(t n \ge \lambda + 1\) è \(\le 1/2\).
+\end{itemize}
+Vantaggio \(\ge 1/2\). Ma provare \(2^\lambda\) chiavi richiede tempo esponenziale: contro un avversario efficiente non funziona.
+\end{approfondimento}
+
+\subsection{Come si costruiscono le PRF (del prof)}
+
+\begin{itemize}
+  \item \textbf{In pratica}: AES, DES, qualunque \textbf{block cipher}. Nessuno sa \textbf{dimostrare} che AES è una PRF: lo si assume, perché resiste agli attacchi da decenni.
+  \item \textbf{In teoria}:
+  \begin{itemize}
+    \item dalle \textbf{OWF} (si può, ma non è pratico);
+    \item dalle stesse ipotesi della crittografia a chiave pubblica (\textbf{fattorizzazione}, \textbf{logaritmo discreto}, \textbf{reticoli}): pratiche ed efficienti, ma comunque meno efficienti di AES.
+  \end{itemize}
+\end{itemize}
+
+\begin{nota}
+\textbf{Block cipher} \emph{(definizione non negli appunti del prof)}: un algoritmo che cifra blocchi di lunghezza fissa (AES: 128 bit) con una chiave. Visto come funzione \(F_k(x)\), cioè ``cifra il blocco \(x\) con la chiave \(k\)'', è il candidato pratico per una PRF.
+\end{nota}
+
+\section{Sicurezza per tanti messaggi: CPA}
+
+\begin{inbreve}
+Vogliamo uno SKE pratico: \textbf{una} chiave, \textbf{corta}, per \textbf{tanti} messaggi. La definizione di sicurezza giusta è la \textbf{sicurezza CPA} (\emph{Chosen Plaintext Attack}): è il gioco della Lezione 6, ma in più l'avversario può farsi cifrare \textbf{tutti i messaggi che vuole}, prima e dopo la sfida.
+\end{inbreve}
+
+\subsection{Definizione (del prof)}
+
+\(\Pi = (\text{Enc}, \text{Dec})\) è \textbf{CPA-sicuro} se
+\[
+\text{GAME}^{\text{cpa}}_{\Pi, A}(\lambda, 0) \ \approx_c\ \text{GAME}^{\text{cpa}}_{\Pi, A}(\lambda, 1)
+\]
+
+dove \(\text{GAME}^{\text{cpa}}_{\Pi, A}(\lambda, b)\), con \(b \in \{0, 1\}\), è:
+
+\begin{verbatim}
+A                                       C
+                                        k ← K
+  ┌───────────────── m ──────────────→
+  └←────────── c ← Enc_k(m) ───────────   (domande di cifratura, quante vuole)
+  ────────── m0*, m1* ∈ M ───────────→
+  ←───────────────── c* ──────────────   c* ← Enc_k(m_b*)   (la sfida)
+  ┌───────────────── m ──────────────→
+  └←────────── c ← Enc_k(m) ───────────   (altre domande di cifratura)
+  ─────────────────── b' ────────────→
+\end{verbatim}
+
+\begin{enumerate}
+  \item Il challenger sceglie una chiave \(k\).
+  \item \textbf{Domande di cifratura}: \(A\) manda messaggi \(m\) a sua scelta e riceve \(c \leftarrow \text{Enc}_k(m)\), quante volte vuole.
+  \item \textbf{Sfida}: \(A\) manda \(m_0^*, m_1^*\) e riceve \(c^* \leftarrow \text{Enc}_k(m_b^*)\).
+  \item \(A\) può fare altre domande di cifratura.
+  \item \(A\) risponde \(b'\).
+\end{enumerate}
+
+\begin{nota}
+\textbf{Perché ``chosen plaintext''} \emph{(non negli appunti del prof)}: l'avversario sceglie dei messaggi in chiaro (\emph{plaintext}) e ne vede i cifrati. Modella situazioni reali in cui Eve riesce a far cifrare ad Alice messaggi che conosce (es. le intestazioni standard di un protocollo). L'unica differenza con la Lezione 6 sono le domande di cifratura: senza di esse è la sicurezza one-time.
+\end{nota}
+
+\subsection{La cifratura deve essere probabilistica (del prof)}
+
+\textbf{Osservazione}: \(\text{Enc}_k(\cdot)\) \textbf{deve essere randomizzata}:
+\[
+c \leftarrow \text{Enc}_k(m) \quad \equiv \quad c = \text{Enc}_k(m; r), \qquad r \leftarrow \mathcal{R} \ (\text{randomness space})
+\]
+Di solito \(\text{Dec}_k(\cdot)\) resta deterministica.
+
+\begin{nota}
+\textbf{Cosa vuol dire e perché} \emph{(non negli appunti del prof)}: ogni volta che si cifra si usa una moneta nuova \(r\), quindi lo stesso messaggio cifrato due volte dà \textbf{cifrati diversi}. Se Enc fosse deterministica, \(A\) vincerebbe sempre: chiede la cifratura di \(m_0^*\) (domanda di cifratura), riceve \(c_0\), poi nella sfida confronta: se \(c^* = c_0\) è stato cifrato \(m_0^*\), altrimenti \(m_1^*\).
+\end{nota}
+
+\section{Uno SKE CPA-sicuro da una PRF}
+
+\begin{inbreve}
+Si sceglie ogni volta un punto casuale \(r\), si calcola \(F_k(r)\) e lo si usa come chiave dell'OTP; \(r\) si manda in chiaro insieme al cifrato. Ogni messaggio usa una ``chiave di OTP'' diversa, \(F_k(r)\), e tutte sembrano casuali perché \(F_k\) è una PRF.
+\end{inbreve}
+
+\subsection{La costruzione (del prof)}
+
+Con una PRF \(\mathcal{F}\) qualunque:
+\[
+\text{Enc}(k, m) = (c_1, c_2), \qquad c_1 = r \leftarrow U_n, \qquad c_2 = F_k(r) \oplus m
+\]
+\[
+\text{Dec}(k, (c_1, c_2)) = F_k(c_1) \oplus c_2 = m
+\]
+
+\begin{esempio}
+\emph{(Valori inventati, non negli appunti del prof.)} \(n = 4\), chiave \(k\) segreta, e supponiamo \(F_k(0110) = 1011\).
+
+\textbf{Alice cifra} \(m = 1100\): sceglie a caso \(r = 0110\), calcola \(F_k(0110) = 1011\) e \(c_2 = 1011 \oplus 1100 = 0111\). Il cifrato è \((0110,\ 0111)\).
+
+\textbf{Bob decifra}: legge \(c_1 = 0110\), calcola \(F_k(0110) = 1011\) (conosce \(k\)) e fa \(1011 \oplus 0111 = 1100 = m\).
+
+Cifrando di nuovo lo stesso \(m\), Alice sceglie un altro \(r\) (es. 1001) e ottiene un cifrato diverso.
+\end{esempio}
+
+\begin{nota}
+\emph{(Non negli appunti del prof.)} Eve vede \(r\) ma non conosce \(k\), quindi non sa calcolare \(F_k(r)\): per lei è un valore che sembra casuale, e \(c_2\) è come un OTP. Rispetto alla Lezione 6 la chiave \(k\) resta la stessa per tutti i messaggi: cambia \(r\).
+\end{nota}
+
+\subsection{Teorema (del prof)}
+
+Se \(\mathcal{F}\) è una famiglia PRF, lo SKE \(\Pi = (\text{Enc}, \text{Dec})\) qui sopra è \textbf{CPA-sicuro}.
+
+\subsection{Dimostrazione: i giochi}
+
+Sia \(G(\lambda, b) \equiv \text{GAME}^{\text{cpa}}_{\Pi, A}(\lambda, b)\). Bisogna mostrare \(G(\lambda, 0) \approx_c G(\lambda, 1)\).
+
+Si considera \(H(\lambda, b)\): \textbf{uguale a} \(G(\lambda, b)\), \textbf{ma} al posto di \(F_k\) si usa una funzione davvero casuale \(R \leftarrow \mathcal{R}(n, n)\).
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+ & \(G(\lambda, b)\) (schema vero) & \(H(\lambda, b)\) (con \(R\)) \\
+\midrule
+Domanda \(m\) & \(c = (r,\ F_k(r) \oplus m)\) & \(c = (r,\ R(r) \oplus m)\) \\
+Sfida & \(c^* = (r^*,\ F_k(r^*) \oplus m_b^*)\) & \(c^* = (r^*,\ R(r^*) \oplus m_b^*)\) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+(con \(r, r^* \leftarrow U_n\) nuovi ogni volta). Il piano \emph{(catena non negli appunti del prof, è la stessa idea della Lezione 6)}:
+\[
+G(\lambda, 0) \ \approx_c\ H(\lambda, 0) \ \approx\ H(\lambda, 1) \ \approx_c\ G(\lambda, 1)
+\]
+
+\subsection{Lemma 1: \texorpdfstring{\(G(\lambda, b) \approx_c H(\lambda, b)\)}{G ≈c H}}
+
+\textbf{Lemma (del prof)}: \(G(\lambda, b) \approx_c H(\lambda, b)\), per ogni \(b \in \{0, 1\}\).
+
+\textbf{Dimostrazione}: per riduzione alla sicurezza della PRF. Se \(A\) distingue \(G\) da \(H\), costruiamo \(B\) che rompe la PRF.
+
+\begin{verbatim}
+A                          B                            C (della PRF)
+                                                        z = F_k(r)  oppure  R(r)
+  ←────── "START" ────────
+  ┌────────── m ─────────→
+  │                        ┌────── r ← U_n ─────────→
+  │                        └←──────── z ─────────────
+  └←── c = (r, z ⊕ m) ────
+  ─────── m0*, m1* ──────→
+                           ──────── r* ────────────→
+                           ←──────── z* ─────────────
+  ←── c* = (r*, z* ⊕ mb*) ─
+  ────────── b' ─────────→
+                           ────────── b' ──────────→
+\end{verbatim}
+
+\begin{enumerate}
+  \item \(B\) fa partire \(A\).
+  \item Per ogni domanda di cifratura \(m\): \(B\) sceglie \(r \leftarrow U_n\), lo chiede al suo challenger e riceve \(z\) (che è \(F_k(r)\) oppure \(R(r)\)), poi risponde ad \(A\) con \(c = (r,\ z \oplus m)\).
+  \item Per la sfida \(m_0^*, m_1^*\): \(B\) sceglie \(r^*\), riceve \(z^*\) e risponde con \(c^* = (r^*,\ z^* \oplus m_b^*)\).
+  \item \(B\) inoltra la risposta \(b'\) di \(A\).
+\end{enumerate}
+
+\textbf{Riduzione perfetta}: se il challenger della PRF usa \(F_k\), \(A\) gioca esattamente \(G(\lambda, b)\); se usa \(R\), esattamente \(H(\lambda, b)\). Quindi il vantaggio di \(B\) contro la PRF è uguale a quello di \(A\) tra \(G\) e \(H\). \(\blacksquare\)
+
+\subsection{Lemma 2: \texorpdfstring{\(H(\lambda, 0) \approx H(\lambda, 1)\)}{H0 ≈ H1}}
+
+\begin{inbreve}
+Con una funzione davvero casuale \(R\), la sfida è \((r^*,\ R(r^*) \oplus m_b^*)\): se \(R(r^*)\) non è mai stato visto, è un OTP perfetto. L'unico rischio è che una domanda di cifratura abbia usato \textbf{lo stesso} \(r^*\), rivelando \(R(r^*)\). Ma con \(r\) di \(n\) bit scelti a caso, una collisione succede con probabilità trascurabile.
+\end{inbreve}
+
+\textbf{Lemma (del prof)}: \(H(\lambda, 0) \approx_s H(\lambda, 1)\) (statisticamente vicini), purché l'attaccante, anche \textbf{illimitato}, faccia al più \(q(\lambda) = \text{poly}(\lambda)\) domande. In particolare \(H(\lambda, 0) \approx_c H(\lambda, 1)\).
+
+\textbf{Intuizione, senza domande di cifratura.} Se \(A\) non fa domande, la sfida è
+\[
+c^* = (r^*,\ R(r^*) \oplus m_b^*) \qquad r^* \leftarrow U_n
+\]
+Siccome \(R\) è una tabella casuale, \(R(r^*)\) è una stringa uniforme \(z^*\): la sfida è distribuita come
+\[
+c^* = (r^*,\ z^* \oplus m_b^*) \qquad r^*, z^* \leftarrow U_n
+\]
+cioè un \textbf{OTP} (più \(r^*\), che non c'entra con \(b\)). Quindi \(b\) è perfettamente nascosto.
+
+\textbf{Il problema delle domande di cifratura.} Ma \(A\) può fare domande. Cosa succede se \(A\) chiede \(m = 0^n\) e il challenger sceglie per caso \textbf{lo stesso} \(r^*\) della sfida? Allora
+\[
+c = (r^*,\ R(r^*) \oplus 0^n) = (r^*,\ R(r^*))
+\]
+e \(A\) vede \(R(r^*)\) in chiaro: la ``chiave'' dell'OTP della sfida è stata rivelata. Ma questo evento capita solo con probabilità trascurabile.
+
+\textbf{In generale.} Sia \textbf{BAD} l'evento ``\(r^*\) coincide con uno degli \(r\) usati nelle domande di cifratura''.
+\begin{itemize}
+  \item \textbf{Se BAD non succede}: \(H(\lambda, 0) \equiv H(\lambda, 1)\), perché \(R(r^*)\) non compare da nessun'altra parte e si può sostituire con una stringa uniforme \(z^*\) indipendente da tutto: è l'OTP.
+  \item \textbf{BAD succede raramente}:
+  \[
+  \Pr[\text{BAD}] \ \le\ \Pr_{r_i, r_j}[\exists\, i \ne j : r_i = r_j] \ \le\ \sum_{\substack{i, j = 1 \\ i \ne j}}^{q} \Pr[r_i = r_j] \ =\ \sum_{i, j} \text{Col}(U_n) \ \le\ \binom{q}{2} \cdot 2^{-n}
+  \]
+  Con \(n = n(\lambda) = \text{poly}(\lambda)\): \(\binom{q}{2} \cdot 2^{-n} = \text{poly}(\lambda) \cdot \text{negl}(\lambda) = \text{negl}(\lambda)\).
+\end{itemize}
+
+Si può dimostrare che i due fatti insieme implicano
+\[
+\text{SD}\big(H(\lambda, 0);\ H(\lambda, 1)\big) \ \le\ \Pr[\text{BAD}] \ =\ \text{negl}(\lambda) \qquad \blacksquare
+\]
+
+\begin{nota}
+\textbf{I passaggi del conto} \emph{(non negli appunti del prof)}:
+\begin{itemize}
+  \item \(r_1, \dots, r_q\) sono tutti gli \(r\) scelti nel gioco (domande e sfida). BAD implica che due di loro coincidono, quindi \(\Pr[\text{BAD}] \le \Pr[\exists\, i \ne j: r_i = r_j]\).
+  \item \textbf{Union bound} (ripasso di probabilità): la probabilità che succeda almeno una delle coincidenze è al più la somma delle probabilità.
+  \item \(\Pr[r_i = r_j] = \text{Col}(U_n) = 2^{-n}\): la collision probability dell'uniforme su \(n\) bit (Lezione 3).
+  \item Le coppie \(\{i, j\}\) sono \(\binom{q}{2} = \frac{q(q-1)}{2}\), un polinomio se \(q\) lo è.
+\end{itemize}
+\textbf{Esempio}: con \(q = 1000\) domande e \(n = 128\), \(\Pr[\text{BAD}] \le 500\,000 \cdot 2^{-128} \approx 10^{-33}\).
+\end{nota}
+
+\subsection{Conclusione}
+
+\emph{(Non negli appunti del prof.)} Mettendo insieme i due lemmi:
+\[
+G(\lambda, 0) \ \approx_c\ H(\lambda, 0) \ \approx\ H(\lambda, 1) \ \approx_c\ G(\lambda, 1)
+\]
+la somma dei vantaggi è \(\text{negl} + \text{negl} + \text{negl} = \text{negl}\): lo schema è CPA-sicuro.
+
+\section{Riepilogo}
+
+\begin{itemize}
+  \item Lo schema \(G(k) \oplus m\) è solo one-time; per tanti messaggi con una chiave servono le \textbf{PRF}.
+  \item \textbf{PRF}: famiglia \(\{F_k\}\); con \(k\) casuale, \(F_k\) è indistinguibile da una funzione davvero casuale \(R\) per chi la interroga (\(\text{GAME}^{\text{real}} \approx_c \text{GAME}^{\text{ideal}}\)). Nessuna PRF è sicura contro avversari illimitati.
+  \item In pratica: AES e i block cipher (non dimostrati). In teoria: dalle OWF, o da fattorizzazione, logaritmo discreto, reticoli.
+  \item \textbf{Sicurezza CPA}: il gioco della Lezione 6 più domande di cifratura a scelta, prima e dopo la sfida. Richiede che Enc sia \textbf{randomizzata}.
+  \item \textbf{Costruzione}: \(\text{Enc}(k, m) = (r,\ F_k(r) \oplus m)\) con \(r\) casuale; \(\text{Dec}(k, (c_1, c_2)) = F_k(c_1) \oplus c_2\).
+  \item \textbf{Teorema}: PRF \(\Rightarrow\) CPA-sicuro. Prova: \(G \approx_c H\) (riduzione perfetta alla PRF) e \(H(\lambda, 0) \approx H(\lambda, 1)\) (OTP, a meno dell'evento BAD di collisione degli \(r\), con \(\Pr[\text{BAD}] \le \binom{q}{2} 2^{-n}\)).
+\end{itemize}
