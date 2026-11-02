@@ -1,0 +1,327 @@
+\chapter{Lezione 9 -- Block cipher, reti di Feistel e modi operativi}
+
+\emph{Segue gli appunti del prof. Le parti aggiunte per capire meglio sono segnate ``non negli appunti del prof''. Usa i concetti della Lezione 3 (distanza statistica), della Lezione 5 (argomento ibrido) e delle Lezioni 7--8 (PRF, funzioni casuali, sicurezza CPA).}
+
+\section{Block cipher}
+
+\begin{inbreve}
+Il nome ``block cipher'' (cifrario a blocchi) è \textbf{fuorviante}: DES e AES in realtà sono \textbf{permutazioni pseudocasuali} (PRP). Si usano spesso come PRF, ma sono di più: sono \textbf{invertibili}. Chi ha la chiave può calcolare sia \(F_k(x)\) sia \(F_k^{-1}(y)\).
+\end{inbreve}
+
+\begin{itemize}
+  \item Esempi: DES, AES, \dots
+  \item Si usano spesso come implementazione di una PRF, ma sono di più, perché sono \textbf{invertibili}.
+\end{itemize}
+
+\begin{nota}
+\textbf{PRP} \emph{(definizione non negli appunti del prof)}: una famiglia \(\{P_k\}\) in cui ogni \(P_k : \{0,1\}^{m} \to \{0,1\}^{m}\) è una \textbf{permutazione} (ogni output viene da un solo input, quindi si può tornare indietro), e con \(k\) casuale \(P_k\) è indistinguibile da una permutazione scelta a caso tra \textbf{tutte} le permutazioni \(\mathcal{P}(m, m)\). È la versione ``invertibile'' di una PRF.
+\end{nota}
+
+\textbf{La domanda del prof}: abbiamo già una PRF (Lezione 8). Come la rendiamo \textbf{invertibile}? Il design più famoso: le \textbf{reti di Feistel}.
+
+\section{Reti di Feistel}
+
+\subsection{Un round}
+
+\begin{inbreve}
+Si spezza l'input in due metà \((x, y)\). Un round di Feistel lascia passare \(y\) com'è (spostato a sinistra) e mette a destra \(x \oplus F(y)\). Si può sempre tornare indietro, \textbf{qualunque} sia \(F\), anche se \(F\) non è invertibile: basta ricalcolare \(F\) e rifare lo XOR.
+\end{inbreve}
+
+\[
+\psi_F(x, y) = \big(y,\ x \oplus F(y)\big) = (x', y')
+\]
+
+\begin{verbatim}
+   x                  y
+   |                  |
+   ⊕ <------ [F] -----|
+   |                  |
+    \________  _______/
+             \/            (le due metà si scambiano)
+     ________/\_______
+    /                 \
+x' = y         y' = x ⊕ F(y)
+\end{verbatim}
+
+\textbf{Inversa}:
+\[
+\psi_F^{-1}(x', y') = \big(F(x') \oplus y',\ x'\big)
+\]
+
+\begin{esempio}
+\emph{(Valori inventati, non negli appunti del prof.)} Metà di 3 bit, \(F(011) = 110\). Input \((x, y) = (101, 011)\):
+\[
+\psi_F(101, 011) = (011,\ 101 \oplus F(011)) = (011,\ 101 \oplus 110) = (011,\ 011)
+\]
+\textbf{Tornare indietro} da \((x', y') = (011, 011)\): \(y = x' = 011\), e \(x = F(x') \oplus y' = F(011) \oplus 011 = 110 \oplus 011 = 101\). Si ritrova \((101, 011)\). \(F\) si è solo dovuta \textbf{calcolare} (in avanti), mai invertire.
+\end{esempio}
+
+\textbf{Domanda (del prof)}: se \(F\) è una PRF, \(\psi_F\) è una PRP? \textbf{No}: la prima metà dell'output è uguale alla seconda metà dell'input (\(x' = y\)). Chi chiede \(\psi_F(x, y)\) e vede che l'output inizia con \(y\) capisce subito che non è una permutazione casuale.
+
+\subsection{Due round}
+
+\textbf{Soluzione (del prof)}: fare più round. Con due round e \(F, F'\) funzioni casuali indipendenti:
+\[
+\psi_{F, F'}(x, y) = \Big(x \oplus F(y),\ \ y \oplus F'\big(x \oplus F(y)\big)\Big)
+\]
+
+\begin{verbatim}
+   x                       y
+   |                       |
+   ⊕ <------- [F] ---------|
+   |                       |
+   |------- [F'] --------> ⊕
+   |                       |
+x ⊕ F(y)        y ⊕ F'(x ⊕ F(y))
+\end{verbatim}
+
+\textbf{Domanda (del prof)}: è una PRP adesso? \textbf{Ancora no.} \textbf{Osservazione}: con due input che hanno la \textbf{stessa} \(y\),
+\[
+\psi_{F,F'}(x, y) \oplus \psi_{F,F'}(x', y) = \big(x \oplus x',\ \ \dots\big)
+\]
+perché \(F(y)\) si cancella nello XOR delle prime metà.
+
+\begin{nota}
+\emph{(Non negli appunti del prof.)} L'attacco: si chiede \(\psi(x, y)\) e \(\psi(x', y)\) con la stessa \(y\) e si fa lo XOR delle due prime metà. Se viene \(x \oplus x'\), quasi sicuramente è Feistel a 2 round; per una permutazione casuale succederebbe solo con probabilità \(2^{-n}\).
+\end{nota}
+
+Risulta che questo è l'\textbf{``unico'' problema}: lo si risolve aggiungendo \textbf{un altro round}.
+
+\textbf{Nel mondo reale}: \(F\) è \textbf{euristica} (non dimostrata), e tutte le chiavi dei vari round si ricavano da un'unica \(k\) (con un PRG).
+
+\subsection{Lemma: due round con domande ``y-uniche''}
+
+\begin{inbreve}
+Due round di Feistel con funzioni davvero casuali sono indistinguibili da una funzione casuale, \textbf{purché} l'avversario non chieda mai due volte la stessa metà destra \(y\). Quella condizione evita proprio l'attacco di prima.
+\end{inbreve}
+
+\textbf{Lemma (del prof)}: per ogni attaccante, anche \textbf{illimitato}, che fa \(q = \text{poly}(\lambda)\) domande, sono indistinguibili:
+\begin{itemize}
+  \item \(S\): \(\psi_{F, F'}(x, y)\), con \(F, F' \leftarrow \mathcal{R}(n, n)\);
+  \item \(R\): \(R(x, y)\), con \(R \leftarrow \mathcal{R}(2n, 2n)\);
+\end{itemize}
+purché le domande di \(A\) siano \textbf{``y-uniche''}, cioè \(y_i \ne y_j\) per ogni \(i \ne j\).
+
+\textbf{Dimostrazione (del prof).} Sia \(H_i\) l'esperimento in cui alle prime \(i\) domande si risponde come in \(S\) e a tutte le altre come in \(R\). Allora \(H_0 \equiv R\) e \(H_q \equiv S\); bisogna mostrare \(H_0 \approx H_q\).
+
+In \(H_i\) le prime \(i\) risposte sono
+\[
+\Big(x_j \oplus F(y_j),\ \ y_j \oplus F'\big(x_j \oplus F(y_j)\big)\Big)_{j = 1, \dots, i-1}, \qquad \Big(x_i \oplus F(y_i),\ \ y_i \oplus F'\big(x_i \oplus F(y_i)\big)\Big), \ \dots
+\]
+\begin{itemize}
+  \item Siccome \(y_i\) è diversa da tutte le \(y_j\) precedenti, \(F(y_i)\) è casuale e indipendente da \(F(y_1), \dots, F(y_{i-1})\) e da tutto il resto. Quindi le prime \(i-1\) risposte restano come prima, e la \(i\)-esima è
+  \[
+  \big(x_i \oplus r,\ \ y_i \oplus F'(x_i \oplus r)\big) \qquad \text{per } r \text{ casuale}
+  \]
+  \item Qual è la probabilità che \(x_i \oplus r = x_j \oplus F(y_j)\) per qualcuno dei \(j = 1, \dots, i-1\)? \textbf{Al più} \((i - 1) \cdot 2^{-n}\).
+  \item Se non succede, \(F'\) viene calcolata in un punto nuovo, quindi \(F'(x_i \oplus r)\) è casuale e indipendente: la risposta è
+  \[
+  \big(x_i \oplus r,\ \ y_i \oplus r'\big) \qquad r, r' \text{ casuali}
+  \]
+  cioè \(2n\) bit uniformi, come in \(R\).
+\end{itemize}
+Per l'argomento ibrido:
+\[
+\text{SD}(S;\ R) \ \le\ \sum_i (i - 1) \cdot 2^{-n} \ \le\ q^2 \cdot 2^{-n} \ =\ \text{negl}(\lambda) \qquad \blacksquare
+\]
+
+\subsection{Teorema: tre round danno una PRP}
+
+\textbf{Teorema (del prof)}: se \(\mathcal{F}\) è una famiglia PRF, \textbf{3 round} di Feistel con chiavi indipendenti sono una \textbf{PRP}.
+
+\textbf{Dimostrazione.} Si considerano i sistemi:
+\begin{itemize}
+  \item \(T\): \(\psi_{F_{k_3}}\big(\psi_{F_{k_2}}\big(\psi_{F_{k_1}}(x, y)\big)\big)\), con \(k_1, k_2, k_3 \leftarrow U_\lambda\) (Feistel vero, 3 round);
+  \item \(S\): \(\psi_{F, F'}\big(\psi_{F''}(x, y)\big)\), con \(F, F', F''\) funzioni davvero casuali;
+  \item \(R\): \(R(x, y)\), con \(R \leftarrow \mathcal{R}(2n, 2n)\) (funzione casuale);
+  \item \(P\): \(P(x, y)\), con \(P \leftarrow \mathcal{P}(2n, 2n)\) (\textbf{permutazione casuale}).
+\end{itemize}
+
+\textbf{1) \(T \approx_c S\).} Perché \(\mathcal{F}\) è una PRF: si sostituiscono le tre \(F_{k_i}\) con funzioni casuali.
+
+\textbf{2) \(S \approx_s R\)} per \(\text{poly}(\lambda)\) domande. \textbf{Idea: un round dà la y-unicità!} Il primo round \(\psi_{F''}(x_i, y_i)\) produce domande y-uniche per i due round successivi. La metà destra dopo il primo round è \(y_i'' = x_i \oplus F''(y_i)\). Si prendono due domande diverse \((x_i, y_i) \ne (x_j, y_j)\). Due casi:
+\begin{enumerate}
+  \item[(i)] \(y_i = y_j\): allora \(x_i \ne x_j\), e
+  \[
+  y_i'' = x_i \oplus F''(y_i) = x_i \oplus F''(y_j) \ne x_j \oplus F''(y_j) = y_j''
+  \]
+  \item[(ii)] \(y_i \ne y_j\): servirebbe \(x_i \oplus F''(y_i) = x_j \oplus F''(y_j)\), cioè
+  \[
+  x_i \oplus x_j = F''(y_i) \oplus F''(y_j)
+  \]
+  e questo succede con probabilità \(\le 2^{-n}\) (\(F''(y_i)\) e \(F''(y_j)\) sono casuali e indipendenti).
+\end{enumerate}
+Quindi
+\[
+\Pr[\text{non y-unico}] \ \le\ \binom{q}{2} \cdot 2^{-n} \ =\ \text{negl}(\lambda)
+\]
+e, per il lemma, \(S \approx_s R\).
+
+\textbf{3) \(R \approx_s P\).} Una funzione casuale è già statisticamente indistinguibile da una permutazione casuale, con \(q = \text{poly}(\lambda)\) domande. \(\blacksquare\)
+
+\begin{nota}
+\emph{(Non negli appunti del prof.)} Perché il passo 3 vale: una funzione casuale si distingue da una permutazione solo se due input diversi danno lo \textbf{stesso} output (una permutazione non lo fa mai). Con \(q\) domande e output di \(2n\) bit questo succede con probabilità al più \(\binom{q}{2} 2^{-2n}\), trascurabile. Mettendo insieme: \(T \approx_c S \approx_s R \approx_s P\), quindi Feistel a 3 round è indistinguibile da una permutazione casuale: è una PRP.
+\end{nota}
+
+\section{Messaggi lunghi: i modi operativi}
+
+\begin{inbreve}
+Con una PRF sappiamo cifrare un messaggio di \textbf{un blocco} (\(n\) bit): \(c = (r, F_k(r) \oplus m)\). Per messaggi lunghi \(m = (m_1, \dots, m_t)\), con ogni \(m_i\) di \(n\) bit, serve un \textbf{modo operativo} (\emph{mode of operation}, detto anche \emph{domain extension}): un modo di usare la PRF blocco per blocco.
+\end{inbreve}
+
+Domanda rimasta aperta (del prof): con una PRF (cioè una OWF) si fa uno SKE che batte Shannon,
+\[
+c = \big(r,\ F_k(r) \oplus m\big) \qquad r \text{ casuale}
+\]
+Ma che fare con messaggi \textbf{molto lunghi} \(m = m_1, \dots, m_t\), \(m_i \in \{0,1\}^n\)?
+
+\subsection{ECB (Electronic Code Book): da non fare mai}
+
+Forse l'idea più semplice: cifrare ogni blocco per conto suo.
+\[
+c_i = F_k(m_i)
+\]
+
+\begin{verbatim}
+   m_1         m_2
+    |           |
+  [F_k]       [F_k]       ...      NON FARLO MAI!
+    |           |
+   c_1         c_2
+\end{verbatim}
+
+\begin{nota}
+\textbf{Perché no} \emph{(non negli appunti del prof)}: ECB è \textbf{deterministico}, quindi non è CPA-sicuro (Lezione 7). Peggio ancora: blocchi uguali del messaggio danno blocchi uguali del cifrato, quindi si vede dove il messaggio si ripete. L'esempio classico è un'immagine cifrata in ECB, in cui si riconosce ancora la figura. In più per decifrare serve \(F_k^{-1}\), cioè una PRP.
+\end{nota}
+
+\subsection{CBC (Cipher Block Chaining)}
+
+\[
+c_0 = r \ \text{(casuale)}, \qquad c_i = F_k\big(m_i \oplus c_{i-1}\big) \quad i = 1, \dots, t
+\]
+
+\begin{verbatim}
+  r (casuale)    m_1              m_2              m_3
+   |              |                |                |
+   |---------->   ⊕       ┌----->  ⊕       ┌----->  ⊕
+   |              |       |        |       |        |
+   |            [F_k]     |      [F_k]     |      [F_k]    ...
+   |              |       |        |       |        |
+  c_0 = r        c_1 -----┘       c_2 -----┘       c_3  ...  c_t
+\end{verbatim}
+
+Ogni blocco cifrato viene messo in XOR con il blocco successivo del messaggio prima di passarlo a \(F_k\): i blocchi sono ``incatenati''.
+
+\begin{nota}
+\emph{(Non negli appunti del prof.)} Per decifrare: \(m_i = F_k^{-1}(c_i) \oplus c_{i-1}\). Serve \(F_k^{-1}\), quindi CBC richiede una \textbf{PRP} (un block cipher come AES), non basta una PRF. La cifratura è sequenziale (serve \(c_{i-1}\) per calcolare \(c_i\)).
+\end{nota}
+
+\subsection{CFB e OFB}
+
+\textbf{CFB} (\emph{Cipher FeedBack}):
+\[
+c_0 = r, \qquad c_i = F_k(c_{i-1}) \oplus m_i
+\]
+L'output di \(F_k\) si mette in XOR col messaggio, e il blocco cifrato ottenuto entra nella \(F_k\) successiva.
+
+\textbf{OFB} (\emph{Output FeedBack}): come CFB, ma nella \(F_k\) successiva entra l'\textbf{output della \(F_k\) precedente}, non il blocco cifrato:
+\[
+c_0 = r, \qquad z_0 = r, \qquad z_i = F_k(z_{i-1}), \qquad c_i = z_i \oplus m_i
+\]
+
+\begin{verbatim}
+   r ------> [F_k] ----─---(OFB: l'output va alla F_k dopo)---> [F_k] ...
+   |                   |                                          |
+   |          m_1 ---> ⊕                               m_2 -----> ⊕
+   |                   |                                          |
+  c_0 = r             c_1 ---(CFB: c_1 va alla F_k dopo)-->      c_2
+\end{verbatim}
+
+\begin{nota}
+\emph{(Non negli appunti del prof.)} In CFB e OFB \(F_k\) si usa solo ``in avanti'': per decifrare si ricalcola la stessa sequenza e si fa lo XOR (\(m_i = c_i \oplus F_k(\cdot)\)). Quindi basta una PRF. In OFB la sequenza \(z_1, z_2, \dots\) non dipende dal messaggio: è come un PRG che produce la chiave dell'OTP.
+\end{nota}
+
+\subsection{CTR (Counter)}
+
+\begin{inbreve}
+CTR applica \(F_k\) a un contatore che parte da un valore casuale \(r\) e cresce di 1 a ogni blocco: \(F_k(r), F_k(r+1), \dots\) è la chiave dell'OTP per i blocchi del messaggio. È come lo schema della Lezione 7 applicato blocco per blocco, ma con gli \(r\) consecutivi invece che tutti casuali.
+\end{inbreve}
+
+\[
+c_0 = r \ \ (\text{casuale in } \{0,1\}^n), \qquad c_i = F_k\big(r + i - 1 \bmod 2^n\big) \oplus m_i \quad i = 1, \dots, t
+\]
+
+\begin{verbatim}
+   r                r+1   (+ mod 2^n)     ...       r+t-1
+   |                 |                                |
+ [F_k]             [F_k]                            [F_k]
+   |                 |                                |
+   ⊕ <--- m_1        ⊕ <--- m_2                       ⊕ <--- m_t
+   |                 |                                |
+  c_1               c_2                              c_t        c_0 = r
+\end{verbatim}
+
+\begin{esempio}
+\emph{(Valori inventati, non negli appunti del prof.)} \(n = 4\), \(r = 0110\) (cioè 6), messaggio di 3 blocchi. Si calcolano \(F_k(0110)\), \(F_k(0111)\), \(F_k(1000)\) (cioè \(F_k(6), F_k(7), F_k(8)\)) e li si mette in XOR con \(m_1, m_2, m_3\). Il cifrato è \((0110,\ c_1,\ c_2,\ c_3)\). Bob, che riceve \(r\), ricalcola gli stessi valori e fa lo XOR. I blocchi si possono cifrare anche \textbf{in parallelo}.
+\end{esempio}
+
+\subsection{Teorema: CTR è CPA-sicuro}
+
+\textbf{Teorema (del prof)}: se \(F\) è una PRF, CTR è CPA-sicuro (per messaggi di \textbf{lunghezza variabile}).
+
+\textbf{Dimostrazione}: simile alla dimostrazione originale per un blocco solo (Lezione 7). Il gioco CPA, con messaggi di più blocchi:
+
+\begin{verbatim}
+A                                                         C
+  ┌─────────────── m = m_1, ..., m_t ─────────────────→
+  └←────────────── c_0, c_1, ..., c_t ──────────────────
+  ─── m0* = m*_{0,1}, ..., m*_{0,t*};  m1* = m*_{1,1}, ..., m*_{1,t*} ──→
+  ←────────────── c_0*, c_1*, ..., c_t** ───────────────
+  ┌─────────────── m = m_1, ..., m_t ─────────────────→
+  └←────────────── c_0, c_1, ..., c_t ──────────────────
+  ──────────────────────── b' ─────────────────────────→
+\end{verbatim}
+
+Sia \(G_0\) il gioco qui sopra con \(b = 0\) e con CTR; lo stesso per \(G_1\). Bisogna mostrare \(G_0 \approx_c G_1\). Con CTR:
+\[
+c_0 = r, \qquad c_1 = F_k(r) \oplus m_1, \qquad \dots, \qquad c_t = F_k(r + t - 1) \oplus m_t
+\]
+
+\begin{itemize}
+  \item Per la sicurezza di \(\mathcal{F}\) si può sostituire \(F_k(\cdot)\) con \(R \leftarrow \mathcal{R}(n, n)\). Chiamiamo questi giochi \(H_0\) e \(H_1\): quindi \(G_0 \approx_c H_0\) e \(G_1 \approx_c H_1\).
+  \item Si introduce infine \(H_2\), in cui la sfida \(c_0^*, c_1^*, \dots, c_{t^*}^*\) è \textbf{uniformemente casuale}. Si mostra \(H_0 \approx_s H_2\) e \(H_1 \approx_s H_2\), assumendo che il numero di domande sia \(q = \text{poly}(\lambda)\).
+\end{itemize}
+
+Guardiamo la sfida in \(H_b\):
+\[
+c_0^* = r^* \leftarrow U_n, \qquad c_1^* = R(r^*) \oplus m_{b,1}^*, \qquad \dots, \qquad c_{t^*}^* = R(r^* + t^* - 1) \oplus m_{b, t^*}^*
+\]
+
+Sia \textbf{OVERLAP} l'evento ``\(r^*, r^* + 1, \dots, r^* + t^* - 1\) si sovrappone a qualcuno dei \(r, r+1, \dots, r + t - 1\) usati nelle domande di cifratura''.
+\begin{itemize}
+  \item Se OVERLAP \textbf{non} succede: \(H_0 \equiv H_2 \equiv H_1\). Infatti \(R\) viene calcolata nella sfida su punti mai usati prima, quindi i valori \(R(r^* + i)\) sono uniformi e indipendenti da tutto: ogni \(c_i^*\) è un OTP.
+  \item Quindi resta solo da mostrare:
+  \[
+  \Pr[\text{OVERLAP}] \ \le\ \text{negl}(\lambda)
+  \]
+\end{itemize}
+
+\begin{approfondimento}{Perché Pr[OVERLAP] è trascurabile (non negli appunti del prof)}
+Si fissa una domanda di cifratura con \(t\) blocchi (contatori \(r, \dots, r + t - 1\)). Le due sequenze di contatori si sovrappongono solo se \(r^*\) cade in una finestra di al più \(t + t^* - 1\) valori attorno a \(r\). Siccome \(r^*\) è uniforme su \(2^n\) valori, la probabilità è al più \((t + t^* - 1)/2^n\). Per lo union bound sulle \(q\) domande:
+\[
+\Pr[\text{OVERLAP}] \ \le\ q \cdot \frac{t + t^* - 1}{2^n} \ \le\ \frac{2\, q\, t_{\max}}{2^n}
+\]
+con \(t_{\max}\) la lunghezza massima (in blocchi) dei messaggi. \(q\) e \(t_{\max}\) sono polinomiali, \(2^n\) è esponenziale: il totale è trascurabile. Mettendo insieme: \(G_0 \approx_c H_0 \approx_s H_2 \approx_s H_1 \approx_c G_1\).
+\end{approfondimento}
+
+\section{Riepilogo}
+
+\begin{itemize}
+  \item I \textbf{block cipher} (DES, AES) sono \textbf{PRP}: permutazioni pseudocasuali, quindi invertibili.
+  \item \textbf{Feistel}: \(\psi_F(x, y) = (y,\ x \oplus F(y))\), invertibile per qualunque \(F\): \(\psi_F^{-1}(x', y') = (F(x') \oplus y',\ x')\).
+  \item 1 round non è una PRP (\(x' = y\)); 2 round nemmeno (con la stessa \(y\), lo XOR delle prime metà è \(x \oplus x'\)).
+  \item \textbf{Lemma}: 2 round con funzioni casuali \(\approx_s\) funzione casuale se le domande sono y-uniche (\(\text{SD} \le q^2 2^{-n}\)).
+  \item \textbf{Teorema}: 3 round con chiavi indipendenti e \(F\) PRF sono una PRP: \(T \approx_c S \approx_s R \approx_s P\); il primo round rende le domande y-uniche.
+  \item \textbf{Modi operativi} per messaggi lunghi: ECB (mai!), CBC, CFB, OFB, \textbf{CTR}.
+  \item \textbf{CTR}: \(c_0 = r\), \(c_i = F_k(r + i - 1) \oplus m_i\). È CPA-sicuro se \(F\) è una PRF: si sostituisce \(F_k\) con \(R\), e la sfida è un OTP a meno dell'evento \textbf{OVERLAP}, di probabilità trascurabile.
+\end{itemize}
