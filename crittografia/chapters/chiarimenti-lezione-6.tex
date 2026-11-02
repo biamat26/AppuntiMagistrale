@@ -1,0 +1,52 @@
+% Chiarimenti sulla Lezione 6: risposte alle domande fatte durante lo studio.
+
+\chapter{Chiarimenti sulla Lezione 6}
+
+\textit{Questo capitolo non è negli appunti del prof: raccoglie spiegazioni più semplici delle parti difficili della Lezione 6.}
+
+\section{Goldreich-Levin: l'idea}
+
+\begin{inbreve}
+Un bit \textbf{fisso} di \(x\) (es. ``il primo bit'') può essere rivelato da qualche OWF (\(f_{\text{BAD}}\)). Goldreich-Levin non chiede sempre lo stesso pezzo di \(x\), ma una \textbf{combinazione scelta a caso}: lo XOR dei bit di \(x\) nelle posizioni indicate da una stringa casuale \(r\). La ``domanda'' \(r\) è pubblica, la ``risposta'' \(\langle x, r \rangle\) resta nascosta.
+\end{inbreve}
+
+\textbf{\(r\) è la domanda.} \(r\) dice quali bit di \(x\) mettere in XOR. Con \(x = 1011\):
+\begin{itemize}
+  \item \(r = 0110\): il bit richiesto è \(x_2 \oplus x_3 = 0 \oplus 1 = 1\);
+  \item \(r = 1001\): il bit richiesto è \(x_1 \oplus x_4 = 1 \oplus 1 = 0\);
+  \item \(r = 1111\): il bit richiesto è \(x_1 \oplus x_2 \oplus x_3 \oplus x_4 = 1\).
+\end{itemize}
+
+\textbf{Perché \(r\) è in chiaro.} È come un'interrogazione in cui la domanda si estrae a caso davanti a tutti: Eve sa \textbf{cosa} le viene chiesto (\(r\)), ma non conosce la risposta, perché non conosce \(x\). Per questo la funzione nuova è \(g(x, r) = f(x) \,\|\, r\): \(f(x)\) è l'output della OWF, \(r\) la domanda.
+
+\textbf{Perché \(f(x)\) e non \(x\).} Con \(g(x, r) = x \,\|\, r\), \(x\) sarebbe in chiaro: Eve calcolerebbe da sola \(\langle x, r \rangle\), e \(g\) non sarebbe nemmeno one-way (basta leggere \(x\)). \(f\) serve a \textbf{nascondere} \(x\): da \(f(x)\) non si risale a \(x\) perché \(f\) è one-way (come da 3233 non si risale a 61 e 53). \(r\) serve a \textbf{scegliere la domanda}.
+
+\section{Prima e dopo Goldreich-Levin}
+
+\begin{esempio}
+\textbf{Stessa \(x\), stessa OWF ``cattiva''.} \(x = 1011\) e una OWF che rivela il primo bit di \(x\): \(f(1011) = 0101 \,\|\, \mathbf{1}\) (l'ultimo bit è \(x_1\) in chiaro).
+
+\textbf{Prima} (bit fisso ``primo bit di \(x\)''): Eve vede \(0101 \,\|\, 1\) e legge il bit. Nessuna garanzia: un bit fisso può capitare proprio tra quelli che \(f\) lascia scappare.
+
+\textbf{Dopo} (\(g(x, r) = f(x) \,\|\, r\), bit \(\langle x, r \rangle\)):
+\begin{itemize}
+  \item \(r = 0110\): il bit è \(x_2 \oplus x_3\). Eve conosce solo \(x_1\): non lo sa calcolare.
+  \item \(r = 1100\): il bit è \(x_1 \oplus x_2\). Eve conosce \(x_1\) ma non \(x_2\): l'XOR resta ignoto. Conoscere un pezzo dell'XOR non basta se l'altro è ignoto.
+\end{itemize}
+\end{esempio}
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+ & Prima & Dopo \\
+\midrule
+Funzione & \(f(x)\) & \(g(x, r) = f(x) \,\|\, r\) \\
+Bit nascosto & fisso (es. primo bit di \(x\)) & \(\langle x, r \rangle\), con \(r\) casuale \\
+Garanzia & nessuna: dipende da \(f\) & sempre, per qualunque OWF \(f\) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{nota}
+\textbf{Attenzione}: dopo Goldreich-Levin \textbf{non} si calcola un bit diverso apposta per ogni funzione. La ricetta è \textbf{sempre la stessa} (\(\langle x, r \rangle\)); cambiano la funzione (si usa \(g\), costruita da \(f\)) e il fatto che la domanda \(r\) sia casuale. È la casualità di \(r\) a fare la differenza: una OWF può lasciar scappare \textbf{qualche} bit di \(x\), ma non abbastanza da ricostruirlo tutto, e un XOR di bit scelti a caso quasi sempre ne contiene qualcuno che \(f\) non rivela.
+\end{nota}
