@@ -1,0 +1,258 @@
+\chapter{Lezione 8 -- Costruire una PRF da un PRG: GGM}
+
+\emph{Segue gli appunti del prof. Le parti aggiunte per capire meglio sono segnate ``non negli appunti del prof''. Usa i concetti della Lezione 5 (PRG, argomento ibrido, riduzioni) e della Lezione 7 (PRF, funzioni casuali \(\mathcal{R}(n, m)\)).}
+
+\section{Come si costruisce una PRF?}
+
+\begin{inbreve}
+Due strade: in pratica si \textbf{crede} che AES sia una PRF; in teoria una PRF si costruisce da \textbf{qualunque OWF}, anzi da \textbf{qualunque PRG}. Oggi si vede la costruzione da un PRG: quella di \textbf{Goldreich, Goldwasser e Micali (GGM)}.
+\end{inbreve}
+
+\begin{itemize}
+  \item Da qualunque OWF, anzi da qualunque \textbf{PRG} \(\Leftarrow\) oggi.
+  \item Credere semplicemente che AES sia una PRF.
+\end{itemize}
+
+\begin{nota}
+\emph{(Non negli appunti del prof.)} Mettendo insieme le lezioni: OWF \(\Rightarrow\) PRG (Lezione 5) \(\Rightarrow\) PRF (oggi) \(\Rightarrow\) SKE CPA-sicuro (Lezione 7). Quindi basta l'esistenza delle OWF per avere cifratura sicura di tanti messaggi con una chiave corta: è il ``Minicrypt'' della Lezione 4.
+\end{nota}
+
+\section{La costruzione GGM}
+
+\subsection{Gli ingredienti (del prof)}
+
+GGM assume un PRG che \textbf{raddoppia}:
+\[
+G : \{0,1\}^\lambda \to \{0,1\}^{2\lambda}
+\]
+e vuole costruire
+\[
+F_k : \{0,1\}^n \to \{0,1\}^\lambda
+\]
+
+Si pensa a \(G(k)\) come a due metà:
+\[
+G(k) = \big(G_0(k),\ G_1(k)\big)
+\]
+dove \(G_0\) e \(G_1\) sono le funzioni che restituiscono i \textbf{primi} e gli \textbf{ultimi} \(\lambda\) bit di \(G(k)\).
+
+\begin{nota}
+\emph{(Non negli appunti del prof.)} Un PRG che raddoppia si ottiene da quello che allunga di 1 bit con lo stretch amplification (Lezione 5), con \(\ell = \lambda\). \(G_0(k)\) e \(G_1(k)\) sono due nuovi ``semi'' di \(\lambda\) bit, ognuno dei quali sembra casuale.
+\end{nota}
+
+\subsection{L'albero (del prof)}
+
+\begin{inbreve}
+Si costruisce un albero binario: la radice è la chiave \(k\); da ogni nodo partono due figli, \(G_0(\text{nodo})\) a sinistra e \(G_1(\text{nodo})\) a destra. L'input \(x\) dice il percorso (0 = sinistra, 1 = destra); \(F_k(x)\) è la foglia in cui si arriva.
+\end{inbreve}
+
+\begin{verbatim}
+                          k
+                   G_0 /     \ G_1
+                     /         \
+                  G_0(k)      G_1(k)
+             G_0 /   \ G_1  G_0 /   \ G_1
+                /     \        /     \
+            F_k(00) F_k(01) F_k(10) F_k(11)
+\end{verbatim}
+
+In formula, per \(x = x_1 \dots x_n \in \{0,1\}^n\):
+\[
+F_k(x) = G_{x_n}\Big(G_{x_{n-1}}\big(\cdots G_{x_1}(k) \cdots\big)\Big)
+\]
+Si parte dalla chiave e si applica \(G_{x_1}\), poi \(G_{x_2}\), …, fino a \(G_{x_n}\): ogni bit di \(x\) sceglie quale metà tenere.
+
+\begin{esempio}
+\emph{(Valori di \(G\) inventati, non negli appunti del prof.)} \(\lambda = 3\), \(n = 2\), chiave \(k = 101\). Supponiamo:
+\[
+G(101) = \underbrace{011}_{G_0}\ \underbrace{110}_{G_1}, \qquad G(011) = \underbrace{000}_{G_0}\ \underbrace{111}_{G_1}, \qquad G(110) = \underbrace{100}_{G_0}\ \underbrace{010}_{G_1}
+\]
+\begin{itemize}
+  \item \(F_k(00)\): sinistra (\(011\)), poi sinistra: \(G_0(011) = 000\).
+  \item \(F_k(01)\): sinistra (\(011\)), poi destra: \(G_1(011) = 111\).
+  \item \(F_k(10)\): destra (\(110\)), poi sinistra: \(G_0(110) = 100\).
+  \item \(F_k(11)\): destra (\(110\)), poi destra: \(G_1(110) = 010\).
+\end{itemize}
+Per calcolare \(F_k(x)\) servono solo \(n\) chiamate a \(G\) (un percorso), non tutto l'albero.
+\end{esempio}
+
+\subsection{Teorema (del prof)}
+
+Se \(G\) è un PRG, allora \(\mathcal{F} = \{F_k : \{0,1\}^n \to \{0,1\}^\lambda\}\) è una PRF.
+
+\textbf{Intuizione (del prof)}: siccome \(k\) è casuale, \((G_0(k), G_1(k)) \approx_c (U_\lambda, U_\lambda)\): i due figli della radice sembrano casuali. Poi si potrebbero sostituire, livello per livello, tutti i nodi e infine tutte le \textbf{foglie} con stringhe uniformi: una tabella di foglie uniformi è proprio una funzione casuale.
+
+\textbf{Ma} così servono \textbf{esponenzialmente} molti ibridi: le foglie sono \(2^n\). L'argomento ibrido funziona solo con un numero polinomiale di passi (Lezione 5). Serve un lemma.
+
+\section{Lemma: tante uscite del PRG insieme}
+
+\begin{inbreve}
+Se \(G\) è un PRG, allora anche \textbf{tante} uscite di \(G\), ognuna con il suo seme indipendente, sembrano tutte insieme casuali, purché siano un numero polinomiale.
+\end{inbreve}
+
+\textbf{Lemma (del prof)}: per ogni \(t(\lambda) = \text{poly}(\lambda)\):
+\[
+\big(G(k_1), \dots, G(k_t)\big) \ \approx_c\ \big(U_{2\lambda}, \dots, U_{2\lambda}\big) \qquad k_i \leftarrow U_\lambda \ \ \forall i = 1, \dots, t
+\]
+
+\textbf{Dimostrazione}: argomento ibrido. \(H_i\) = le prime \(i\) uscite sostituite da stringhe uniformi:
+\begin{align*}
+H_0 &\equiv \big(G(k_1),\ G(k_2),\ \dots,\ G(k_t)\big) \\
+H_1 &\equiv \big(U_{2\lambda},\ G(k_2),\ \dots,\ G(k_t)\big) \\
+H_2 &\equiv \big(U_{2\lambda},\ U_{2\lambda},\ G(k_3),\ \dots,\ G(k_t)\big) \\
+&\ \ \vdots \\
+H_t &\equiv \big(U_{2\lambda},\ U_{2\lambda},\ \dots,\ U_{2\lambda}\big)
+\end{align*}
+\[
+H_0 \approx_c H_1 \approx_c \cdots \approx_c H_{t-1} \approx_c H_t \ \Rightarrow\ H_0 \approx_c H_t
+\]
+(vale perché i passi sono \(t\) = polinomiali).
+
+\textbf{\(H_0 \approx_c H_1\)} (riduzione al PRG):
+
+\begin{verbatim}
+A                                B                          C
+                                                            z_1 = G(k_1)  oppure  U_2λ
+                                 ←──── z_1 ∈ {0,1}^2λ ─────
+                                 k_2, ..., k_t ← U_λ
+  ←── z_1, G(k_2), ..., G(k_t) ──
+  ──────────── b' ─────────────→
+                                 ──────────── b' ─────────→
+\end{verbatim}
+
+\(B\) riceve \(z_1\), sceglie da solo \(k_2, \dots, k_t\), calcola le altre uscite e dà tutto ad \(A\). Se \(z_1 = G(k_1)\) la stringa è distribuita come \(H_0\), se \(z_1\) è uniforme come \(H_1\). Allo stesso modo \(H_{i-1} \approx_c H_i\) mettendo \(z\) in posizione \(i\) \emph{(caso generale non negli appunti del prof)}. \(\blacksquare\)
+
+\begin{nota}
+\emph{(Non negli appunti del prof.)} Differenza con lo stretch amplification: lì le uscite erano \textbf{in catena} (il seme di un giro veniva dal giro prima); qui i semi \(k_1, \dots, k_t\) sono \textbf{indipendenti}, quindi la riduzione è ancora più semplice: \(B\) sceglie da solo tutti gli altri semi.
+\end{nota}
+
+\section{Dimostrazione del teorema: induzione su \texorpdfstring{\(n\)}{n}}
+
+\begin{inbreve}
+Si dimostra che GGM è una PRF per input di lunghezza \(n\) sapendo che lo è per lunghezza \(n-1\). Un albero di profondità \(n\) è un albero di profondità \(n-1\) con un livello in più in fondo: l'ultimo passo applica \(G_x\) alla foglia dell'albero più piccolo.
+\end{inbreve}
+
+Induzione su \(n(\lambda) = \text{poly}(\lambda)\). Siano
+\[
+F'_k : \{0,1\}^{n-1} \to \{0,1\}^\lambda \qquad F_k : \{0,1\}^n \to \{0,1\}^\lambda
+\]
+con
+\[
+F_k(x, y) = G_x\big(F'_k(y)\big) \qquad x \in \{0,1\},\ \ y \in \{0,1\}^{n-1}
+\]
+
+\begin{nota}
+\textbf{Cosa vuol dire} \emph{(non negli appunti del prof)}: per calcolare \(F_k\) su \(n\) bit si percorre l'albero piccolo con \(n-1\) bit (\(y\)), arrivando a \(F'_k(y)\), e poi si fa un ultimo passo con il bit rimanente \(x\): metà sinistra se \(x = 0\), destra se \(x = 1\). Il prof scrive l'input come \((x, y)\) per comodità; \(x\) è il bit usato per \textbf{ultimo}.
+\end{nota}
+
+\subsection{Caso base: \texorpdfstring{\(n = 1\)}{n = 1}}
+
+GGM è sicuro per input di lunghezza \(n = 1\), perché
+\[
+F_k(0) = G_0(k), \qquad F_k(1) = G_1(k)
+\]
+e \((G_0(k), G_1(k)) \approx_c (U_\lambda, U_\lambda)\) (è la definizione di PRG). Cioè la tabella di \(F_k\) è indistinguibile da una tabella casuale:
+
+\begin{center}
+\begin{tabular}{cc}
+\toprule
+\(x\) & \(R(x)\) \\
+\midrule
+0 & \$ \\
+1 & \$ \\
+\bottomrule
+\end{tabular}
+\quad \(\approx_c\) \quad
+\begin{tabular}{cc}
+\toprule
+\(x\) & \(F_k(x)\) \\
+\midrule
+0 & \(G_0(k)\) \\
+1 & \(G_1(k)\) \\
+\bottomrule
+\end{tabular}
+\end{center}
+(\$ = valore uniforme).
+
+\subsection{Passo induttivo: i tre giochi}
+
+Assumiamo che \(F'_k\) sia una PRF per input di lunghezza \(n-1\); mostriamo che anche \(F_k\) lo è. In tutti e tre i giochi \(A\) chiede coppie \((x, y)\) e riceve una risposta:
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+Gioco & Risposta a \((x, y)\) & Cos'è \\
+\midrule
+\(\text{GAME}_0(\lambda)\) & \(F_k(x, y) = G_x(F'_k(y))\) & la PRF vera \\
+\(\text{GAME}_1(\lambda)\) & \(H(x, y) = G_x(R'(y))\), \(R' \leftarrow \mathcal{R}(n-1, \lambda)\) & albero piccolo sostituito da \(R'\) \\
+\(\text{GAME}_2(\lambda)\) & \(R(x, y)\), \(R \leftarrow \mathcal{R}(n, \lambda)\) & funzione davvero casuale \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Il piano: \(\text{GAME}_0 \approx_c \text{GAME}_1 \approx_c \text{GAME}_2\), quindi \(F_k\) è una PRF.
+
+\subsection{Lemma: \texorpdfstring{\(\text{GAME}_0 \approx_c \text{GAME}_1\)}{GAME0 ≈c GAME1}}
+
+\textbf{Lemma (del prof)}: \(\text{GAME}_0(\lambda) \approx_c \text{GAME}_1(\lambda)\). (Esercizio: riduzione.)
+
+\begin{verbatim}
+A                          B                          C (della PRF F')
+                                                      F'_k  oppure  R'
+  ┌──────── x, y ────────→
+  │                        ┌────────── y ──────────→
+  │                        └←───────── w ───────────
+  └←────── G_x(w) ────────
+  ─────────── b' ────────→
+                           ─────────── b' ─────────→
+\end{verbatim}
+
+Per ogni domanda \((x, y)\) di \(A\), \(B\) chiede \(y\) al suo challenger, riceve \(w\) (che è \(F'_k(y)\) oppure \(R'(y)\)) e risponde con \(G_x(w)\). Se il challenger usa \(F'_k\), \(A\) gioca esattamente \(\text{GAME}_0\); se usa \(R'\), esattamente \(\text{GAME}_1\). \textbf{Riduzione perfetta}: un \(A\) che distingue i due giochi darebbe un \(B\) che rompe \(F'\), contro l'ipotesi induttiva. \(\blacksquare\)
+
+\subsection{Lemma: \texorpdfstring{\(\text{GAME}_1 \approx_c \text{GAME}_2\)}{GAME1 ≈c GAME2}}
+
+\begin{inbreve}
+In \(\text{GAME}_1\) i ``semi'' \(R'(y)\) sono stringhe casuali indipendenti, una per ogni \(y\) diverso, e la risposta è una metà di \(G(\text{seme})\). Per il lemma sulle tante uscite del PRG, quelle uscite si possono sostituire con stringhe uniformi: e una tabella di valori uniformi è una funzione casuale, cioè \(\text{GAME}_2\).
+\end{inbreve}
+
+\textbf{Lemma (del prof)}: \(\text{GAME}_1(\lambda) \approx_c \text{GAME}_2(\lambda)\). Per riduzione al lemma di prima.
+
+Sia \(t(\lambda) = q(\lambda)\) il numero di domande fatte da \(A\). \(B\) riceve dal suo challenger \(z_1, z_2, \dots, z_q\) (ognuna di \(2\lambda\) bit), che sono \((G(k_1), \dots, G(k_q))\) oppure tutte uniformi. Indichiamo con \(z_i = (z_i^0, z_i^1)\) le due metà di \(\lambda\) bit di ogni \(z_i\).
+
+\begin{verbatim}
+A                          B                          C
+                                                      z_1, ..., z_q
+                           ←──── z_1, z_2, ..., z_q ──   (z_i = z_i^0 z_i^1)
+  ┌──────── x, y ────────→
+  └←────── z = ?? ────────
+\end{verbatim}
+
+Come risponde \(B\):
+\begin{itemize}
+  \item \textbf{Prima domanda} \((x_1, y_1)\): si pensa a \(y_1\) come se fissasse il seme (\(k_1\), che \(B\) non conosce) e si risponde \(z_1^{x_1}\). Funziona.
+  \item \textbf{Seconda domanda} \((x_2, y_2)\), con \(y_2 \ne y_1\): si fa come prima con la stringa successiva, cioè si risponde \(z_2^{x_2}\).
+  \item \textbf{Ma se} \(y_2 = y_1\)? Senza perdita di generalità \(x_2 \ne x_1\) (altrimenti è la stessa domanda e si dà la stessa risposta). Allora bisogna rispondere \(z_1^{x_2}\), perché in \(\text{GAME}_1\) si calcolerebbe \(G_{x_2}(R'(y_1))\), e il seme \(R'(y_1)\) è \textbf{lo stesso} per entrambe le domande. \(\blacksquare\)
+\end{itemize}
+
+\begin{nota}
+\textbf{Perché funziona} \emph{(non negli appunti del prof)}. \(B\) assegna a ogni \(y\) diverso una stringa \(z_i\) diversa (la prima libera), e risponde con la metà indicata da \(x\).
+\begin{itemize}
+  \item Se \(z_i = G(k_i)\): il seme \(k_i\) fa la parte di \(R'(y)\), che in \(\text{GAME}_1\) è una stringa uniforme, indipendente per ogni \(y\) diverso. La risposta \(z_i^{x} = G_x(k_i)\) è esattamente \(G_x(R'(y))\): \(A\) gioca \(\text{GAME}_1\).
+  \item Se \(z_i\) è uniforme: ogni coppia \((x, y)\) diversa riceve \(\lambda\) bit uniformi e indipendenti, e la stessa domanda riceve sempre la stessa risposta. È una funzione casuale costruita ``man mano'' (lazy sampling, Lezione 7): \(A\) gioca \(\text{GAME}_2\).
+\end{itemize}
+Quindi chi distingue \(\text{GAME}_1\) da \(\text{GAME}_2\) distingue \((G(k_1), \dots, G(k_q))\) da stringhe uniformi, contro il lemma.
+\end{nota}
+
+\subsection{Conclusione}
+
+\emph{(Non negli appunti del prof.)} \(\text{GAME}_0 \approx_c \text{GAME}_1 \approx_c \text{GAME}_2\): \(F_k\) è indistinguibile da una funzione casuale, cioè è una PRF per input di \(n\) bit. Per induzione vale per ogni \(n = \text{poly}(\lambda)\) (i passi sono polinomiali, quindi la perdita totale resta trascurabile).
+
+\section{Riepilogo}
+
+\begin{itemize}
+  \item Le PRF si costruiscono da qualunque PRG (quindi da qualunque OWF); in pratica si usa AES.
+  \item \textbf{GGM}: \(G : \{0,1\}^\lambda \to \{0,1\}^{2\lambda}\), \(G(k) = (G_0(k), G_1(k))\). Albero con radice \(k\); \(F_k(x) = G_{x_n}(\cdots G_{x_1}(k) \cdots)\): i bit di \(x\) indicano il percorso, la foglia è l'output.
+  \item Sostituire direttamente tutte le foglie richiederebbe esponenzialmente molti ibridi.
+  \item \textbf{Lemma}: \((G(k_1), \dots, G(k_t)) \approx_c (U_{2\lambda}, \dots, U_{2\lambda})\) per \(t\) polinomiale (argomento ibrido, semi indipendenti).
+  \item \textbf{Teorema} per induzione su \(n\): \(F_k(x, y) = G_x(F'_k(y))\). Caso base \(n = 1\): è la definizione di PRG. Passo: \(\text{GAME}_0 \approx_c \text{GAME}_1\) (riduzione perfetta a \(F'\)), \(\text{GAME}_1 \approx_c \text{GAME}_2\) (riduzione al lemma, assegnando una \(z_i\) a ogni \(y\) diverso).
+\end{itemize}
