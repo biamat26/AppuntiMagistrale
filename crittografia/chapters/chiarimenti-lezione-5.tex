@@ -166,7 +166,17 @@ Con \(n = 2\): \(f(00) = 10\), \(f(01) = 00\), \(f(10) = 11\), \(f(11) = 01\). O
 Domanda: esiste un unico \(h\) hard-core per \textbf{tutte} le OWF? No: qualunque \(h\) scegli, c'è una OWF (\(f_{\text{BAD}}\)) per cui \(h\) non funziona, perché \(f_{\text{BAD}}\) scrive \(h(x)\) in chiaro.
 \end{inbreve}
 
-\(f_{\text{BAD}}(x) = f(x) \,\|\, h(x)\), con \(f\) OWF qualunque. Esempio con \(h\) = ``primo bit di \(x\)'' e \(x = 101\): \(f_{\text{BAD}}(101) = f(101) \,\|\, \mathbf{1}\).
+\(f_{\text{BAD}}(x) = f(x) \,\|\, h(x)\), con \(f\) OWF qualunque: \(f_{\text{BAD}}\) calcola \(f(x)\) e ci attacca in fondo \(h(x)\), scritto in chiaro.
+
+\begin{esempio}
+\textbf{Esempio con la moltiplicazione.}
+\begin{itemize}
+  \item \textbf{La OWF}: \(f(p, q) = p \cdot q\). Con \(x = (61, 53)\): \(f(x) = 3233\). Chi vede solo 3233 non sa quali numeri sono stati moltiplicati.
+  \item \textbf{Il bit}: \(h(x) = 1\) se \(p > q\), 0 altrimenti. Qui \(61 > 53\), quindi \(h(x) = 1\). Guardando solo 3233 questo bit è nascosto: \(61 \cdot 53 = 53 \cdot 61\), il prodotto non dice quale numero è stato messo per primo.
+  \item \textbf{f\_BAD}: \(f_{\text{BAD}}(61, 53) = (3233,\ \mathbf{1})\): il prodotto più il bit, in chiaro.
+\end{itemize}
+Con \(f\), Eve vede 3233 e non sa se \(p > q\). Con \(f_{\text{BAD}}\) vede \((3233, 1)\) e lo \textbf{legge}: \(h\) non è hard-core per \(f_{\text{BAD}}\). Però per trovare 61 e 53 deve comunque \textbf{fattorizzare} 3233: il bit le dice solo in che ordine scrivere la risposta, non quale sia. Quindi \(f_{\text{BAD}}\) è ancora una OWF.
+\end{esempio}
 \begin{itemize}
   \item \(h\) \textbf{non} è hard-core per \(f_{\text{BAD}}\): si legge nell'ultimo bit dell'uscita.
   \item \(f_{\text{BAD}}\) \textbf{è comunque una OWF}: chi la inverte trova \(x'\) con \(f(x') = f(x)\), cioè inverte \(f\), che è one-way (dimostrazione completa all'inizio della Lezione 6).
