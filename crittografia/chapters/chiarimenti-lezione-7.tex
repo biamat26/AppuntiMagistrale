@@ -1,0 +1,118 @@
+% Chiarimenti sulla Lezione 7: risposte alle domande fatte durante lo studio.
+
+\chapter{Chiarimenti sulla Lezione 7}
+
+\textit{Questo capitolo non è negli appunti del prof: raccoglie spiegazioni più semplici delle parti difficili della Lezione 7.}
+
+\section{Il problema}
+
+\begin{inbreve}
+\(\text{Enc}(k, m) = G(k) \oplus m\) (Lezione 6) va bene per \textbf{un} messaggio: con la stessa \(k\), \(G(k)\) è sempre la stessa stringa, quindi con due messaggi \(c_1 \oplus c_2 = m_1 \oplus m_2\). Serve una maschera \textbf{diversa per ogni messaggio}, ricavata dalla \textbf{stessa} chiave corta \(k\).
+\end{inbreve}
+
+Perché una sola chiave per tanti messaggi: nella realtà Alice e Bob si mandano centinaia di messaggi; scambiarsi una chiave nuova per ognuno (o migliaia di chiavi in anticipo) è lo stesso problema dell'OTP. L'obiettivo della lezione è uno schema \textbf{pratico}: una chiave, corta, per tanti messaggi.
+
+\section{Funzione casuale e PRF}
+
+\begin{inbreve}
+Una funzione da \(n\) bit a \(n\) bit è una \textbf{tabella} con una riga per ogni input. Una funzione \textbf{davvero casuale} \(R\) è una tabella riempita a caso: fissa una volta riempita, ma imprevedibile. Una \textbf{PRF} \(F_k\) è una tabella che \textbf{sembra} riempita a caso, ma ogni riga si \textbf{calcola} dalla chiave corta \(k\).
+\end{inbreve}
+
+\begin{esempio}
+Con 2 bit, una tabella casuale potrebbe essere \(R(00) = 11\), \(R(01) = 01\), \(R(10) = 11\), \(R(11) = 00\). Con input di 128 bit la tabella ha \(2^{128}\) righe: impossibile da scrivere o condividere. Per questo serve la PRF.
+\end{esempio}
+
+\begin{itemize}
+  \item \textbf{Un input, un output}: \(F_k(00) = 01\). La tabella non la produce nessuno; serve solo a immaginare tutti i risultati insieme. Si calcola solo la riga che serve.
+  \item \textbf{Perché la \(k\) in basso}: \(F_k(r)\) è come \(F(k, r)\), ma i due input hanno ruoli diversi. \(k\) si sceglie una volta, è fissa e segreta, e sceglie \textbf{quale tabella}; \(r\) cambia ogni volta, è pubblico, e sceglie \textbf{quale riga}.
+  \item \textbf{Una chiave, una tabella}: chiavi diverse danno tabelle diverse. Con chiavi di 128 bit le tabelle della famiglia sono \(2^{128}\) (ogni bit vale 0 o 1, quindi \(2 \cdot 2 \cdots 2 = 2^{128}\) chiavi). Eve conosce la famiglia, non la tabella scelta.
+\end{itemize}
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+ & \(R\) (davvero casuale) & \(F_k\) (PRF) \\
+\midrule
+Come si ottiene & riempiendo ogni riga a caso & calcolando le righe da \(k\) \\
+Cosa conservare & tutta la tabella (enorme) & solo \(k\) (corta) \\
+Per chi non conosce \(k\) & sembra casuale & sembra casuale \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section{Sicurezza CPA e cifratura casuale}
+
+\begin{inbreve}
+Nel gioco CPA Eve può farsi cifrare tutti i messaggi che vuole (con la stessa \(k\)), poi riceve la sfida: il cifrato di uno tra due messaggi scelti da lei, \(m_0\) o \(m_1\), deciso da una moneta del challenger che Eve non vede. Deve indovinare quale.
+\end{inbreve}
+
+\begin{esempio}
+\textbf{Perché la cifratura deterministica perde sempre.} Se cifrare ``SÌ'' dà sempre XQ7: Eve chiede ``ciframi SÌ'' e riceve XQ7; nella sfida manda ``SÌ'' e ``NO''; se \(c^* = \text{XQ7}\) era ``SÌ'', altrimenti ``NO''. Indovina sempre, solo \textbf{confrontando}, senza chiave. Con una moneta \(r\) nuova a ogni cifratura, ``SÌ'' dà cifrati diversi ogni volta (XQ7, poi K9T, \dots) e il confronto non serve più.
+\end{esempio}
+
+\section{Lo schema: \texorpdfstring{\(F_k(r)\)}{F\_k(r)} è una maschera}
+
+\begin{inbreve}
+\(\text{Enc}(k, m) = (r,\ F_k(r) \oplus m)\): \(F_k\) \textbf{non cifra il messaggio}, fabbrica una \textbf{maschera} di OTP a partire dal punto casuale \(r\). Il messaggio lo cifra lo XOR.
+\end{inbreve}
+
+\begin{esempio}
+\(F_k(0110) = 1011\), \(F_k(1001) = 0010\) (inventati). Alice cifra \(m = 1100\) con \(r = 0110\): \((0110,\ 1011 \oplus 1100) = (0110,\ 0111)\). Bob calcola \(F_k(0110) = 1011\) e fa \(1011 \oplus 0111 = 1100\). Ricifrando lo stesso \(m\) con \(r = 1001\): \((1001,\ 1110)\), un cifrato diverso.
+\end{esempio}
+
+\textbf{Perché non \(F_k(m)\)}: (1) sarebbe deterministico (stesso \(m\), stesso cifrato), quindi non CPA-sicuro; (2) Bob dovrebbe \textbf{invertire} \(F_k\), che in generale non si inverte. Con \(r\): la maschera cambia ogni volta, e Bob calcola \(F_k(r)\) solo in avanti.
+
+\section{La dimostrazione, passo per passo}
+
+\begin{inbreve}
+Ragionamento in tre passi: (1) se la maschera fosse davvero casuale, la sfida sarebbe un OTP; (2) la PRF sembra casuale, quindi è come se lo fosse; (3) unica trappola: la sfida riusa un \(r\) già visto (evento BAD), cosa praticamente impossibile.
+\end{inbreve}
+
+\subsection{A cosa serve B}
+
+Vogliamo ``Eve non rompe lo schema''; sappiamo solo ``nessuno rompe la PRF''. Sono frasi su cose diverse: \(B\) è il \textbf{ponte}. Per assurdo: se esistesse un'Eve che rompe lo schema, si costruirebbe \(B\) che rompe la PRF; impossibile, quindi Eve non esiste. (Come dimostrare che nessuno apre la cassaforte A sapendo che nessuno apre la B: si mostra che chi aprisse A saprebbe aprire B.)
+
+\textbf{Cosa fa B.} Il challenger della PRF ha una ``scatola nera'' con dentro \(F_k\) oppure \(R\). \(B\) finge di essere il challenger di Eve: per ogni cifratura sceglie \(r\), chiede alla scatola la riga \(r\), riceve \(z\) e dà a Eve \((r,\ z \oplus m)\); lo stesso per la sfida, con una moneta tirata da lui.
+
+\textbf{Come B usa la risposta.} \(B\) sa quale messaggio ha cifrato, quindi sa se Eve ha indovinato. Regola: Eve indovina \(\Rightarrow\) ``nella scatola c'è \(F_k\)''; Eve sbaglia \(\Rightarrow\) ``c'è \(R\)''.
+
+\begin{esempio}
+Con \(R\) la sfida è un OTP: Eve indovina il 50\%. Se (per assurdo) con \(F_k\) Eve indovinasse l'80\%: \(B\) ha ragione l'80\% delle volte quando c'è \(F_k\) e il 50\% quando c'è \(R\), in media il 65\%: più del 50\%, quindi \(B\) rompe la PRF. Contraddizione.
+\end{esempio}
+
+\subsection{L'evento BAD}
+
+Con \(R\), la sfida \((r^*,\ R(r^*) \oplus m_b)\) è un OTP se Eve non ha mai visto la riga \(r^*\). Ma dalle domande di cifratura Eve conosce le righe \(R(r_1), R(r_2), \dots\) (ha scelto lei i messaggi, quindi toglie il messaggio e trova la maschera).
+
+\textbf{BAD} = ``il \(r^*\) della sfida coincide con un \(r\) già usato''. Allora Eve conosce \(R(r^*)\), la toglie dalla sfida e legge il messaggio.
+
+\begin{esempio}
+Eve chiede ``ciframi 0000'' e riceve \((0110,\ 1011)\): siccome XOR con 0000 non cambia nulla, ha visto la maschera \(R(0110) = 1011\). Se la sfida è \((0110,\ 0111)\), fa \(0111 \oplus 1011 = 1100\) e legge il messaggio della sfida. Quel messaggio non è ``uno su tantissimi'': è proprio quello su cui viene giudicata (nella realtà, magari quello con la password).
+\end{esempio}
+
+\subsection{Quanto è probabile BAD}
+
+\begin{enumerate}
+  \item Due \(r\) di \(n\) bit scelti a caso sono uguali con probabilità \(1/2^n\) (le stringhe possibili sono \(2^n\); con \(n = 2\): 1 su 4).
+  \item Con \(q\) valori le coppie sono \(q(q-1)/2\).
+  \item Union bound: \(\Pr[\text{BAD}] \le \frac{q(q-1)}{2} \cdot \frac{1}{2^n}\).
+  \item Con \(q = 1000\) e \(n = 128\): \(\approx 500\,000 / 2^{128} \approx 10^{-33}\).
+\end{enumerate}
+\(q\) è polinomiale, \(2^n\) esponenziale: il rapporto è trascurabile. Quindi con \(R\) Eve non distingue \(m_0\) da \(m_1\), e per il lemma di \(B\) lo stesso vale con \(F_k\): lo schema è CPA-sicuro.
+
+\section{PRG contro PRF}
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+ & PRG & PRF \\
+\midrule
+Input & seme \(s\) & chiave \(k\) + punto \(x\) \\
+Output & \textbf{una} stringa lunga & \textbf{un valore per ogni} \(x\) \\
+Somiglia a & un nastro casuale & una tabella casuale \\
+Cifratura & un messaggio per chiave (L6) & tanti messaggi per chiave (L7) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Da una PRF si fa facilmente un PRG (\(F_k(0), F_k(1), \dots\) in fila); da un PRG si fa una PRF con l'albero GGM (Lezione 8).
