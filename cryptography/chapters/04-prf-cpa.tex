@@ -1,0 +1,14 @@
+\chapter{Pseudorandom Functions and CPA Security}\label{ch:prf-cpa}
+
+At the end of the previous chapter we beat Shannon's bound: with a PRG, a short key encrypts a long message. But the scheme $\Enc(k, m) = G(k) \oplus m$ is still \textbf{one-time}: the pad $G(k)$ is always the same, so a key can protect a single message. This chapter removes that limitation:
+\begin{itemize}
+  \item \textbf{a stronger definition} $\to$ security when many messages are encrypted with the same key, even against an adversary who can obtain encryptions of messages of its choice (CPA security);
+  \item \textbf{a new tool} $\to$ pseudorandom functions, a ``secret giant table'' that looks like a random function;
+  \item \textbf{a scheme and its proof} $\to$ $\Enc(k, m) = (r, F_k(r) \oplus m)$ is CPA-secure;
+  \item \textbf{a construction} $\to$ pseudorandom functions can be built from PRGs (GGM).
+\end{itemize}
+
+\input{chapters/04-1-cpa-security}
+\input{chapters/04-2-pseudorandom-functions}
+\input{chapters/04-3-cpa-encryption}
+\input{chapters/04-4-ggm}

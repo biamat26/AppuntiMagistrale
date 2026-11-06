@@ -1,0 +1,68 @@
+% ============================================================
+%  Pseudorandom functions
+% ============================================================
+
+\section{Pseudorandom functions}
+
+\subsection{The idea: a secret giant table}
+
+A PRG gives \textbf{one} long string that looks random. A pseudorandom function gives a whole \textbf{function} that looks random: we can ask for its value on \textbf{any} input, whenever we need it.
+
+Think of a truly random function $R : \{0,1\}^n \to \{0,1\}^\ell$ as a \textbf{table}, with one row for each of the $2^n$ inputs and a uniformly random $\ell$-bit value in each row. Such a table cannot be stored: with $n = 128$ it has $2^{128}$ rows. A PRF \textbf{simulates} it with a short key: the value of row $x$ is computed on demand as $F_k(x)$.
+
+\begin{frameddefn}[label={def:prf}]{Pseudorandom function}
+  Let $\mathcal{F} = \{F_k : \{0,1\}^n \to \{0,1\}^\ell\}_{k \in \{0,1\}^\lambda}$ be a family of functions computable in polynomial time. $\mathcal{F}$ is a \textbf{pseudorandom function} (PRF) if, for every PPT adversary $\Adv$,
+  \[
+    \mathrm{REAL}_{\mathcal{F},\Adv}(\lambda) \cind \mathrm{RAND}_{\mathcal{F},\Adv}(\lambda)
+  \]
+  where in both games $\Adv$ asks queries $x \in \{0,1\}^n$ (polynomially many, each one possibly chosen depending on the previous answers) and finally outputs a bit:
+  \begin{itemize}
+    \item \textbf{$\mathrm{REAL}$} $\to$ the challenger chooses $k \sample \{0,1\}^\lambda$ once, and answers every query $x$ with $F_k(x)$;
+    \item \textbf{$\mathrm{RAND}$} $\to$ the challenger answers every query $x$ with $R(x)$, where $R$ is a truly random function from $\{0,1\}^n$ to $\{0,1\}^\ell$.
+  \end{itemize}
+\end{frameddefn}
+
+Three lengths appear in the definition:
+\begin{itemize}
+  \item \textbf{$\lambda$} $\to$ the length of the key $k$;
+  \item \textbf{$n$} $\to$ the length of the input $x$;
+  \item \textbf{$\ell$} $\to$ the length of the output $F_k(x)$.
+\end{itemize}
+
+\paragraph{How the challenger of RAND samples a random function.} It cannot write down the whole table, so it builds it \textbf{lazily}, one row at a time, keeping a list of the rows already filled:
+\begin{itemize}
+  \item if $x$ is a \textbf{new} input, it chooses $y \sample \{0,1\}^\ell$, writes $(x, y)$ in the list and answers $y$;
+  \item if $x$ was \textbf{already asked}, it answers with the same $y$ as before.
+\end{itemize}
+The answers are distributed exactly as the values of a truly random function. Note that $R$ is a \textbf{function}: the same input always gets the same answer.
+
+\begin{framedobs}{How many functions are there?}
+  A table with $2^n$ rows, each containing one of $2^\ell$ values, can be filled in
+  \[
+    \underbrace{2^\ell \cdot 2^\ell \cdots 2^\ell}_{2^n \text{ rows}} = 2^{\ell \cdot 2^n}
+  \]
+  ways. So choosing a truly random function requires $\ell \cdot 2^n$ random bits, the whole table. A PRF chooses one function among only $2^\lambda$, with a key of $\lambda$ bits: a tiny fraction of all functions, which no efficient adversary can tell apart from a random one.
+\end{framedobs}
+
+\begin{framedobs}{PRFs are deterministic}
+  For a fixed key, $F_k$ is a deterministic function: the same input always gives the same output. This is essential: in an encryption scheme, Bob must recompute exactly the value computed by Alice. The randomness of the encryption will come from \textbf{where} the PRF is evaluated, not from the PRF itself.
+\end{framedobs}
+
+\paragraph{Comparison with pairwise independent hashing.} Both are families of functions indexed by a random key, but the guarantees are very different:
+
+\begin{table}[H]
+  \centering
+  \small
+  \begin{tabularx}{\textwidth}{@{}lXX@{}}
+    \toprule
+    & \textbf{Pairwise independent family} & \textbf{PRF} \\
+    \midrule
+    Guarantee & uniform outputs on \textbf{two} inputs & looks random on \textbf{polynomially many} inputs \\
+    Against & unbounded adversaries & efficient adversaries \\
+    Queries & fixed in advance & adaptive \\
+    Key & grows with the number of uses & short, reused \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+In practice, block ciphers such as AES are used (and assumed to behave) as PRFs.

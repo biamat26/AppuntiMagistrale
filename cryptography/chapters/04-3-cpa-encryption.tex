@@ -1,0 +1,187 @@
+% ============================================================
+%  CPA-secure encryption from a PRF
+% ============================================================
+
+\section{CPA-secure encryption from a PRF}
+
+\subsection{The scheme}
+
+The idea: keep the One-Time Pad structure, but take a \textbf{different pad for every message}, by evaluating the PRF on a \textbf{fresh random point}.
+
+\begin{frameddefn}[label={def:prf-enc}]{Encryption from a PRF}
+  Let $\mathcal{F} = \{F_k : \{0,1\}^n \to \{0,1\}^\ell\}_{k \in \{0,1\}^\lambda}$ be a PRF. The scheme $\Pi = (\Enc, \Dec)$ has key space $\{0,1\}^\lambda$, message space $\Mspace = \{0,1\}^\ell$ and ciphertext space $\{0,1\}^n \times \{0,1\}^\ell$:
+  \[
+    \begin{aligned}
+      \Enc(k, m) &= (c_1, c_2) = \big(r,\ F_k(r) \oplus m\big) && \text{with } r \sample \{0,1\}^n \text{ fresh at every encryption} \\
+      \Dec\big(k, (c_1, c_2)\big) &= F_k(c_1) \oplus c_2
+    \end{aligned}
+  \]
+\end{frameddefn}
+
+\begin{itemize}
+  \item \textbf{Correctness} $\to$ $F_k(c_1) \oplus c_2 = F_k(r) \oplus F_k(r) \oplus m = m$.
+  \item \textbf{$r$ is the label, $F_k(r)$ is the pad} $\to$ $r$ travels in clear and tells Bob which pad to recompute; the pad itself cannot be computed without $k$.
+  \item \textbf{$r$ can be public} $\to$ in the PRF game the adversary even \textbf{chooses} the inputs, and still $F_k(x)$ looks random to it. The secret is $k$, not $r$ (as with the public seed of an extractor).
+  \item \textbf{The scheme is randomized} $\to$ the randomness comes from $r$; the PRF is deterministic. The same message encrypted twice gives two different ciphertexts.
+  \item \textbf{Lengths} $\to$ the message has $\ell$ bits because it is XORed with the pad; the ciphertext has $n + \ell$ bits, $n$ more than the message: the price of randomization.
+\end{itemize}
+
+\begin{framedex}{Encrypting the same message twice}
+  Alice encrypts the same message $m$ twice with the same key:
+  \begin{itemize}
+    \item first time: $r = 7$, ciphertext $\big(7,\ F_k(7) \oplus m\big)$;
+    \item second time: $r = 42$, ciphertext $\big(42,\ F_k(42) \oplus m\big)$.
+  \end{itemize}
+  The two pads $F_k(7)$ and $F_k(42)$ are different and look independent, so Eve cannot tell that the message is the same. Bob reads the labels $7$ and $42$, recomputes the two pads with $k$ and removes them.
+\end{framedex}
+
+\subsection{Security}
+
+\begin{framedthm}[label={thm:prf-cpa}]{Encryption from a PRF is CPA-secure}
+  If $\mathcal{F}$ is a PRF, then the scheme of \Cref{def:prf-enc} is CPA-secure.
+\end{framedthm}
+
+The proof is a game hopping with three kinds of games. Let $q = \poly(\lambda)$ be the total number of ciphertexts the adversary sees (the answers to its queries and the challenge), with labels $r_1, \ldots, r_q$.
+
+\begin{table}[H]
+  \centering
+  \small
+  \begin{tabularx}{\textwidth}{@{}lXl@{}}
+    \toprule
+    \textbf{Game} & \textbf{Every ciphertext (queries and challenge)} & \textbf{Hop} \\
+    \midrule
+    $\mathrm{GAME}(\lambda, b)$ & $(r,\ F_k(r) \oplus m)$, with $k \sample \{0,1\}^\lambda$ & \\
+    $\mathrm{HYB}(\lambda, b)$ & $(r,\ R(r) \oplus m)$, with $R$ a truly random function & $\cind$ (PRF security) \\
+    $\mathrm{HYB}'(\lambda)$ & $(r, u)$, with $r \sample \{0,1\}^n$ and $u \sample \{0,1\}^\ell$: pure noise & $\approx_s$ (collisions are rare) \\
+    \bottomrule
+  \end{tabularx}
+  \caption{The games of the proof. $\mathrm{HYB}'$ does not depend on $b$: the challenge is random whatever message was chosen.}
+\end{table}
+
+\paragraph{The plan.} $\mathrm{HYB}'$ does not depend on $b$, so it is the common middle point:
+\[
+  \mathrm{GAME}(\lambda, 0) \;\cind\; \mathrm{HYB}(\lambda, 0) \;\approx_s\; \mathrm{HYB}'(\lambda) \;\approx_s\; \mathrm{HYB}(\lambda, 1) \;\cind\; \mathrm{GAME}(\lambda, 1)
+\]
+
+\subsubsection{Step 1: from the PRF to a random function}
+
+\begin{framedlem}[label={lem:game-hyb}]{}
+  For $b \in \{0,1\}$: $\mathrm{GAME}(\lambda, b) \cind \mathrm{HYB}(\lambda, b)$.
+\end{framedlem}
+
+\begin{proof}
+  Suppose a PPT $\Adv$ tells $\mathrm{GAME}(\lambda, b)$ and $\mathrm{HYB}(\lambda, b)$ apart with non-negligible advantage. We build a PPT $B$ that plays the PRF game: $B$ has access to an oracle $O$, which is either $F_k$ (game $\mathrm{REAL}$) or a random function $R$ (game $\mathrm{RAND}$), and simulates the CPA challenger for $\Adv$.
+
+  \begin{center}
+    \begin{tikzpicture}[x=1cm, y=1cm]
+      \node (A) at (0,0) {$\Adv$};
+      \node (B) at (5,0) {$B$};
+      \node (O) at (10,0) {$O \in \{F_k, R\}$};
+      \draw[msg] (0,-0.7) -- node[above] {$m$} (5,-0.7);
+      \node[lbl] at (5,-1.05) {$r \sample \{0,1\}^n$};
+      \draw[msg] (5,-1.5) -- node[above] {$r$} (10,-1.5);
+      \draw[msg] (10,-2.1) -- node[above] {$y = O(r)$} (5,-2.1);
+      \draw[msg] (5,-2.7) -- node[above] {$(r,\ y \oplus m)$} (0,-2.7);
+      \draw[msg] (0,-3.4) -- node[above] {$m_0, m_1$} (5,-3.4);
+      \draw[msg] (5,-4.0) -- node[above] {$(r^*,\ O(r^*) \oplus m_b)$} (0,-4.0);
+      \draw[msg] (0,-4.7) -- node[above] {$b'$} (5,-4.7);
+      \draw[msg] (5,-4.7) -- node[above] {$b'$} (10,-4.7);
+    \end{tikzpicture}
+  \end{center}
+
+  For every encryption query $m$ (and for the challenge, with $m_b$), $B$ chooses a fresh $r \sample \{0,1\}^n$, asks $O(r)$ and answers $(r, O(r) \oplus m)$. At the end it outputs the bit of $\Adv$.
+  \begin{itemize}
+    \item If $O = F_k$, $\Adv$ is playing \textbf{exactly} $\mathrm{GAME}(\lambda, b)$.
+    \item If $O = R$, $\Adv$ is playing \textbf{exactly} $\mathrm{HYB}(\lambda, b)$.
+  \end{itemize}
+  The simulation is perfect, so the advantage of $B$ in distinguishing $\mathrm{REAL}$ from $\mathrm{RAND}$ equals the advantage of $\Adv$, which is non-negligible. $B$ is PPT (one oracle query and one XOR per ciphertext). This contradicts the security of the PRF.
+\end{proof}
+
+\subsubsection{Step 2: from a random function to pure noise}
+
+In $\mathrm{HYB}$ the pad of each ciphertext is $R(r_i)$. If all the labels are distinct, each $R(r_i)$ is a \textbf{new} row of the random table: a fresh uniform value, independent of everything else. Then $R(r_i) \oplus m_i$ is uniform whatever $m_i$ is (a One-Time Pad with a fresh pad), and each ciphertext is pure noise, exactly as in $\mathrm{HYB}'$. The two games differ only if two labels collide, because then two ciphertexts share the same pad (and XORing them gives $m_i \oplus m_j$). Call this event
+\[
+  \mathrm{BAD} = \big[\exists\, i \neq j : r_i = r_j\big]
+\]
+The labels are uniform and independent in both games, so $\Pr[\mathrm{BAD}]$ is the same in $\mathrm{HYB}$ and in $\mathrm{HYB}'$.
+
+\begin{framedlem}[label={lem:difference}]{Difference lemma}
+  Let $H$ and $H'$ be two games and $\mathrm{BAD}$ an event such that $\Pr[\mathrm{BAD}]$ is the same in both, and, conditioned on $\overline{\mathrm{BAD}}$, the view of the adversary has the same distribution in both. Then
+  \[
+    \big|\Pr[H = 1] - \Pr[H' = 1]\big| \leq \Pr[\mathrm{BAD}]
+  \]
+\end{framedlem}
+
+\begin{proof}
+  \leavevmode
+  \begin{enumerate}
+    \item \textbf{Split on $\mathrm{BAD}$} (law of total probability), in both games:
+    \[
+      \Pr[H = 1] = \Pr[H = 1 \wedge \mathrm{BAD}] + \Pr[H = 1 \wedge \overline{\mathrm{BAD}}]
+    \]
+    and the same for $H'$.
+    \item \textbf{Regroup and use the triangle inequality:}
+    \[
+      \begin{aligned}
+        \big|\Pr[H = 1] - \Pr[H' = 1]\big| &\leq
+        \underbrace{\big|\Pr[H = 1 \wedge \mathrm{BAD}] - \Pr[H' = 1 \wedge \mathrm{BAD}]\big|}_{|A|} \\
+        &\quad + \underbrace{\big|\Pr[H = 1 \wedge \overline{\mathrm{BAD}}] - \Pr[H' = 1 \wedge \overline{\mathrm{BAD}}]\big|}_{|B|}
+      \end{aligned}
+    \]
+    \item \textbf{The part without $\mathrm{BAD}$ vanishes.} With conditional probabilities,
+    \[
+      B = \Pr[\overline{\mathrm{BAD}}] \cdot \Big(\Pr[H = 1 \mid \overline{\mathrm{BAD}}] - \Pr[H' = 1 \mid \overline{\mathrm{BAD}}]\Big) = 0
+    \]
+    because, conditioned on $\overline{\mathrm{BAD}}$, the adversary sees the same distribution in both games, and an algorithm that receives the same distribution outputs $1$ with the same probability.
+    \item \textbf{The part with $\mathrm{BAD}$ is at most $\Pr[\mathrm{BAD}]$.} We know nothing about the adversary when $\mathrm{BAD}$ happens, but a difference of two probabilities is at most $1$:
+    \[
+      |A| = \Pr[\mathrm{BAD}] \cdot \Big|\Pr[H = 1 \mid \mathrm{BAD}] - \Pr[H' = 1 \mid \mathrm{BAD}]\Big| \leq \Pr[\mathrm{BAD}] \qedhere
+    \]
+  \end{enumerate}
+\end{proof}
+
+In words: if two games are identical until a bad event happens, their distance is at most the probability of the bad event.
+
+\begin{framedlem}[label={lem:hyb-hybprime}]{}
+  For $b \in \{0,1\}$: $\big|\Pr[\mathrm{HYB}(\lambda, b) = 1] - \Pr[\mathrm{HYB}'(\lambda) = 1]\big| \leq \dfrac{q^2}{2} \cdot 2^{-n}$, which is negligible.
+\end{framedlem}
+
+\begin{proof}
+  By the difference lemma it is enough to bound $\Pr[\mathrm{BAD}]$. The labels are $q$ independent uniform strings of $n$ bits. By the union bound over all pairs:
+  \[
+    \Pr[\mathrm{BAD}] = \Pr\big[\exists\, i \neq j : r_i = r_j\big]
+    \leq \sum_{i \neq j} \Pr[r_i = r_j]
+    = \binom{q}{2} \cdot \Col(\Uni{n})
+    = \binom{q}{2} \cdot 2^{-n}
+    \leq \frac{q^2}{2} \cdot 2^{-n}
+  \]
+  where $\Pr[r_i = r_j] = \Col(\Uni{n}) = 2^{-n}$: fixed $r_i$, the probability that $r_j$ is exactly the same string is one over $2^n$. Since $q = \poly(\lambda)$, $q^2$ is a polynomial and $2^{-n}$ is negligible, so the product is negligible. The bound holds even for unbounded adversaries: the two games are \textbf{statistically} close.
+\end{proof}
+
+\begin{framedobs}{It is the birthday paradox}
+  With $23$ people there is already a $50\%$ chance that two share a birthday, because the \textbf{pairs} are many ($\binom{23}{2} = 253$). In the same way, collisions among the labels become likely when $q \approx 2^{n/2}$. With $n = 128$ that is about $2^{64}$ ciphertexts: in practice, this is the number of encryptions after which a key should be refreshed.
+\end{framedobs}
+
+\subsubsection{Step 3: putting the hops together}
+
+\begin{proof}[Proof of \Cref{thm:prf-cpa}]
+  By the triangle inequality, with \Cref{lem:game-hyb} and \Cref{lem:hyb-hybprime}:
+  \[
+    \begin{aligned}
+      \big|\Pr[\mathrm{GAME}(\lambda, 0) = 1] - \Pr[\mathrm{GAME}(\lambda, 1) = 1]\big|
+      &\leq \big|\Pr[\mathrm{GAME}(\lambda, 0) = 1] - \Pr[\mathrm{HYB}(\lambda, 0) = 1]\big| \\
+      &\quad + \big|\Pr[\mathrm{HYB}(\lambda, 0) = 1] - \Pr[\mathrm{HYB}'(\lambda) = 1]\big| \\
+      &\quad + \big|\Pr[\mathrm{HYB}'(\lambda) = 1] - \Pr[\mathrm{HYB}(\lambda, 1) = 1]\big| \\
+      &\quad + \big|\Pr[\mathrm{HYB}(\lambda, 1) = 1] - \Pr[\mathrm{GAME}(\lambda, 1) = 1]\big| 
+    \end{aligned}
+  \]
+  The first and the last terms are negligible by \Cref{lem:game-hyb}, the two middle terms by \Cref{lem:hyb-hybprime}. A sum of four negligible functions is negligible, so the scheme is CPA-secure.
+\end{proof}
+
+\begin{framedobs}{The structure of the proof}
+  \begin{itemize}
+    \item \textbf{Hop 1 (computational)} $\to$ replace the PRF by a truly random function; justified by the PRF assumption through a perfect reduction.
+    \item \textbf{Hop 2 (statistical)} $\to$ replace every ciphertext by noise; no assumption at all, only the probability that two random labels collide.
+    \item \textbf{The middle game does not depend on $b$} $\to$ it connects the game with $b = 0$ to the game with $b = 1$.
+  \end{itemize}
+\end{framedobs}

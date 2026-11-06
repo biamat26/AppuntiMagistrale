@@ -1,0 +1,72 @@
+% ============================================================
+%  Security against chosen-plaintext attacks
+% ============================================================
+
+\section{Security against chosen-plaintext attacks}
+
+\subsection{The threat model}
+
+In practice Alice and Bob agree on \textbf{one} key and use it for the whole conversation. Moreover, the adversary can often \textbf{make Alice encrypt messages of its choice}:
+\begin{itemize}
+  \item \textbf{e-mail} $\to$ Eve sends an e-mail to Alice, and Alice's server stores or forwards it encrypted with Alice's key;
+  \item \textbf{web} $\to$ a malicious page makes the victim's browser send requests chosen by the attacker, which leave encrypted with the victim's key (attacks on TLS such as BEAST relied on this);
+  \item \textbf{history} $\to$ during the Second World War, the British laid mines in chosen places, knowing that German reports would encrypt those place names with Enigma.
+\end{itemize}
+This is a \textbf{chosen-plaintext attack} (CPA). The adversary chooses the \textbf{messages}, never the key nor the randomness of the encryption, and sees only the ciphertexts.
+
+As usual, giving the adversary more power gives a stronger guarantee: a scheme that resists an adversary who can encrypt whatever it wants also resists one who cannot.
+
+\subsection{The definition}
+
+\begin{frameddefn}[label={def:cpa-game}]{The CPA game $\mathrm{GAME}^{\text{cpa}}_{\Pi,\Adv}(\lambda, b)$}
+  Let $b \in \{0,1\}$ be a fixed bit. The adversary $\Adv$ plays against a challenger $C$:
+  \begin{enumerate}
+    \item $C$ chooses a key $k \sample \Kspace$, \textbf{once};
+    \item \textbf{encryption queries:} $\Adv$ sends messages $m$ of its choice and receives $\Enc(k, m)$, always with the \textbf{same} key $k$;
+    \item \textbf{challenge:} $\Adv$ sends two messages $m_0, m_1$ of the same length and receives $c^* \leftarrow \Enc(k, m_b)$;
+    \item $\Adv$ may ask more encryption queries, and finally outputs a bit $b'$, which is the output of the game.
+  \end{enumerate}
+  $\Adv$ is PPT, so it asks at most a polynomial number of queries.
+\end{frameddefn}
+
+\begin{center}
+  \begin{tikzpicture}[x=1cm, y=1cm]
+    \node (A) at (0,0) {$\Adv$};
+    \node (C) at (7,0) {$C$};
+    \node[lbl, anchor=west] at (7.3,-0.5) {$k \sample \Kspace$};
+    \draw[msg] (0,-1.0) -- node[above] {$m$} (7,-1.0);
+    \draw[msg] (7,-1.6) -- node[above] {$\Enc(k, m)$} (0,-1.6);
+    \node[lbl] at (3.5,-2.0) {$\vdots$ \ (polynomially many queries)};
+    \draw[msg] (0,-2.7) -- node[above] {$m_0, m_1$} (7,-2.7);
+    \draw[msg] (7,-3.3) -- node[above] {$c^* \leftarrow \Enc(k, m_b)$} (0,-3.3);
+    \node[lbl] at (3.5,-3.7) {$\vdots$ \ (more queries)};
+    \draw[msg] (0,-4.4) -- node[above] {$b'$} (7,-4.4);
+  \end{tikzpicture}
+\end{center}
+
+\begin{frameddefn}[label={def:cpa-security}]{CPA security}
+  A symmetric-key encryption scheme $\Pi = (\Enc, \Dec)$ is \textbf{CPA-secure} if
+  \[
+    \mathrm{GAME}^{\text{cpa}}_{\Pi,\Adv}(\lambda, 0) \cind \mathrm{GAME}^{\text{cpa}}_{\Pi,\Adv}(\lambda, 1)
+  \]
+  that is, for every PPT adversary $\Adv$:
+  \[
+    \Big|\Pr\big[\mathrm{GAME}^{\text{cpa}}_{\Pi,\Adv}(\lambda, 0) = 1\big] - \Pr\big[\mathrm{GAME}^{\text{cpa}}_{\Pi,\Adv}(\lambda, 1) = 1\big]\Big| \leq \negl(\lambda)
+  \]
+\end{frameddefn}
+
+It is the one-time game of \Cref{def:one-time-security} with one difference: the adversary has access to an \textbf{encryption oracle} under the same key, before and after the challenge.
+
+\subsection{CPA security requires randomized encryption}
+
+\begin{framedobs}[label={obs:deterministic-cpa}]{No deterministic scheme is CPA-secure}
+  If $\Enc$ is deterministic, the same message under the same key always gives the same ciphertext. Then the adversary:
+  \begin{enumerate}
+    \item asks the encryption of $m_0$ and receives $c_0 = \Enc(k, m_0)$;
+    \item sends $m_0, m_1$ (with $m_0 \neq m_1$) as challenge and receives $c^*$;
+    \item outputs $b' = 0$ if $c^* = c_0$, and $b' = 1$ otherwise.
+  \end{enumerate}
+  It always wins: its advantage is $1$. So a CPA-secure scheme must be \textbf{randomized}: it needs \textbf{fresh randomness at every encryption}, so that the same message has many possible ciphertexts.
+\end{framedobs}
+
+In particular the scheme $G(k) \oplus m$ of \Cref{def:prg-otp} is not CPA-secure. We need a new tool.
