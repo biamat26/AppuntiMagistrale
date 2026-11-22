@@ -1,0 +1,271 @@
+\chapter{Lezione 11 -- Cifratura autenticata e sicurezza CCA}
+
+\emph{Segue gli appunti del prof. Le parti aggiunte per capire meglio sono segnate ``non negli appunti del prof''. Usa i concetti della Lezione 7 (CPA, lo schema \((r, F_k(r) \oplus m)\)) e della Lezione 10 (MAC, UF-CMA).}
+
+\section{Segretezza e autenticità insieme}
+
+\begin{inbreve}
+Finora segretezza (cifratura) e autenticità (MAC) erano due obiettivi \textbf{separati}. La \textbf{cifratura autenticata} li vuole \textbf{tutti e due insieme}: uno schema che nasconde il messaggio e garantisce che nessuno possa modificarlo. È quello che serve per un \textbf{canale sicuro}, come TLS 1.3 o una VPN.
+\end{inbreve}
+
+Il prof: fino a oggi, segretezza e autenticità del messaggio erano obiettivi separati. Ora li vogliamo \textbf{entrambi contemporaneamente}. Questo costruisce un \textbf{canale sicuro} (\emph{secure channel}), usato ovunque: per esempio TLS 1.3 o le VPN.
+
+La prima cosa che serve è una \textbf{definizione}! Corrisponde a uno SKE che \textbf{nasconde} il messaggio ma garantisce anche che \textbf{nessuno possa manometterlo} (\emph{tamper with}).
+
+\subsection{Tutto quello che abbiamo visto fallisce: la malleabilità}
+
+\textbf{Esempio (del prof).} Lo schema CPA-sicuro della Lezione 7:
+\[
+c = (c_1, c_2) = \big(r,\ F_k(r) \oplus m\big)
+\]
+Eve prende il cifrato e cambia la seconda parte:
+\[
+\tilde{c}_2 = c_2 \oplus 0^{n-1}1 = F_k(r) \oplus \big(m \oplus 0^{n-1}1\big)
+\]
+
+\begin{nota}
+\textbf{Cosa succede} \emph{(non negli appunti del prof)}. \(0^{n-1}1\) è la stringa con \(n-1\) zeri e un 1 in fondo. Farne lo XOR vuol dire \textbf{ribaltare l'ultimo bit}. Siccome \(c_2 = F_k(r) \oplus m\), ribaltare l'ultimo bit di \(c_2\) ribalta l'ultimo bit di \(m\). Quindi \((r, \tilde{c}_2)\) è un cifrato \textbf{valido} del messaggio \(m\) con l'ultimo bit ribaltato. Eve non ha imparato niente su \(m\) (la segretezza regge), ma ha \textbf{modificato} il messaggio senza la chiave, e Bob non se ne accorge.
+
+\textbf{Esempio}: se \(m\) è un bonifico ``paga 100'' e Eve sa dove sta la cifra, può trasformarlo in ``paga 900'' senza sapere niente della chiave.
+\end{nota}
+
+È un esempio di \textbf{attacco di malleabilità} (del prof): cambiando il cifrato \(c\) si ottiene un cifrato \(\tilde{c}\) di un messaggio \(\tilde{m}\) \textbf{legato a \(m\)} in modo non banale.
+
+\textbf{Non malleabile}: attacchi come quello sopra sono impossibili, in senso generale.
+
+\textbf{Applicazioni nel mondo reale} (del prof):
+\begin{itemize}
+  \item \textbf{Aste digitali.} \emph{(Esempio non negli appunti del prof.)} Se le offerte sono cifrate con uno schema malleabile, un concorrente prende il cifrato dell'offerta di un altro e lo trasforma nel cifrato di un'offerta ``un po' più alta'', senza sapere quanto vale.
+  \item \textbf{L'attacco di Bleichenbacher contro TLS}: sfrutta la malleabilità di RSA (lo si vedrà in una lezione successiva).
+\end{itemize}
+
+\section{Sicurezza CCA}
+
+\begin{inbreve}
+\textbf{CCA} (\emph{Chosen Ciphertext Attack}) è come CPA, ma l'avversario può anche farsi \textbf{decifrare} cifrati a sua scelta, tutti tranne quello della sfida. Uno schema malleabile non è CCA-sicuro: Eve modifica un po' il cifrato della sfida, se lo fa decifrare, e dal risultato capisce il messaggio originale.
+\end{inbreve}
+
+\textbf{Definizione (del prof).} Uguale alla sicurezza CPA (Lezione 7), ma con un gioco diverso, \(\text{GAME}^{\text{cca}}_{\Pi, A}(\lambda, b)\):
+
+\begin{verbatim}
+A                                        C
+                                         k ← K
+  ┌──────────────── m ─────────────────→      (domande di CIFRATURA)
+  └←──────────── c ← Enc(k, m) ──────────
+  ┌──────────────── c~ ────────────────→      (domande di DECIFRATURA)
+  └←──────────── m~ = Dec(k, c~) ────────
+  ───────────────── m0*, m1* ──────────→
+  ←────────────── c* ← Enc(k, m_b*) ─────     (la sfida)
+  ┌──────────────── m ─────────────────→      (altre domande di cifratura)
+  └←──────────── c ← Enc(k, m) ──────────
+  ┌──────────────── c~ ────────────────→      (altre domande di decifratura,
+  └←──────────── m~ = Dec(k, c~) ────────      con c~ ≠ c* !)
+  ──────────────────── b' ─────────────→
+\end{verbatim}
+
+(\(\tilde{c}\) e \(\tilde{m}\) si leggono ``c tilde'' e ``m tilde''.) Come al solito, \(\Pi\) è \textbf{CCA-sicuro} se \(\text{GAME}^{\text{cca}}(\lambda, 0) \approx_c \text{GAME}^{\text{cca}}(\lambda, 1)\).
+
+\begin{nota}
+\emph{(Non negli appunti del prof.)}
+\begin{itemize}
+  \item Rispetto a CPA c'è \textbf{una sola} cosa in più: le \textbf{domande di decifratura}, prima e dopo la sfida.
+  \item Dopo la sfida \(A\) può chiedere di decifrare tutto \textbf{tranne} \(c^*\) stesso: altrimenti vincerebbe sempre in modo banale.
+  \item Modella un attaccante che riesce a far decifrare a Bob cifrati manipolati e a vedere (anche solo in parte) cosa ne esce, per esempio dai messaggi di errore di un server. È esattamente quello che fa l'attacco di Bleichenbacher.
+\end{itemize}
+\end{nota}
+
+\subsection{Esercizio (del prof)}
+
+Lo SKE visto sopra (\(c_1 = r\), \(c_2 = F_k(r) \oplus m\)) \textbf{non} è CCA-sicuro.
+
+\textbf{Soluzione (del prof).} Dalla sfida \(c^* = (c_1^*, c_2^*)\), si chiede di decifrare
+\[
+\tilde{c} = \big(c_1^*,\ c_2^* \oplus 0^{n-1}1\big)
+\]
+e si riceve
+\[
+\tilde{m} = m_b^* \oplus 0^{n-1}1
+\]
+
+\begin{nota}
+\textbf{Come si conclude} \emph{(non negli appunti del prof)}.
+\begin{itemize}
+  \item \(\tilde{c} \ne c^*\) (differisce nell'ultimo bit), quindi la domanda di decifratura è \textbf{permessa}.
+  \item \(\tilde{c}\) è un cifrato valido di \(m_b^*\) con l'ultimo bit ribaltato (la malleabilità di prima), quindi la risposta è \(\tilde{m} = m_b^* \oplus 0^{n-1}1\).
+  \item \(A\) ribalta di nuovo l'ultimo bit: \(\tilde{m} \oplus 0^{n-1}1 = m_b^*\). Ora sa quale messaggio è stato cifrato e risponde \(b'\) giusto \textbf{sempre}. Vantaggio 1.
+\end{itemize}
+\textbf{Morale}: malleabile \(\Rightarrow\) non CCA-sicuro.
+\end{nota}
+
+\section{Due proprietà: CPA e autenticità}
+
+\begin{inbreve}
+Per avere CCA il prof chiede due proprietà più semplici: \textbf{CPA} (segretezza) e \textbf{autenticità}: nessun avversario, anche facendosi cifrare quello che vuole, riesce a produrre un cifrato \textbf{nuovo} che si decifra correttamente. In pratica: gli unici cifrati validi sono quelli fatti da chi ha la chiave.
+\end{inbreve}
+
+Vedremo una costruzione basata su 2 proprietà:
+\begin{enumerate}
+  \item sicurezza \textbf{CPA};
+  \item \textbf{AUTENTICITÀ} (una proprietà nuova).
+\end{enumerate}
+
+Sia
+\[
+\text{Dec} : \mathcal{K} \times \mathcal{C} \to \mathcal{M} \cup \{\bot\}
+\]
+dove \(\bot\) significa ``\textbf{errore di decifratura}''.
+
+\begin{nota}
+\emph{(Non negli appunti del prof.)} Finora Dec restituiva sempre un messaggio. Ora può anche \textbf{rifiutare} un cifrato, rispondendo \(\bot\) (si legge ``bottom''): ``questo cifrato non l'ha fatto chi ha la chiave''. È il modo in cui Bob si accorge di una manomissione.
+\end{nota}
+
+\subsection{Il gioco \texorpdfstring{\(\text{GAME}^{\text{auth}}_{\Pi, A}(\lambda)\)}{GAME auth} (del prof)}
+
+\begin{verbatim}
+A                                    C
+                                     k ← K
+  ┌──────────────── m ─────────────→
+  └←──────────────── c ──────────────   c ← Enc(k, m)
+  ─────────────────── c* ──────────→
+                                     A VINCE se:
+                                      - c* ∉ {c}
+                                      - Dec(k, c*) ≠ ⊥
+\end{verbatim}
+
+\begin{enumerate}
+  \item \(A\) si fa cifrare tutti i messaggi che vuole.
+  \item Alla fine consegna un cifrato \(c^*\).
+  \item \(A\) vince se \(c^*\) è \textbf{nuovo} (non è uno dei cifrati ricevuti) e \textbf{valido} (non viene rifiutato).
+\end{enumerate}
+
+\(\Pi\) ha \textbf{autenticità} se \(\Pr[\text{GAME}^{\text{auth}}_{\Pi, A}(\lambda) = 1] \le \text{negl}(\lambda)\) per ogni PPT \(A\).
+
+\begin{nota}
+\emph{(Non negli appunti del prof.)} È lo stesso spirito di UF-CMA (Lezione 10), ma sui \textbf{cifrati}: ``falsificare'' qui vuol dire produrre un cifrato nuovo che Bob accetta. In letteratura si chiama anche \textbf{integrità dei cifrati} (INT-CTXT). Lo schema \((r, F_k(r) \oplus m)\) non ce l'ha: \(\tilde{c}\) dell'attacco di malleabilità è nuovo e valido. Anzi, lì Dec non rifiuta \textbf{mai} niente, quindi qualunque stringa nuova vince.
+\end{nota}
+
+\subsection{Teorema: CPA + AUTH \texorpdfstring{\(\Rightarrow\)}{=>} CCA (del prof)}
+
+\textbf{Intuizione (del prof).} Siccome vale AUTH, le domande di decifratura sono \textbf{inutili}! Quindi possiamo ridurre CPA a CCA.
+
+\emph{(Perché inutili, non negli appunti del prof.)} Una domanda di decifratura può essere di due tipi:
+\begin{itemize}
+  \item un cifrato \textbf{vecchio}, cioè ricevuto da una domanda di cifratura: \(A\) conosce già il messaggio, perché l'ha scelto lui;
+  \item un cifrato \textbf{nuovo}: per AUTH viene rifiutato (\(\bot\)) tranne con probabilità trascurabile.
+\end{itemize}
+In entrambi i casi \(A\) non impara niente che non sapesse già.
+
+\textbf{Sketch della riduzione (del prof).}
+
+\begin{verbatim}
+A_cca                          B_cpa                       C_cpa
+  ┌──────── m ────────→
+  │                            ┌──────── m ──────────→
+  │                            └←─────── c ───────────
+  └←─────── c ────────
+  ┌──────── c~ ───────→
+  └←── ⊥, oppure m se c~ = un c "vecchio" ──
+  ──────── m0*, m1* ──→
+                               ──────── m0*, m1* ───→
+                               ←────────── c* ────────
+  ←──────── c* ───────
+              ...
+\end{verbatim}
+
+\begin{itemize}
+  \item \(B\) gioca CPA, quindi ha solo l'oracolo di \textbf{cifratura}: le domande di cifratura di \(A\) le inoltra.
+  \item Le domande di decifratura \(\tilde{c}\) le gestisce \textbf{da solo}, senza chiave: se \(\tilde{c}\) è un cifrato ``vecchio'' (ricevuto da una domanda di cifratura) risponde il messaggio corrispondente, che conosce; altrimenti risponde \(\bot\).
+  \item La sfida la inoltra, e alla fine inoltra \(b'\).
+\end{itemize}
+
+Sia \textbf{BAD} l'evento: \(\exists\, \tilde{c}_i\) (una domanda di decifratura) che è \textbf{FRESCO} e \textbf{VALIDO}. È l'unico caso in cui \(B\) risponde male (\(\bot\) invece del messaggio vero).
+\[
+\Pr[A \text{ vince}] \ \le\ \underbrace{\Pr[A \text{ vince} \wedge \text{BAD}]}_{\le\ \varepsilon_{\text{auth}}} \ +\ \underbrace{\Pr[A \text{ vince} \wedge \overline{\text{BAD}}]}_{\le\ \varepsilon_{\text{cpa}}} \qquad \blacksquare
+\]
+
+\begin{nota}
+\textbf{I passaggi} \emph{(non negli appunti del prof)}.
+\begin{itemize}
+  \item \(\wedge\) vuol dire ``e'', \(\overline{\text{BAD}}\) vuol dire ``BAD non succede''. La disuguaglianza spezza la vittoria di \(A\) in due casi che coprono tutto: o succede BAD o no.
+  \item \textbf{Primo termine}: \(\Pr[A \text{ vince} \wedge \text{BAD}] \le \Pr[\text{BAD}]\). Se BAD succede, \(A\) ha prodotto un cifrato nuovo e valido: ha vinto il gioco AUTH. Quindi questa probabilità è al massimo \(\varepsilon_{\text{auth}}\), trascurabile.
+  \item \textbf{Secondo termine}: se BAD non succede, \(B\) ha risposto \textbf{esattamente} come il vero challenger CCA (i cifrati vecchi danno il messaggio, quelli nuovi sono davvero invalidi). Quindi \(A\) vince come se giocasse contro \(B\), e \(B\) vince il gioco CPA quando vince \(A\): il vantaggio è al massimo \(\varepsilon_{\text{cpa}}\), trascurabile.
+  \item Il prof scrive tutto come ``probabilità di vincere''; nel gioco ``indovina \(b\)'' andrebbe letto come \(\tfrac12 + \varepsilon_{\text{auth}} + \varepsilon_{\text{cpa}}\), cioè vantaggio trascurabile.
+\end{itemize}
+\end{nota}
+
+\section{Combinare cifratura e MAC}
+
+\begin{inbreve}
+Per avere CPA e AUTH insieme si combinano uno SKE CPA-sicuro e un MAC, con due chiavi \(k_1, k_2\) indipendenti. Ci sono tre modi: fare il tag del \textbf{messaggio} e mandarlo accanto (Encrypt-and-Authenticate), fare il tag del messaggio e \textbf{cifrarlo insieme} (Authenticate-then-Encrypt), oppure fare il tag del \textbf{cifrato} (Encrypt-then-MAC). Solo l'ultimo è sempre sicuro.
+\end{inbreve}
+
+Come si ottengono 1) + 2)? Si combina uno SKE con un MAC. Ci sono molti modi di farlo (del prof).
+
+\subsection{A) Encrypt-and-Authenticate}
+
+\[
+c \leftarrow \text{Enc}(k_1, m), \qquad \tau = \text{Tag}(k_2, m), \qquad c' = (c, \tau)
+\]
+
+\textbf{È CCA-sicuro o no?} \textbf{Non sempre} (del prof): si consideri un Tag che restituisce \(m[0] \,\|\, \tau'\), dove \(\tau'\) è un tag di \(m\).
+
+\begin{nota}
+\emph{(Spiegazione non negli appunti del prof.)} \(m[0]\) è il \textbf{primo bit} del messaggio. Questo Tag è ancora UF-CMA (falsificarlo richiede comunque \(\tau'\)), ma il MAC \textbf{non deve nascondere} il messaggio, e infatti qui lo mostra in parte. Siccome \(\tau\) viaggia \textbf{in chiaro} accanto a \(c\), chi vede \(c'\) legge il primo bit di \(m\): lo schema non è nemmeno CPA-sicuro (si scelgono \(m_0^*, m_1^*\) che differiscono nel primo bit).
+
+C'è anche un problema più generale: un MAC è \textbf{deterministico}, quindi due messaggi uguali hanno lo stesso tag, e chi vede i cifrati capisce quando un messaggio si ripete.
+\end{nota}
+
+\subsection{B) Authenticate-then-Encrypt}
+
+\[
+\tau = \text{Tag}(k_2, m), \qquad c \leftarrow \text{Enc}(k_1,\ m \,\|\, \tau)
+\]
+
+\textbf{Sicuro o no? NO} (del prof). Nonostante sia stato usato in \textbf{TLS 1.2}.
+
+\textbf{Esercizio (del prof): romperlo!}
+
+\begin{approfondimento}{Soluzione proposta (non negli appunti del prof)}
+Basta trovare uno SKE CPA-sicuro con cui la combinazione si rompe. Partiamo da uno SKE CPA-sicuro \((\text{Enc}, \text{Dec})\) e definiamo
+\[
+\text{Enc}'(k, x) = \big(\text{Enc}(k, x),\ 0\big), \qquad \text{Dec}'\big(k, (c, \beta)\big) = \text{Dec}(k, c)
+\]
+cioè aggiungiamo in fondo un bit \(\beta\) che Dec' \textbf{ignora} (come l'esempio \(0 \,\|\, \text{Tag}\) della Lezione 10). Enc' è ancora CPA-sicuro: il bit in più è sempre 0 e non dice niente.
+
+Ora Authenticate-then-Encrypt con Enc':
+\begin{itemize}
+  \item dalla sfida \(c^* = (c, 0)\), l'avversario chiede di decifrare \(\tilde{c} = (c, 1)\);
+  \item \(\tilde{c} \ne c^*\), quindi la domanda è permessa;
+  \item Dec' ignora l'ultimo bit e trova \(m_b^* \,\|\, \tau\) con il tag giusto, quindi non rifiuta e risponde \(m_b^*\). L'avversario vince sempre.
+\end{itemize}
+Il problema: il tag protegge il \textbf{messaggio}, non il \textbf{cifrato}. Chi modifica il cifrato in un modo che non cambia il messaggio non viene scoperto. In TLS 1.2 la versione reale di questo problema sono gli attacchi di tipo \textbf{padding oracle} (es.\ Lucky13, POODLE): il server risponde con errori diversi a seconda di \textbf{dove} fallisce la decifratura, e questo basta a recuperare il messaggio.
+\end{approfondimento}
+
+\subsection{C) Encrypt-then-MAC: il modo corretto}
+
+``Ecco il modo corretto'' (del prof):
+\[
+c \leftarrow \text{Enc}(k_1, m), \qquad \tau = \text{Tag}(k_2, c), \qquad c' = (c, \tau)
+\]
+
+\begin{nota}
+\textbf{Perché funziona} \emph{(non negli appunti del prof)}.
+\begin{itemize}
+  \item \textbf{Decifrare}: Bob ricalcola \(\text{Tag}(k_2, c)\); se non coincide con \(\tau\) risponde \(\bot\), altrimenti decifra \(c\) con \(k_1\).
+  \item \textbf{CPA}: \(\tau\) dipende solo da \(c\), che è già un cifrato CPA-sicuro; e \(k_2\) è indipendente da \(k_1\). Quindi \(\tau\) non aggiunge informazioni su \(m\).
+  \item \textbf{AUTH}: un cifrato nuovo e valido \((c, \tau)\) è una coppia nuova con un tag giusto: una falsificazione del MAC. Serve che il MAC sia \textbf{fortemente} UF-CMA (Lezione 10), perché il nuovo cifrato potrebbe avere lo stesso \(c\) e un \(\tau\) diverso; con tag unici (\(F_k\) di una PRF) va bene.
+  \item Per il teorema, CPA + AUTH \(\Rightarrow\) \textbf{CCA}.
+\end{itemize}
+Il tag protegge il \textbf{cifrato}: qualunque modifica, anche di un solo bit, viene scoperta \textbf{prima} di decifrare. È lo schema usato in pratica (per esempio, l'idea dietro AES-GCM in TLS 1.3).
+\end{nota}
+
+\section{Riepilogo}
+
+\begin{itemize}
+  \item \textbf{Cifratura autenticata}: segretezza e autenticità insieme, per un \textbf{canale sicuro} (TLS 1.3, VPN).
+  \item \textbf{Malleabilità}: con \((r, F_k(r) \oplus m)\), ribaltare un bit di \(c_2\) ribalta lo stesso bit di \(m\). Applicazioni: aste digitali, Bleichenbacher contro TLS.
+  \item \textbf{CCA}: CPA più domande di \textbf{decifratura} (tutte tranne \(c^*\)). Malleabile \(\Rightarrow\) non CCA: si decifra \(c^*\) con un bit ribaltato e si ribalta di nuovo.
+  \item \(\text{Dec}\) può rispondere \(\bot\). \textbf{AUTH}: anche con domande di cifratura, nessun PPT produce un cifrato \textbf{nuovo e valido}.
+  \item \textbf{Teorema}: CPA + AUTH \(\Rightarrow\) CCA. \(B_{\text{cpa}}\) risponde alle domande di decifratura da solo (messaggio se il cifrato è vecchio, \(\bot\) se è nuovo); sbaglia solo se BAD (cifrato fresco e valido): \(\Pr[A \text{ vince}] \le \varepsilon_{\text{auth}} + \varepsilon_{\text{cpa}}\).
+  \item \textbf{Combinare SKE e MAC}: A) Encrypt-and-Authenticate (\(\text{Tag}(k_2, m)\) in chiaro: non sempre sicuro); B) Authenticate-then-Encrypt (\(\text{Enc}(k_1, m \,\|\, \tau)\): \textbf{rotto}, eppure usato in TLS 1.2); C) \textbf{Encrypt-then-MAC} (\(\tau = \text{Tag}(k_2, c)\)): il modo corretto.
+\end{itemize}
