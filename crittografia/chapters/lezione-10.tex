@@ -1,0 +1,443 @@
+\chapter{Lezione 10 -- MAC computazionali}
+
+\emph{Segue gli appunti del prof. Le parti aggiunte per capire meglio sono segnate ``non negli appunti del prof''. Usa i concetti delle Lezioni 2--3 (MAC statistici, funzioni hash), della Lezione 7 (PRF, CPA, evento BAD) e della Lezione 9 (modi operativi, CBC).}
+
+\section{MAC nel setting computazionale}
+
+\begin{inbreve}
+Un MAC serve ad \textbf{autenticare}: Alice attacca al messaggio un \textbf{tag} che solo chi ha la chiave sa calcolare, e Bob lo ricontrolla. Nelle Lezioni 2--3 lo abbiamo visto con sicurezza \textbf{statistica}, dove la chiave doveva crescere con il numero di messaggi. Oggi lo stesso problema nel setting \textbf{computazionale}: con una PRF si ottiene un MAC con una chiave corta per quanti messaggi si vuole.
+\end{inbreve}
+
+Il prof: ``abbiamo già studiato i MAC nel setting statistico. Oggi: il setting computazionale''.
+
+\begin{verbatim}
+        k
+        ↓
+m ──→ [Tag] ──→ τ ∈ T          (Tag è DETERMINISTICA)
+\end{verbatim}
+
+\begin{nota}
+\textbf{Ripasso} \emph{(non negli appunti del prof)}: Alice manda \((m, \tau)\) \textbf{in chiaro}, con \(\tau = \text{Tag}(k, m)\). Bob, che ha la stessa chiave, ricalcola \(\text{Tag}(k, m)\) e controlla che sia uguale a \(\tau\). Tag è deterministica proprio perché Bob deve poter ricalcolare lo \textbf{stesso} tag. Il MAC non nasconde il messaggio: garantisce che venga da chi ha la chiave e che non sia stato modificato.
+\end{nota}
+
+\subsection{Definizione: UF-CMA (del prof)}
+
+\begin{inbreve}
+Un MAC è \textbf{UF-CMA} se nessun avversario efficiente, anche dopo essersi fatto calcolare il tag di tutti i messaggi che vuole, riesce a produrre un tag valido per un messaggio \textbf{nuovo}, se non con probabilità trascurabile.
+\end{inbreve}
+
+\textbf{I nomi} \emph{(non negli appunti del prof)}: \textbf{UF} = \emph{UnForgeability}, impossibilità di falsificare; \textbf{CMA} = \emph{Chosen Message Attack}, l'avversario sceglie i messaggi di cui farsi dare il tag. È l'analogo della CPA della Lezione 7.
+
+Diciamo che \(\Pi = \text{Tag} : \mathcal{K} \times \mathcal{M} \to \mathcal{T}\) è \textbf{UF-CMA} se per ogni PPT \(A\):
+\[
+\Pr\big[\text{GAME}^{\text{ufcma}}_{\Pi, A}(\lambda) = 1\big] \ \le\ \text{negl}(\lambda)
+\]
+dove il gioco è:
+
+\begin{verbatim}
+A                                    C
+                                     k ← K
+  ┌──────────────── m ─────────────→
+  └←────────── τ = Tag(k, m) ────────   (quante volte vuole)
+  ─────────────── (m*, τ*) ────────→
+                                     Output 1 se:
+                                      (i)  τ* = Tag(k, m*)
+                                      (ii) m* ∉ {m}
+\end{verbatim}
+
+\begin{enumerate}
+  \item Il challenger sceglie una chiave \(k\) a caso.
+  \item \(A\) chiede il tag di messaggi \(m\) a sua scelta e riceve \(\tau = \text{Tag}(k, m)\), quante volte vuole (un numero polinomiale).
+  \item Alla fine \(A\) consegna una coppia \((m^*, \tau^*)\), il suo tentativo di \textbf{falsificazione} (\emph{forgery}).
+  \item \(A\) vince (output 1) se \textbf{(i)} il tag è giusto e \textbf{(ii)} \(m^*\) \textbf{non} è uno dei messaggi già chiesti.
+\end{enumerate}
+
+\begin{nota}
+\emph{(Non negli appunti del prof.)} \(\{m\}\) è l'insieme di tutti i messaggi chiesti da \(A\) durante il gioco. La condizione (ii) serve perché ricopiare una coppia \((m, \tau)\) già ricevuta è sempre possibile e non è una falsificazione. Differenza con la Lezione 2: lì Eve vedeva \textbf{una} coppia ed era illimitata; qui ne vede \textbf{tante}, scelte da lei, ma è PPT.
+
+Attenzione: a differenza dei giochi di cifratura, qui non c'è un bit \(b\) da indovinare. \(A\) deve \textbf{produrre} qualcosa (un tag valido), quindi la sicurezza è ``probabilità di vincere trascurabile'', non ``vantaggio trascurabile'' tra due giochi.
+\end{nota}
+
+\subsection{Osservazioni (del prof)}
+
+\textbf{1) Nessuna protezione contro i replay attack.} Eve può intercettare una coppia valida \((m, \tau)\) e \textbf{rispedirla} più tardi: il tag è giusto, e Bob la accetta. La definizione non lo impedisce (per la condizione (ii) non conta come falsificazione). È l'applicazione che deve ricordarsene, per esempio con numeri di sequenza o timestamp dentro il messaggio \emph{(esempi non negli appunti del prof)}.
+
+\textbf{2) UF-CMA debole contro forte.} Si può permettere \(m^* \in \{m\}\) (un messaggio già chiesto), ma allora il tag \(\tau^*\) deve essere \textbf{fresco}: diverso da tutti i tag ricevuti per quel messaggio. Questa è la versione \textbf{forte} (\emph{strong} UF-CMA); quella del gioco sopra è la \textbf{debole} (\emph{weak}).
+
+\begin{esempio}
+\textbf{Esempio (del prof).} Consideriamo
+\[
+\text{Tag}'(k, m) = 0 \,\|\, \text{Tag}(k, m)
+\]
+con Tag deterministica, ma Bob controlla solo Tag e \textbf{scarta il primo bit}.
+
+\emph{(Spiegazione non negli appunti del prof.)} Allora \((m, 1 \,\|\, \tau)\) viene accettato da Bob quanto \((m, 0 \,\|\, \tau)\): Eve, partendo da un tag ricevuto, ne produce un altro \textbf{diverso} per lo \textbf{stesso} messaggio. Non è una falsificazione per la versione debole (il messaggio non è nuovo), ma lo è per la versione forte (il tag è fresco). Quindi Tag' è debolmente sicuro ma \textbf{non} fortemente sicuro.
+\end{esempio}
+
+\textbf{Negli schemi reali i tag sono UNICI}: per ogni messaggio c'è un solo tag che Bob accetta. Allora \textbf{debole \(\Rightarrow\) forte}.
+
+\emph{(Perché, non negli appunti del prof.)} Se il tag valido di \(m\) è uno solo e \(A\) ha già chiesto \(m\), l'unico tag accettato è quello che ha già ricevuto: non ne esiste uno ``fresco''. Quindi l'unico modo di vincere nella versione forte è con un messaggio nuovo, cioè vincere nella versione debole.
+
+\section{Un MAC da una PRF}
+
+\begin{inbreve}
+Il MAC più naturale: il tag è la PRF calcolata sul messaggio, \(\text{Tag}(k, m) = F_k(m)\). Siccome \(F_k\) sembra una tabella casuale, il tag di un messaggio mai chiesto è una riga mai vista: indovinarla è come indovinare \(n\) bit casuali.
+\end{inbreve}
+
+``Costruiamo MAC efficienti''.
+
+\textbf{Teorema (del prof).} Sia \(\mathcal{F} = \{F_k : \{0,1\}^n \to \{0,1\}^n\}\) una famiglia PRF. Allora
+\[
+\text{Tag}(k, m) = F_k(m)
+\]
+è \textbf{UF-CMA}.
+
+\textbf{Dimostrazione (del prof).} Sia \(G(\lambda) \equiv \text{GAME}^{\text{ufcma}}_{\Pi, A}(\lambda)\), e sia \(H(\lambda)\) uguale a \(G(\lambda)\) tranne che \(F_k(\cdot)\) è sostituita da \(R(\cdot)\), con \(R \leftarrow \mathcal{R}(n, n)\) (una funzione davvero casuale).
+
+\begin{itemize}
+  \item Per la sicurezza di \(\mathcal{F}\): \(G(\lambda) \approx_c H(\lambda)\).
+  \item Resta da mostrare: per ogni \(A\), \(\Pr[H(\lambda) = 1] \le \text{negl}(\lambda)\). Anche un \(A\) che chiede \textbf{tutto} \(\{0,1\}^n \setminus \{m^*\}\) indovina \(R(m^*)\) con probabilità \(\le 2^{-n}\). \(\blacksquare\)
+\end{itemize}
+
+\begin{nota}
+\textbf{I passaggi in dettaglio} \emph{(non negli appunti del prof)}.
+
+\textbf{Perché \(G \approx_c H\) basta.} Qui il gioco dà un'uscita 0/1 (vinto o perso). Se \(\Pr[G = 1]\) fosse non trascurabile e \(\Pr[H = 1]\) trascurabile, la differenza sarebbe non trascurabile, e si romperebbe la PRF con questa riduzione: \(B\) fa da challenger per \(A\), risponde a ogni domanda \(m\) chiedendo \(m\) al challenger della PRF; alla fine chiede anche \(m^*\) e controlla se la risposta è \(\tau^*\) (e se \(m^*\) è nuovo). Risponde 1 se \(A\) ha vinto. Se il challenger usa \(F_k\), \(A\) gioca \(G\); se usa \(R\), gioca \(H\).
+
+\textbf{Perché in \(H\) si vince con probabilità \(\le 2^{-n}\).} \(R\) è una tabella casuale: le righe sono indipendenti. Le domande di \(A\) rivelano solo righe \textbf{diverse} da \(m^*\) (perché \(m^*\) deve essere nuovo). Quindi \(R(m^*)\) è un valore uniforme su \(n\) bit che \(A\) non ha mai visto, e \(\tau^*\) è giusto con probabilità esattamente \(2^{-n}\). Con \(n = 128\): \(2^{-128}\).
+\end{nota}
+
+\textbf{Esercizio (del prof).} Esiste un Tag UF-CMA che \textbf{non} è una PRF. Basta prendere
+\[
+\text{Tag}(k, m) = 0 \,\|\, F_k(m)
+\]
+\emph{(Spiegazione non negli appunti del prof.)} È UF-CMA: falsificarlo vuol dire indovinare \(F_k(m^*)\) per un \(m^*\) nuovo, come prima. Ma non è una PRF: il primo bit è \textbf{sempre} 0, mentre per una funzione casuale sarebbe 0 solo metà delle volte. Quindi ``essere un buon MAC'' è una richiesta \textbf{più debole} di ``essere una PRF'': a un MAC basta che il tag sia \textbf{imprevedibile}, non che sembri casuale.
+
+\section{Messaggi lunghi}
+
+\begin{inbreve}
+Il MAC \(F_k(m)\) funziona solo per messaggi di \(n\) bit (un blocco). Per un messaggio lungo \(m = m_1, \dots, m_d\) servono altre idee. I tentativi più semplici, combinando i tag dei singoli blocchi, si rompono tutti: l'avversario rimescola, scambia o mescola pezzi di tag che ha già visto.
+\end{inbreve}
+
+\textbf{Domanda (del prof).} Come si fa il tag di un messaggio lungo, di lunghezza \(N = n \cdot d\), con \(d \in \mathbb{N}\)? Scriviamo \(m = m_1, \dots, m_d\), con ogni blocco \(m_i\) di \(n\) bit.
+
+\subsection{Tentativo 1: XOR dei blocchi}
+
+\[
+\tau = \text{Tag}\Big(k,\ \bigoplus_{i=1}^{d} m_i\Big)
+\]
+Si fa lo XOR di tutti i blocchi e poi il tag del risultato (un solo blocco).
+
+\textbf{Non sicuro (del prof).} Dato \(\tau\) per \(m = (0^n, 1^n)\), si consegna \(\tau^* = \tau\) e \(m^* = (1^n, 0^n)\).
+
+\emph{(Perché, non negli appunti del prof.)} Lo XOR non dipende dall'\textbf{ordine} dei blocchi: \(0^n \oplus 1^n = 1^n \oplus 0^n = 1^n\). Quindi i due messaggi hanno lo stesso XOR, quindi lo stesso tag. \(m^*\) è nuovo e \(\tau^*\) è valido: falsificazione. (\(0^n\) vuol dire ``\(n\) zeri'' e \(1^n\) ``\(n\) uni''.)
+
+\subsection{Tentativo 2: un tag per ogni blocco}
+
+\[
+\tau = (\tau_1, \dots, \tau_d), \qquad \tau_i = \text{Tag}(k, m_i) \quad \forall i \in [d]
+\]
+(\([d]\) indica l'insieme \(\{1, \dots, d\}\).)
+
+\textbf{Non sicuro: ``di nuovo le permutazioni!''} \emph{(L'attacco esplicito non è negli appunti del prof.)} Dato il tag \((\tau_1, \tau_2)\) di \((m_1, m_2)\), si consegna \(m^* = (m_2, m_1)\) con \(\tau^* = (\tau_2, \tau_1)\). Ogni \(\tau_i\) dipende solo dal suo blocco, non dalla sua posizione, quindi scambiando i blocchi basta scambiare i tag.
+
+\subsection{Tentativo 3: ``uccidiamo le permutazioni''}
+
+Si mette nel tag anche la \textbf{posizione} \(i\) del blocco:
+\[
+\tau_i = \text{Tag}(k,\ i \,\|\, m_i)
+\]
+Ora lo scambio non funziona più. Guarda (del prof): dati \(\tau_1, \tau_2\) per \(m_1, m_2\), consegnando \(m^* = (m_2, m_1)\) e \(\tau^* = (\tau_2, \tau_1)\) si sbaglia, perché
+\[
+\tau_2 = \text{Tag}(k,\ 2 \,\|\, m_2)
+\]
+mentre in prima posizione servirebbe \(\text{Tag}(k,\ 1 \,\|\, m_2)\).
+
+\textbf{Ancora non sicuro (del prof).} Dati
+\[
+\tau^{(1)} = (\tau_1, \tau_2) \ \text{per} \ m^{(1)} = (m_1, m_2), \qquad \tau^{(2)} = (\tau_3, \tau_4) \ \text{per} \ m^{(2)} = (m_3, m_4)
+\]
+si falsifica
+\[
+m^* = (m_1, m_4), \qquad \tau^* = (\tau_1, \tau_4)
+\]
+
+\emph{(Perché, non negli appunti del prof.)} \(\tau_1 = \text{Tag}(k, 1 \,\|\, m_1)\) è il tag giusto per ``\(m_1\) in posizione 1'', e \(\tau_4 = \text{Tag}(k, 2 \,\|\, m_4)\) per ``\(m_4\) in posizione 2''. Mescolando pezzi di \textbf{due messaggi diversi} si ottiene un messaggio nuovo con un tag valido. Il problema: ogni blocco ha il suo tag \textbf{separato}, e niente lega i blocchi allo \textbf{stesso} messaggio.
+
+\begin{nota}
+\emph{(Non negli appunti del prof.)} In pratica \(i \,\|\, m_i\) deve stare in un blocco di \(n\) bit, quindi alcuni bit vanno usati per scrivere \(i\) e i blocchi del messaggio diventano più corti. Il libro di Katz e Lindell aggiusta questo tentativo aggiungendo in ogni blocco anche un \textbf{identificatore casuale} del messaggio e la sua \textbf{lunghezza}, ma è poco efficiente. Il prof segue un'altra strada.
+\end{nota}
+
+\section{L'approccio hash-then-PRF}
+
+\begin{inbreve}
+Invece di fare il tag di ogni blocco, si \textbf{comprime} prima tutto il messaggio in un solo blocco con una funzione hash \(h_s\) (con seme \(s\) segreto), e poi si applica la PRF: \(F_k(h_s(m))\). Le collisioni dell'hash esistono (comprime!), ma devono essere difficili da trovare: basta che la famiglia sia \textbf{quasi universale}.
+\end{inbreve}
+
+``Ecco un approccio di design'' (del prof). Sia
+\[
+\mathcal{H} = \{h_s : \{0,1\}^N \to \{0,1\}^n\}
+\]
+una famiglia di funzioni hash con seme \(s\). Dato questo, si considera
+\[
+\mathcal{F}(\mathcal{H}) \equiv \{F_k(h_s(\cdot))\}_{k, s}
+\]
+cioè: prima si comprime il messaggio con \(h_s\), poi si applica \(F_k\). La chiave è la coppia \((k, s)\).
+
+\textbf{Domanda (del prof): che sicurezza serve da \(\mathcal{H}\)?} Notiamo che \(h_s\) è una funzione che \textbf{comprime} (\emph{shrinking}): da \(N = n \cdot d\) bit a \(n\) bit.
+
+\begin{verbatim}
+     {0,1}^(n·d)                      {0,1}^n
+   (tanti messaggi)                 (pochi output)
+      x ──────────────────────────→  o
+      x ──────────────────────────→  o   ← due messaggi, stesso output
+\end{verbatim}
+
+\textbf{Le collisioni} (\(m \ne m'\) con \(h_s(m) = h_s(m')\)) \textbf{esistono}, ma devono essere \textbf{difficili da trovare}!
+
+\begin{nota}
+\emph{(Non negli appunti del prof.)} Perché esistono: ci sono \(2^N\) messaggi e solo \(2^n\) output, con \(N > n\), quindi per forza tanti messaggi finiscono nello stesso output (principio dei cassetti). Perché sono un problema: se Eve trovasse \(m \ne m'\) con \(h_s(m) = h_s(m')\), allora \(F_k(h_s(m)) = F_k(h_s(m'))\): chiede il tag di \(m\) e lo usa per \(m'\). Falsificazione.
+\end{nota}
+
+\subsection{Definizione: almost universal (del prof)}
+
+\begin{inbreve}
+Una famiglia di hash è \textbf{ε-quasi universale} se, presi due messaggi diversi qualsiasi \textbf{fissati prima}, e poi scelto il seme \(s\) a caso, la probabilità che collidano è al massimo \(\varepsilon\).
+\end{inbreve}
+
+\(\mathcal{H}\) è \textbf{\(\varepsilon\)-AU} (\emph{almost universal}) se \(\forall\, x, x' \in \{0,1\}^N\) con \(x \ne x'\):
+\[
+\Pr_s\big[h_s(x) = h_s(x')\big] \ \le\ \varepsilon
+\]
+
+\(\Pr_s\) vuol dire ``probabilità sulla scelta casuale del seme \(s\)''. Il caso migliore è \textbf{perfettamente universale}: \(\varepsilon = 2^{-n}\), come se i due output fossero due stringhe casuali di \(n\) bit.
+
+\begin{nota}
+\emph{(Non negli appunti del prof.)} Confronto con la Lezione 2: lì le hash \textbf{pairwise independent} chiedevano che le coppie di output fossero \textbf{uniformi}. Qui si chiede molto meno: solo che due input diversi \textbf{collidano raramente}. Ed è una proprietà \textbf{statistica}: vale contro chiunque, purché \(x\) e \(x'\) siano scelti \textbf{senza conoscere} \(s\). Per questo nel MAC il seme \(s\) deve restare segreto.
+\end{nota}
+
+\textbf{Hash pubbliche (del prof).} Si potrebbero usare anche funzioni hash ``a chiave pubblica'', come \textbf{SHA-3}, in cui il seme è pubblico e trovare collisioni è difficile \textbf{computazionalmente}. \textbf{Osservazione}: queste non seguono dalle OWF!
+
+\emph{(Non negli appunti del prof.)} Cioè: per costruire hash resistenti alle collisioni con seme pubblico non basta l'esistenza delle OWF (Minicrypt, Lezione 4) e servono ipotesi più forti. Invece le famiglie AU che vediamo sotto si costruiscono \textbf{senza nessuna ipotesi}.
+
+\subsection{Teorema (del prof)}
+
+Assumendo che \(\mathcal{F}\) sia una PRF e \(\mathcal{H}\) sia AU, allora \(\mathcal{F}(\mathcal{H})\) è una \textbf{PRF}.
+
+\textbf{Corollario (del prof).} \(\mathcal{F}(\mathcal{H})\) è UF-CMA come MAC (per il teorema della sezione precedente).
+
+\textbf{Un'osservazione importante (del prof).} Per ora consideriamo solo \textbf{FIL} (\emph{Fixed-Input Length}): tutti i messaggi hanno la \textbf{stessa} lunghezza \(N\).
+
+\subsection{Dimostrazione (del prof)}
+
+Si considera una sequenza di giochi. In tutti \(A\) chiede valori \(x\) e riceve una risposta \(y\):
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+Gioco & Risposta a \(x\) & Cos'è \\
+\midrule
+\(H_0\) & \(y = F_k(h_s(x))\) & la costruzione vera \\
+\(H_1\) & \(y = R(h_s(x))\), \(R \leftarrow \mathcal{R}(n, n)\) & PRF sostituita da una funzione casuale \\
+\(H_2\) & \(y = R'(x)\), \(R' \leftarrow \mathcal{R}(N, n)\) & funzione casuale sui messaggi lunghi \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+(Il prof scrive \(R' \leftarrow \mathcal{R}(nd, n)\), con \(nd = N\).) Il piano: \(H_0 \approx_c H_1 \approx_s H_2\); siccome \(H_2\) è una funzione casuale, \(\mathcal{F}(\mathcal{H})\) è una PRF.
+
+\paragraph{\(H_0 \approx_c H_1\) (per la sicurezza della PRF).}
+
+\begin{verbatim}
+A (H0 vs H1)            B (contro la PRF)            C (della PRF)
+                        sceglie s
+  ┌──────── x ────────→
+  │                     ┌────── h_s(x) ──────────→
+  │                     └←──────── τ ──────────────
+  └←─────── τ ─────────
+  ─────────── b' ─────→
+                        ─────────── b' ──────────→
+\end{verbatim}
+
+\(B\) sceglie da solo il seme \(s\); per ogni domanda \(x\) di \(A\) calcola \(h_s(x)\), lo chiede al suo challenger e inoltra la risposta. \emph{(Spiegazione non negli appunti del prof.)} Se il challenger usa \(F_k\), \(A\) riceve \(F_k(h_s(x))\), cioè \(H_0\); se usa \(R\), riceve \(R(h_s(x))\), cioè \(H_1\). Riduzione perfetta.
+
+\paragraph{\(H_1 \approx_s H_2\): la parte più delicata,} purché il numero di domande sia \(q = \text{poly}(\lambda)\).
+
+\textbf{Intuizione (del prof).} Finché la funzione \(R\) viene calcolata in punti \textbf{diversi} \(h_s(x)\), \(R\) produce una sequenza di stringhe \textbf{casuali e indipendenti}, proprio come fa \(R'\). Questo suggerisce di definire \textbf{BAD} come l'evento
+\[
+\exists\, i \ne j \ \text{t.c.} \ h_s(x_i) = h_s(x_j)
+\]
+Quindi:
+\[
+\text{SD}(H_1;\ H_2) \ \le\ \Pr[\text{BAD}] \ \le\ \sum_{\substack{i, j \\ i \ne j}} \Pr\big[h_s(x_i) = h_s(x_j)\big] \ \le\ q^2 \cdot \varepsilon \qquad \big(\varepsilon \approx 2^{-n}\big) \qquad \blacksquare
+\]
+
+\begin{nota}
+\textbf{I passaggi} \emph{(non negli appunti del prof)}. \(x_1, \dots, x_q\) sono le domande (diverse) di \(A\).
+\begin{itemize}
+  \item Se BAD non succede, gli \(h_s(x_i)\) sono tutti diversi, quindi \(R\) viene letta in \(q\) righe diverse: \(q\) valori uniformi e indipendenti. In \(H_2\), \(R'\) viene letta nelle righe \(x_1, \dots, x_q\), diverse: anche lì \(q\) valori uniformi e indipendenti. I due giochi sono \textbf{identici}.
+  \item Union bound sulle coppie: le coppie sono \(\binom{q}{2} \le q^2\), e ognuna collide con probabilità \(\le \varepsilon\) perché \(\mathcal{H}\) è AU.
+\end{itemize}
+È lo stesso schema del Lemma 2 della Lezione 7 (BAD = due \(r\) uguali) e del lemma su Feistel (Lezione 9).
+\end{nota}
+
+\subsection{Attenzione a come si definisce BAD (del prof)}
+
+``Bisogna stare un po' attenti a come si definisce BAD.'' Il prof lo disegna in due modi:
+
+\begin{verbatim}
+In H1:                                  In H2:
+A ──── x ────→                          A ──── x ────→
+  ←── y = R(h_s(x)) ──  s ← {0,1}^λ       ←── y ← {0,1}^n ──
+                                         BAD: s ← {0,1}^λ  (scelto DOPO)
+BAD: ∃ i, j t.c. h_s(x_i) = h_s(x_j)     ∃ x_i, x_j t.c. h_s(x_i) = h_s(x_j)
+\end{verbatim}
+
+\begin{nota}
+\textbf{Perché serve questa attenzione} \emph{(non negli appunti del prof)}. La definizione AU vale solo per \(x, x'\) \textbf{fissati prima} di scegliere \(s\). Ma in \(H_1\) le risposte \(R(h_s(x))\) dipendono da \(s\), quindi in principio \(A\) potrebbe scegliere le domande successive \textbf{in base a} \(s\), e allora non si potrebbe applicare la definizione AU direttamente.
+
+La soluzione: si definisce BAD nel gioco \(H_2\). Lì le risposte sono \textbf{stringhe uniformi}, che non dipendono da \(s\): il seme si può immaginare scelto \textbf{alla fine}, dopo tutte le domande. Allora le domande \(x_1, \dots, x_q\) sono indipendenti da \(s\), e la definizione AU si applica a ogni coppia. Siccome \(H_1\) e \(H_2\) sono identici finché BAD non succede, la probabilità di BAD è la stessa nei due giochi, e il conto vale.
+\end{nota}
+
+\section{Costruire famiglie AU}
+
+\begin{inbreve}
+Due esempi, entrambi con l'aritmetica del campo \(GF(2^n)\) (stringhe di \(n\) bit viste come polinomi). Il primo: il seme è una lista di coefficienti \(a_1, \dots, a_d\) e l'hash è \(\sum a_i m_i\); è perfettamente universale, ma il seme è lungo quanto il messaggio. Il secondo: il seme è un solo elemento \(s\) e l'hash è il polinomio con coefficienti \(m_i\) valutato in \(s\); il seme è corto e la probabilità di collisione è al più \((d-1)/2^n\).
+\end{inbreve}
+
+``Costruiamo \(\mathcal{H}\). Due esempi'' (del prof).
+
+\subsection{Il campo \texorpdfstring{\(GF(2^n)\)}{GF(2\^{}n)}}
+
+\textbf{(Del prof.)} Data \(m_i \in \{0,1\}^n\), se ne fa un \textbf{polinomio}, per esempio
+\[
+m_i = 0101 \quad \to \quad 0 \cdot X^3 + 1 \cdot X^2 + 0 \cdot X^1 + 1 \cdot X^0
+\]
+
+\begin{nota}
+\emph{(Non negli appunti del prof.)} \(GF(2^n)\) (\emph{Galois Field}, campo di Galois) è un modo di fare \textbf{somme, prodotti e divisioni} tra stringhe di \(n\) bit, restando sempre dentro le stringhe di \(n\) bit:
+\begin{itemize}
+  \item i bit della stringa sono i coefficienti di un polinomio (0 o 1);
+  \item \textbf{somma} = somma dei polinomi con coefficienti mod 2 = \textbf{XOR} bit a bit (quindi \(-a = a\): sottrarre è come sommare);
+  \item \textbf{prodotto} = prodotto dei polinomi, poi si prende il resto della divisione per un polinomio fissato ``irriducibile'' di grado \(n\), così il risultato torna ad avere \(n\) bit;
+  \item ogni elemento diverso da 0 ha un \textbf{inverso} \(\delta^{-1}\), con \(\delta \cdot \delta^{-1} = 1\). È questo che lo rende un \textbf{campo}, come i numeri reali.
+\end{itemize}
+Per le dimostrazioni sotto bastano due fatti: si può \textbf{dividere} per qualunque elemento non nullo, e un polinomio non nullo di grado \(t\) ha \textbf{al massimo \(t\) radici}, come nei reali.
+\end{nota}
+
+\subsection{Esempio 1: somma pesata (del prof)}
+
+\(\mathbb{F} = GF(2^n)\), \(m = m_1, \dots, m_d\) con \(m_i \in \mathbb{F}\), e seme \(s = (a_1, \dots, a_d) \in \mathbb{F}^d\):
+\[
+h_{a_1 \dots a_d}(m_1, \dots, m_d) = \sum_{i=1}^{d} a_i \cdot m_i
+\]
+
+\textbf{È perfettamente universale.} Fissiamo
+\[
+m = (m_1, \dots, m_d), \qquad m' = (m_1', \dots, m_d'), \qquad \delta_i = m_i' - m_i
+\]
+Siccome \(m \ne m'\), esiste \(\delta_j \ne 0\). Senza perdita di generalità sia \(j = 1\). C'è collisione se e solo se:
+\[
+\sum_i a_i m_i = \sum_i a_i m_i' \quad \Longleftrightarrow \quad a_1 \cdot \delta_1 = -\sum_{i=2}^{d} a_i \delta_i \quad \Longleftrightarrow \quad a_1 = \delta_1^{-1} \cdot \Big(-\sum_{i \ne 1} a_i \delta_i\Big)
+\]
+\[
+\Longrightarrow \quad \Pr\big[h_s(m) = h_s(m')\big] = 2^{-n} \qquad \textbf{PERFETTAMENTE UNIVERSALE!}
+\]
+
+\begin{nota}
+\textbf{I passaggi} \emph{(non negli appunti del prof)}.
+\begin{itemize}
+  \item Primo \(\Leftrightarrow\): si porta tutto da una parte, \(\sum_i a_i (m_i' - m_i) = 0\), cioè \(\sum_i a_i \delta_i = 0\), e si isola il termine con \(i = 1\).
+  \item Secondo \(\Leftrightarrow\): si divide per \(\delta_1\), che si può fare perché \(\delta_1 \ne 0\) e siamo in un campo.
+  \item Il conto finale: fissati \(a_2, \dots, a_d\), il lato destro è \textbf{un valore preciso}. \(a_1\) è scelto a caso tra \(2^n\) valori, indipendente dagli altri, e la collisione c'è solo se \(a_1\) è proprio quel valore: probabilità \(1/2^n\).
+\end{itemize}
+\textbf{Il difetto}: il seme ha \(d\) elementi da \(n\) bit, cioè è lungo \textbf{quanto il messaggio}.
+\end{nota}
+
+\subsection{Esempio 2: valutazione di un polinomio (del prof)}
+
+``Rendiamo la chiave più corta.'' \(\mathbb{F} = GF(2^n)\), seme \(s \in \mathbb{F}\) (un \textbf{solo} elemento):
+\[
+h_s(m) = \sum_{i=1}^{d} m_i \cdot s^{\,i-1} = q_m(s)
+\]
+cioè i blocchi \(m_i\) sono i \textbf{coefficienti} di un polinomio \(q_m\) di grado \(\le d - 1\), e l'hash è il suo valore nel punto \(s\).
+
+\textbf{Collisioni:}
+\[
+h_s(m) = h_s(m') \ \Longleftrightarrow\ q_m(s) = q_{m'}(s) \ \Longleftrightarrow\ q_{m - m'}(s) = 0 \ \Longleftrightarrow\ \sum_i (m_i - m_i')\, s^{\,i-1} = 0
+\]
+Quindi
+\[
+\Pr\big[h_s(m) = h_s(m')\big] = \Pr\big[s \ \text{è una radice di}\ q_{m-m'}\big] \ \le\ \frac{d - 1}{2^n} \ \approx\ \frac{N}{n \cdot 2^n}
+\]
+(ricordando \(n \cdot d = N\)).
+
+\begin{nota}
+\textbf{Perché} \emph{(non negli appunti del prof)}. \(q_{m - m'}\) è il polinomio con coefficienti \(m_i - m_i'\): non è il polinomio nullo perché \(m \ne m'\), e ha grado al massimo \(d - 1\). Un polinomio non nullo di grado \(\le d - 1\) ha al massimo \(d - 1\) radici. \(s\) è uniforme tra \(2^n\) valori, quindi cade su una radice con probabilità \(\le (d-1)/2^n\).
+
+Non è perfettamente universale, ma è \(\varepsilon\)-AU con \(\varepsilon = (d-1)/2^n\), ancora trascurabile se \(d\) è polinomiale. In cambio il seme è lungo solo \(n\) bit.
+
+\textbf{Esempio}: \(n = 128\) e messaggi di \(d = 2^{20}\) blocchi (16 MB): \(\varepsilon \le 2^{20} / 2^{128} = 2^{-108}\).
+\end{nota}
+
+\section{Nel mondo reale: CBC-MAC}
+
+\begin{inbreve}
+CBC-MAC è il modo CBC della Lezione 9 usato per autenticare: IV fisso a \(0^n\), si incatenano i blocchi con \(F_s\), e il tag è l'\textbf{ultimo} blocco. È sicuro per messaggi di lunghezza \textbf{fissa}, ma con lunghezze variabili si rompe; per lunghezze variabili si usa CBC-MAC come hash e poi una PRF con un'altra chiave (\(\mathcal{F}(\mathcal{H})\)).
+\end{inbreve}
+
+\textbf{CBC-MAC (del prof).} È proprio un \(\mathcal{F}(\mathcal{H})\) in cui sia \(\mathcal{F}\) sia \(\mathcal{H}\) sono costruite da una PRF \(F\).
+
+\begin{verbatim}
+ 0^n = IV      m_1              m_2              m_3
+   |            |                |                |
+   └────────→   ⊕       ┌─────→  ⊕       ┌─────→  ⊕
+                |       |        |       |        |
+              [F_s]     |      [F_s]     |      [F_s]
+                |       |        |       |        |
+                └───────┘        └───────┘        └──→ y = h_s(m)
+\end{verbatim}
+
+\begin{nota}
+\emph{(Non negli appunti del prof.)} In formula: \(y_0 = 0^n\), \(y_i = F_s(m_i \oplus y_{i-1})\), e l'output è \(y_d\). Le differenze con CBC per cifrare (Lezione 9): l'IV è \textbf{fisso} a \(0^n\) (non casuale), non serve la randomizzazione (un MAC è deterministico), e si tiene solo l'\textbf{ultimo} blocco, non tutti. Con un IV casuale mandato insieme al tag, CBC-MAC si romperebbe (cambiando l'IV si può cambiare il primo blocco senza cambiare il tag).
+\end{nota}
+
+\textbf{Fatto (del prof).} ``CBC-MAC'' come sopra dà una famiglia \(\mathcal{H}\) \textbf{computazionalmente AU} (le collisioni sono difficili da trovare per avversari PPT, non per tutti).
+
+In realtà CBC-MAC, \textbf{da solo} come disegnato sopra, è un MAC \textbf{FIL UF-CMA}.
+
+\textbf{Esercizio (del prof).} Ma \textbf{non} è un MAC \textbf{VIL} UF-CMA (\emph{Variable-Input Length}: messaggi di lunghezze diverse). (Invece CBC-MAC usato come \(\mathcal{F}(\mathcal{H})\) è UF-CMA per VIL.)
+
+\textbf{Soluzione (del prof).} Si costruisce un falsificatore che fa domande di \textbf{1 blocco} e falsifica su \textbf{2 blocchi}:
+
+\begin{verbatim}
+ m_1             m_2                A                          C
+  |               |                   ──────── m_1 ────────→
+[F_s]             ⊕ ←── τ_1           ←─────── τ_1 ─────────
+  |               |                   ───── m_2 ⊕ τ_1 ─────→
+F_s(m_1) = τ_1  [F_s]                 ←─────── τ_2 ─────────
+                  |                   ── (m_1 ‖ m_2, τ_2) ──→    ✓
+                 τ_2
+\end{verbatim}
+
+\begin{nota}
+\textbf{Perché funziona} \emph{(non negli appunti del prof)}.
+\begin{itemize}
+  \item Domanda 1: il tag di \(m_1\) (un blocco) è \(\tau_1 = F_s(0^n \oplus m_1) = F_s(m_1)\).
+  \item Domanda 2: il tag del blocco singolo \(m_2 \oplus \tau_1\) è \(\tau_2 = F_s(m_2 \oplus \tau_1)\).
+  \item Il tag vero del messaggio di due blocchi \(m_1 \,\|\, m_2\) è \(F_s\big(m_2 \oplus F_s(m_1)\big) = F_s(m_2 \oplus \tau_1) = \tau_2\).
+\end{itemize}
+Quindi \((m_1 \,\|\, m_2, \tau_2)\) è valido, e \(m_1 \,\|\, m_2\) non è mai stato chiesto: falsificazione. Con lunghezza fissa l'attacco non si può fare, perché non si possono chiedere messaggi di 1 blocco e consegnarne uno di 2. Le soluzioni pratiche: mettere la \textbf{lunghezza} nel primo blocco, oppure applicare alla fine una PRF con una \textbf{chiave diversa}, cioè usare CBC-MAC come \(\mathcal{F}(\mathcal{H})\).
+\end{nota}
+
+\section{Riepilogo}
+
+\begin{itemize}
+  \item \textbf{MAC computazionale}: Tag deterministica. \textbf{UF-CMA}: anche con i tag di tutti i messaggi che vuole, un PPT \(A\) produce un \((m^*, \tau^*)\) valido con \(m^*\) nuovo solo con probabilità trascurabile.
+  \item Nessuna protezione dai \textbf{replay attack}. \textbf{Debole} (\(m^*\) nuovo) contro \textbf{forte} (basta \(\tau^*\) fresco); con tag unici debole \(\Rightarrow\) forte. Esempio: \(0 \,\|\, \text{Tag}\) con Bob che ignora il primo bit.
+  \item \textbf{Teorema}: \(F\) PRF \(\Rightarrow\) \(\text{Tag}(k, m) = F_k(m)\) è UF-CMA (in \(H\) il tag di \(m^*\) è una riga mai vista: \(2^{-n}\)). Il viceversa no: \(0 \,\|\, F_k(m)\) è un MAC ma non una PRF.
+  \item \textbf{Messaggi lunghi}: XOR dei blocchi (si scambiano i blocchi), un tag per blocco (si permutano), \(\text{Tag}(k, i \,\|\, m_i)\) (si mescolano blocchi di due messaggi): tutti rotti.
+  \item \textbf{Hash-then-PRF}: \(\mathcal{F}(\mathcal{H}) = \{F_k(h_s(\cdot))\}\). \(\mathcal{H}\) \(\varepsilon\)-\textbf{AU}: \(\Pr_s[h_s(x) = h_s(x')] \le \varepsilon\) per \(x \ne x'\) fissati. \textbf{Teorema}: PRF + AU \(\Rightarrow\) PRF, quindi MAC UF-CMA (FIL). Prova: \(H_0 \approx_c H_1\) (PRF), \(H_1 \approx_s H_2\) con BAD = collisione di \(h_s\), \(\text{SD} \le q^2 \varepsilon\); BAD va definito nel gioco in cui le risposte non dipendono da \(s\).
+  \item \textbf{Famiglie AU} in \(GF(2^n)\): \(\sum a_i m_i\) (perfettamente universale, seme lungo) e \(q_m(s) = \sum m_i s^{i-1}\) (\(\varepsilon \le (d-1)/2^n\), seme corto).
+  \item \textbf{CBC-MAC}: IV \(= 0^n\), \(y_i = F_s(m_i \oplus y_{i-1})\), tag = ultimo blocco. FIL UF-CMA, ma \textbf{non} VIL: \(\big(m_1 \,\|\, m_2,\ F_s(m_2 \oplus \tau_1)\big)\). Come \(\mathcal{F}(\mathcal{H})\) è sicuro anche VIL.
+\end{itemize}
