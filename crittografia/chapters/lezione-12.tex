@@ -1,0 +1,247 @@
+\chapter{Lezione 12 -- Encrypt-then-MAC e hash resistenti alle collisioni}
+
+\emph{Segue gli appunti del prof. Le parti aggiunte per capire meglio sono segnate ``non negli appunti del prof''. Usa i concetti della Lezione 10 (MAC, UF-CMA debole e forte, hash AU) e della Lezione 11 (CPA + AUTH \(\Rightarrow\) CCA).}
+
+\section{Encrypt-then-MAC: la costruzione}
+
+\begin{inbreve}
+Il modo corretto di combinare cifratura e MAC: si cifra il messaggio con una chiave, e poi si fa il tag del \textbf{cifrato} con un'altra chiave. Chi decifra controlla prima il tag: se è sbagliato rifiuta (\(\bot\)), altrimenti decifra.
+\end{inbreve}
+
+``Ecco il modo corretto'' (del prof, ripreso dalla Lezione 11). La chiave è una coppia \(k' = (k_1, k_2)\):
+\[
+\text{Enc}'\big((k_1, k_2), m\big): \qquad c \leftarrow \text{Enc}_1(k_1, m), \qquad \tau = \text{Tag}(k_2, c), \qquad c' = (c, \tau)
+\]
+\[
+\text{Dec}'(k', c'): \qquad \text{se } \text{Tag}(k_2, c) \ne \tau \ \text{ output } \bot, \qquad \text{altrimenti } m = \text{Dec}_1(k_1, c)
+\]
+
+\subsection{Teorema (del prof)}
+
+La costruzione (C) dà uno SKE \textbf{CCA-sicuro}, assumendo che \(\Pi_1 = (\text{Enc}_1, \text{Dec}_1)\) sia \textbf{CPA-sicuro} e \(\Pi_2 = \text{Tag}\) sia \textbf{UF-CMA}.
+
+\textbf{Dimostrazione (del prof).} Basta mostrare che \(\Pi' = (\text{Enc}', \text{Dec}')\) soddisfa sia \textbf{CPA} sia \textbf{AUTH} (poi si applica il teorema CPA + AUTH \(\Rightarrow\) CCA della Lezione 11).
+
+\subsection{CPA di \texorpdfstring{\(\Pi'\)}{Pi'}, per riduzione a \texorpdfstring{\(\Pi_1\)}{Pi1}}
+
+\begin{verbatim}
+A'_cpa                          B_1                         C_1 (di Π1)
+                                sceglie k_2                 k_1
+  ┌──────── m ──────────→
+  │                             ┌──────── m ──────────→
+  │                             └←─────── c ───────────
+  └←────── (c, τ) ──────        τ = Tag(k_2, c)
+  ─────── m0*, m1* ────→
+                                ─────── m0*, m1* ────→
+                                ←──────── c* ──────────
+  ←────── (c*, τ*) ─────        τ* = Tag(k_2, c*)
+  (altre domande: come prima)
+  ─────────── b' ──────→
+                                ─────────── b' ───────→
+\end{verbatim}
+
+``L'analisi è immediata'' (del prof).
+
+\begin{nota}
+\textbf{Perché è immediata} \emph{(non negli appunti del prof)}. \(B_1\) sceglie \textbf{da solo} la chiave del MAC \(k_2\), quindi sa calcolare tutti i tag. La chiave di cifratura \(k_1\) ce l'ha il suo challenger: ogni volta che serve un cifrato, \(B_1\) lo chiede a \(C_1\) e ci aggiunge il tag. \(A'\) riceve esattamente quello che riceverebbe nel gioco CPA di \(\Pi'\), e la sfida \((c^*, \tau^*)\) contiene il cifrato di \(m_b^*\) fatto da \(C_1\). Quindi \(B_1\) indovina \(b\) quando lo indovina \(A'\): se \(A'\) rompesse \(\Pi'\), \(B_1\) romperebbe \(\Pi_1\). Riduzione perfetta.
+\end{nota}
+
+\subsection{AUTH di \texorpdfstring{\(\Pi'\)}{Pi'}, per riduzione a \texorpdfstring{\(\Pi_2\)}{Pi2}}
+
+\begin{verbatim}
+A'_auth                         B_2                         C_2 (di Π2)
+                                sceglie k_1                 k_2
+  ┌──────── m ──────────→
+  │                             ┌─── c ← Enc(k_1, m) ──→
+  │                             └←─────── τ ───────────
+  └←────── (c, τ) ──────
+  ────── (c*, τ*) ─────→
+                                ────── (c*, τ*) ──────→
+\end{verbatim}
+
+\(B_2\) sceglie da solo la chiave di cifratura \(k_1\), cifra lui i messaggi di \(A'\), e si fa dare i tag dei cifrati dal suo challenger (le domande del gioco UF-CMA). Alla fine consegna come falsificazione la coppia \((c^*, \tau^*)\) prodotta da \(A'\).
+
+\emph{(Non negli appunti del prof.)} Se \(A'\) vince, \((c^*, \tau^*)\) è valido, cioè \(\text{Tag}(k_2, c^*) = \tau^*\): è un tag giusto per il ``messaggio'' \(c^*\) del MAC.
+
+\subsection{Una sottigliezza (del prof)}
+
+\textbf{Attenzione}: \(A'_{\text{auth}}\) vince purché \((c^*, \tau^*) \notin \{(c, \tau)\}\). Questo permette che \(c^* = c\) di una domanda di cifratura precedente. Invece \(B_2\) vince solo se \(c^* \notin \{c\}\). Quindi la riduzione \textbf{potrebbe fallire}.
+
+\begin{nota}
+\emph{(Non negli appunti del prof.)} Il caso problematico: \(A'\) prende un cifrato \(c\) che ha già ricevuto, con il suo tag \(\tau\), e trova un \textbf{altro} tag \(\tau^* \ne \tau\) valido per lo stesso \(c\). Per il gioco AUTH di \(\Pi'\) è una vittoria (la coppia \((c, \tau^*)\) è nuova). Ma per il gioco UF-CMA \textbf{debole} non è una falsificazione, perché il ``messaggio'' \(c\) era già stato chiesto. Quindi \(B_2\) non vince.
+\end{nota}
+
+Si può sistemare in \textbf{2 modi} (del prof):
+\begin{enumerate}
+  \item assumere che Tag sia \textbf{strong UF-CMA} (Lezione 10): un tag nuovo per un messaggio vecchio conta come falsificazione;
+  \item assumere che i tag siano \textbf{unici}: allora per un \(c\) già chiesto non esiste un altro tag valido. \(\blacksquare\)
+\end{enumerate}
+
+\section{Funzioni hash resistenti alle collisioni}
+
+\begin{inbreve}
+Una funzione hash prende un input di \textbf{qualsiasi lunghezza} e restituisce un output \textbf{corto e fisso} (128, 256, 512 bit). Le collisioni esistono per forza, ma devono essere \textbf{difficili da trovare}. A differenza delle hash AU della Lezione 10, qui il seme è \textbf{pubblico}: anche chi lo conosce non deve trovare collisioni.
+\end{inbreve}
+
+\textbf{Una primitiva molto importante} (del prof). In pratica è una funzione deterministica
+\[
+H : \{0,1\}^* \to \{0,1\}^n
+\]
+tipicamente con \(n = 128, 256, 512\).
+
+\emph{(Notazione, non negli appunti del prof.)} \(\{0,1\}^*\) vuol dire ``stringhe di bit di \textbf{qualunque} lunghezza'': 1 bit, 1000 bit, un file da un gigabyte.
+
+\textbf{Nota (del prof)}: gli input hanno lunghezza \textbf{variabile}; altrimenti si ottiene una cosiddetta \textbf{funzione di compressione}
+\[
+\text{cmps} : \{0,1\}^N \to \{0,1\}^n, \qquad N \gg n
+\]
+(input di lunghezza fissa \(N\), molto più grande dell'output).
+
+\subsection{Che sicurezza? Le collisioni}
+
+``Che sicurezza?? Il problema principale sono le \textbf{collisioni}'' (del prof): due input diversi \(x \ne x'\) con
+\[
+H(x) = H(x')
+\]
+
+\begin{verbatim}
+      tutti gli input                     output (n bit)
+         x  ────────────────────────────→  o
+         x' ────────────────────────────→  o   ← H(x) = H(x')
+\end{verbatim}
+
+Le collisioni \textbf{esistono}, ma devono essere \textbf{difficili da trovare}. Molti esempi reali: MD5, SHA-1, SHA-2, SHA-3. \textbf{MD5 e SHA-1 sono in realtà rotti} (del prof).
+
+\begin{nota}
+\emph{(Non negli appunti del prof.)} ``Rotti'' vuol dire che sono state trovate collisioni esplicite: per MD5 si trovano in pochi secondi su un portatile, per SHA-1 la prima collisione pubblica è del 2017 (due PDF diversi con lo stesso hash). Oggi si usano SHA-2 (es.\ SHA-256) e SHA-3.
+
+\textbf{A cosa servono}: firme digitali (si firma l'hash del documento, non il documento intero), controllo di integrità dei file scaricati, memorizzazione delle password, blockchain. In tutti questi casi, chi trova due input con lo stesso hash può spacciare uno per l'altro.
+\end{nota}
+
+\subsection{Definizione (del prof)}
+
+Sia \(\mathcal{H} = \{H_s : \{0,1\}^* \to \{0,1\}^n\}_{s \in \{0,1\}^\lambda}\) una famiglia di \textbf{funzioni hash}. \(\mathcal{H}\) è \textbf{resistente alle collisioni} (\emph{collision resistant}, \textbf{CR}) se nessun PPT \(A\) vince questo gioco, tranne con probabilità \(\text{negl}(\lambda)\):
+
+\begin{verbatim}
+A                                    C
+                                     s ← {0,1}^λ
+  ←──────────────── s ───────────────
+  ─────────────── x, x' ────────────→
+                                     A VINCE se:
+                                      x ≠ x'
+                                      H_s(x) = H_s(x')
+\end{verbatim}
+
+\begin{nota}
+\emph{(Non negli appunti del prof.)} Il challenger sceglie un seme \(s\) e lo \textbf{dà all'avversario}: il seme è \textbf{pubblico}. L'avversario deve trovare una collisione per \(H_s\). Confronto con le hash \textbf{AU} della Lezione 10: lì il seme era \textbf{segreto} e i due messaggi erano fissati prima di sceglierlo; la proprietà era statistica e si otteneva senza ipotesi. Qui il seme è noto e l'avversario sceglie \(x, x'\) \textbf{dopo} averlo visto: è una richiesta molto più forte, e infatti è \textbf{computazionale} (e, come diceva il prof nella Lezione 10, non segue dalle sole OWF).
+\end{nota}
+
+\subsection{Perché il seme?}
+
+``Perché il seme?? In pratica non c'è nessun seme'' (del prof): SHA-256 è \textbf{una} funzione fissata. Ma senza un seme non possiamo escludere l'attaccante efficiente \(A_{x, x'}\) che ha una collisione \textbf{scritta dentro il suo codice} (\emph{hard-wired}).
+
+\begin{nota}
+\textbf{Cosa vuol dire} \emph{(non negli appunti del prof)}. Una funzione fissata \(H\) che comprime \textbf{ha} collisioni. Prendiamone una, \((x, x')\). L'algoritmo ``\(A_{x, x'}\): stampa \(x\) e \(x'\)'' è efficientissimo (non fa nessun calcolo) e vince \textbf{sempre}. Noi non sappiamo scriverlo, perché non conosciamo la collisione, ma \textbf{esiste}. E la definizione dice ``nessun PPT \(A\) vince'', cioè parla di tutti gli algoritmi che esistono, non solo di quelli che sappiamo scrivere. Quindi, senza seme, nessuna funzione fissata potrebbe mai soddisfare la definizione.
+
+Con il seme il problema sparisce: l'avversario è fissato \textbf{prima}, e il seme \(s\) viene scelto a caso \textbf{dopo}. Una collisione scritta nel codice funziona per una \(H_s\), ma non per quella che verrà estratta a caso tra \(2^\lambda\).
+\end{nota}
+
+\section{Costruzioni: Merkle-Damgård}
+
+\begin{inbreve}
+Il design principale si fa in due passi: (1) si progetta una \textbf{funzione di compressione} che riduce un input di lunghezza fissa \(2n\) a \(n\) bit; (2) la si \textbf{incatena} blocco dopo blocco per gestire input lunghi. Il teorema dice che se la funzione di compressione è resistente alle collisioni, anche la catena lo è.
+\end{inbreve}
+
+``Prossimo argomento: le costruzioni. Vedremo uno dei design principali: \textbf{MERKLE-DAMGÅRD}'' (del prof). Due passi:
+\begin{enumerate}
+  \item progettare una \textbf{funzione di compressione};
+  \item renderla una \textbf{funzione hash CR}.
+\end{enumerate}
+Nel mondo reale (SHA-1, SHA-2, MD5): il passo 1 si fa in modo \textbf{euristico}; il passo 2 è come qui.
+
+\subsection{Il passo 2 (del prof)}
+
+Si assume una funzione di compressione \(\text{cmps} : \{0,1\}^{2n} \to \{0,1\}^n\). Il messaggio è \(x = x_1, \dots, x_d\), con ogni \(x_i \in \{0,1\}^n\).
+
+\textbf{Merkle-Damgård (MD)}:
+
+\begin{verbatim}
+        x_1          x_2                  x_d
+         ↓            ↓                    ↓
+0^n ──→ [cmps] ──→ [cmps] ──→ ... ──→ [cmps] ──→ y_d = H_s(x)
+               y_1          y_2
+\end{verbatim}
+
+\begin{nota}
+\emph{(In formula, non negli appunti del prof.)}
+\[
+y_0 = 0^n, \qquad y_i = \text{cmps}_s(x_i,\ y_{i-1}) \quad i = 1, \dots, d, \qquad H_s(x) = y_d
+\]
+Ogni passo prende \(2n\) bit (il blocco del messaggio \(x_i\) e il risultato precedente \(y_{i-1}\)) e li riduce a \(n\). È la stessa idea ``a catena'' del CBC-MAC (Lezione 10), con cmps al posto di \(F_s\).
+\end{nota}
+
+\textbf{Albero di Merkle} (\emph{Merkle tree}, del prof): invece di una catena, un \textbf{albero}. Si combinano i blocchi a due a due, poi i risultati a due a due, fino alla radice:
+
+\begin{verbatim}
+                 y = H_s(x)
+                     │
+                  [cmps]
+                 /      \
+             [cmps]    [cmps]
+             /   \     /    \
+           x_1   x_2 x_3    x_4
+\end{verbatim}
+
+\emph{(Non negli appunti del prof.)} Con l'albero i calcoli dei rami si possono fare \textbf{in parallelo}, e per controllare un singolo blocco basta il suo percorso fino alla radice (si usa nelle blockchain e nei sistemi di file distribuiti).
+
+\subsection{Teorema (del prof)}
+
+Assumendo che \(\{\text{cmps}_s : \{0,1\}^{2n} \to \{0,1\}^n\}\) sia \textbf{CR}, allora MD \(\{H_s : \{0,1\}^{nd} \to \{0,1\}^n\}\) è \textbf{CR} per ogni scelta \textbf{fissata} di \(d \in \text{poly}(\lambda)\).
+
+\textbf{Dimostrazione (del prof).} Si consideri una qualunque collisione \(x = (x_1, \dots, x_d)\) e \(x' = (x_1', \dots, x_d')\), con \(x \ne x'\) ma \(H_s(x) = H_s(x')\).
+
+Andando \textbf{all'indietro}, dev'esserci un \textbf{ultimo} indice \(j\) tale che
+\[
+(x_j,\ y_{j-1}) \ne (x_j',\ y_{j-1}')
+\]
+Siccome \(j\) è il più grande indice con questa proprietà,
+\[
+\text{cmps}_s(x_j,\ y_{j-1}) = \text{cmps}_s(x_j',\ y_{j-1}')
+\]
+
+\begin{verbatim}
+     x_1      x_2      x_3                x_1'     x_2'     x_3'
+      ↓        ↓        ↓                  ↓        ↓        ↓
+0^n → [cmps] → [cmps] → [cmps] → y   =   0^n → [cmps] → [cmps] → [cmps] → y'
+         y_1      y_2                          y_1'     y_2'
+\end{verbatim}
+
+Quindi: da una macchina che rompe la CR di \(H_s\), si ottiene una macchina che rompe la CR di \(\text{cmps}_s\). \(\blacksquare\)
+
+\begin{nota}
+\textbf{I passaggi in dettaglio} \emph{(non negli appunti del prof)}.
+
+\textbf{Perché esiste un indice \(j\).} Le coppie \((x_i, y_{i-1})\) sono gli \textbf{input} dei vari passi della catena. Se per \textbf{tutti} gli \(i\) gli input fossero uguali, in particolare sarebbe \(x_i = x_i'\) per ogni \(i\), cioè \(x = x'\): impossibile. Quindi almeno un passo ha input diversi, e prendiamo l'\textbf{ultimo}, \(j\).
+
+\textbf{Perché gli output al passo \(j\) sono uguali.} Due casi:
+\begin{itemize}
+  \item se \(j = d\) (l'ultimo passo): gli output sono \(y_d = H_s(x)\) e \(y_d' = H_s(x')\), uguali per ipotesi;
+  \item se \(j < d\): al passo \(j + 1\) gli input sono \textbf{uguali} (perché \(j\) era l'ultimo con input diversi), quindi in particolare \(y_j = y_j'\), cioè gli output del passo \(j\).
+\end{itemize}
+Quindi al passo \(j\) ci sono \textbf{input diversi} e \textbf{output uguali}: \((x_j, y_{j-1})\) e \((x_j', y_{j-1}')\) sono una collisione di \(\text{cmps}_s\).
+
+\textbf{La riduzione.} \(B\) riceve il seme \(s\) per cmps, lo passa ad \(A\) e riceve \(x, x'\). Calcola le due catene (cmps è pubblica), cerca all'indietro l'indice \(j\) e consegna \((x_j, y_{j-1})\) e \((x_j', y_{j-1}')\). Vince ogni volta che vince \(A\), e fa solo \(2d\) calcoli di cmps: è efficiente.
+
+\textbf{Perché \(d\) fissato.} Con lunghezze \textbf{diverse} la dimostrazione non funziona così com'è: con \(y_0 = 0^n\), se cmps manda \((x_1, 0^n)\) in \(0^n\), i messaggi \(x_1 \| x_2\) e \(x_2\) collidono, e non c'è un indice da confrontare. In pratica si aggiunge alla fine un blocco con la \textbf{lunghezza} del messaggio (il ``MD strengthening''), ed è così che sono fatti SHA-1 e SHA-2.
+\end{nota}
+
+\section{Riepilogo}
+
+\begin{itemize}
+  \item \textbf{Encrypt-then-MAC}: \(c \leftarrow \text{Enc}_1(k_1, m)\), \(\tau = \text{Tag}(k_2, c)\); Dec' rifiuta (\(\bot\)) se il tag è sbagliato. \textbf{Teorema}: \(\Pi_1\) CPA + \(\Pi_2\) UF-CMA \(\Rightarrow\) CCA, mostrando CPA (riduzione a \(\Pi_1\), \(B_1\) sceglie \(k_2\)) e AUTH (riduzione a \(\Pi_2\), \(B_2\) sceglie \(k_1\)).
+  \item \textbf{Sottigliezza}: \(A'\) può vincere con un \(c\) vecchio e un \(\tau\) nuovo, che per UF-CMA debole non è una falsificazione. Si sistema con Tag \textbf{strong} UF-CMA oppure con tag \textbf{unici}.
+  \item \textbf{Hash}: \(H : \{0,1\}^* \to \{0,1\}^n\) (input di lunghezza qualunque); con input di lunghezza fissa è una \textbf{funzione di compressione}. Le collisioni esistono ma devono essere difficili da trovare. MD5 e SHA-1 sono rotti.
+  \item \textbf{CR}: dato il seme \(s\) \textbf{pubblico}, nessun PPT trova \(x \ne x'\) con \(H_s(x) = H_s(x')\). Il seme serve a escludere l'attaccante con una collisione scritta nel codice.
+  \item \textbf{Merkle-Damgård}: (1) funzione di compressione (euristica nel mondo reale), (2) catena \(y_i = \text{cmps}_s(x_i, y_{i-1})\) con \(y_0 = 0^n\). Variante ad albero: \textbf{Merkle tree}.
+  \item \textbf{Teorema}: cmps CR \(\Rightarrow\) MD CR (per \(d\) fissato). Prova: l'ultimo indice \(j\) con input diversi dà una collisione di cmps.
+\end{itemize}
