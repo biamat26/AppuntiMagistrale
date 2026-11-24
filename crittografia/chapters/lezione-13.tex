@@ -1,0 +1,450 @@
+\chapter{Lezione 13 -- Merkle-Damgård rafforzato e teoria dei numeri}
+
+\emph{Segue gli appunti del prof. Le parti aggiunte per capire meglio sono segnate ``non negli appunti del prof''. Riprende la Lezione 12 (hash CR, Merkle-Damgård) e poi comincia la teoria dei numeri, che servirà per la crittografia a chiave pubblica.}
+
+\section{Merkle-Damgård con lunghezze variabili}
+
+\begin{inbreve}
+Merkle-Damgård, così com'è, funziona solo per messaggi tutti della stessa lunghezza. Con lunghezze variabili si trovano collisioni facili: se la funzione di compressione manda \(0^{2n}\) in \(0^n\), allora \(x\) e \(0^n \| x\) hanno lo stesso hash. La soluzione è aggiungere alla fine un blocco con la \textbf{lunghezza} del messaggio (MD rafforzato).
+\end{inbreve}
+
+\subsection{Il problema (del prof)}
+
+Sfortunatamente, la costruzione \textbf{non è sicura in generale per VIL} (\emph{Variable-Input Length}, messaggi di lunghezze diverse). Si consideri una funzione di compressione con
+\[
+\text{cmps}_s(0^{2n}) = 0^n
+\]
+In questo caso, per ogni \(x\):
+\[
+H_s^{\text{MD}}(x) = H_s^{\text{MD}}(0^n \,\|\, x)
+\]
+
+\begin{verbatim}
+        0^n            x_1            x_2
+         ↓              ↓              ↓
+0^n ──→ [cmps] ──→ 0^n ──→ [cmps] ──→ [cmps] ──→ ...
+\end{verbatim}
+
+\begin{nota}
+\textbf{Perché} \emph{(non negli appunti del prof)}. In Merkle-Damgård si parte da \(y_0 = 0^n\). Se il primo blocco del messaggio è \(0^n\), il primo passo calcola \(\text{cmps}_s(0^n, 0^n) = \text{cmps}_s(0^{2n}) = 0^n\): si torna \textbf{esattamente al punto di partenza}. Da lì in poi la catena di \(0^n \,\|\, x\) è identica a quella di \(x\), quindi i due hash coincidono. Due messaggi diversi con lo stesso hash: collisione.
+
+Non è una collisione di cmps (c'è un solo input, \(0^{2n}\)), quindi la dimostrazione della Lezione 12 non la ``vede''. E una cmps così può benissimo essere CR: avere un valore particolare in un punto non aiuta a trovare collisioni. Il problema sta nella \textbf{catena}, non in cmps.
+\end{nota}
+
+\textbf{Serve (del prof)}: una codifica \textbf{suffix-free}, cioè tale che \textbf{nessun input legale sia suffisso di un altro input}!
+
+\emph{(Non negli appunti del prof.)} Un \textbf{suffisso} è la parte finale di una stringa: \(x\) è suffisso di \(0^n \,\|\, x\). L'attacco sopra funziona proprio perché un messaggio è la ``coda'' dell'altro.
+
+\subsection{La codifica suffix-free più semplice (del prof)}
+
+Si aggiunge in fondo un blocco \(\langle \ell \rangle\):
+
+\begin{verbatim}
+        x_1          x_2                x_d          <l>
+         ↓            ↓                  ↓            ↓
+0^n ──→ [cmps] ──→ [cmps] ──→ ... ──→ [cmps] ──→ [cmps] ──→ y_(d+1)
+\end{verbatim}
+
+\(\langle \ell \rangle\) = la \textbf{lunghezza} di \(x\), codificata con \(n\) bit.
+
+\textbf{Esempio (del prof).}
+\[
+x = \underbrace{1 \cdots 1}_{n} \,\|\, \underbrace{1 \cdots 1}_{n} \,\|\, \underbrace{1 \cdots 1}_{n} = 1^n \,\|\, 1^n \,\|\, 1^n
+\qquad \Longrightarrow \qquad x \,\|\, \langle \ell \rangle = x \,\|\, \langle 3n \rangle
+\]
+
+\textbf{Si considerino di nuovo \(x\) e \(0^n \,\|\, x\)} (del prof):
+\[
+x \,\|\, \langle \ell \rangle \qquad \text{e} \qquad 0^n \,\|\, x \,\|\, \langle \ell + n \rangle
+\]
+L'ultimo blocco ora è \textbf{diverso}, e l'attacco non funziona più.
+
+\begin{nota}
+\emph{(Non negli appunti del prof.)} Il prof scrive \(\langle \ell + 1 \rangle\), contando la lunghezza in \textbf{blocchi}; contando in bit è \(\ell + n\). Il punto è lo stesso: i due messaggi hanno lunghezze diverse, quindi gli ultimi blocchi sono diversi. Anche se le catene arrivano allo stesso \(y_d\) prima dell'ultimo passo, l'ultimo passo calcola \(\text{cmps}_s(\langle \ell \rangle, y_d)\) contro \(\text{cmps}_s(\langle \ell + n \rangle, y_d)\): input diversi. Se dessero lo stesso output, sarebbe una collisione di cmps. È così che sono fatti SHA-1 e SHA-2 (``MD strengthening'').
+\end{nota}
+
+\subsection{Teorema (del prof)}
+
+La costruzione MD \textbf{rafforzata} (\emph{strengthened}) è \textbf{CR per VIL}.
+
+\textbf{Dimostrazione (del prof).} ``È semplice.'' Siano \(x = x_1 \cdots x_d\) e \(x' = x_1' \cdots x_{d'}'\) una collisione in MD. Due casi:
+\begin{enumerate}
+  \item \(d' = d\): stessa dimostrazione di prima (Lezione 12).
+  \item \(d' \ne d\): ma allora
+  \[
+  \text{cmps}_s\big(\langle d \rangle \,\|\, y_d\big) = \text{cmps}_s\big(\langle d' \rangle \,\|\, y_{d'}'\big) \qquad \blacksquare
+  \]
+\end{enumerate}
+
+\begin{nota}
+\emph{(Non negli appunti del prof.)} Nel caso 2 l'ultimo passo delle due catene ha input diversi (\(\langle d \rangle \ne \langle d' \rangle\)) e output uguali (sono i due hash, uguali per ipotesi). Quindi è direttamente una collisione di cmps, senza bisogno di cercare l'indice \(j\).
+\end{nota}
+
+\subsection{Come si costruisce la funzione di compressione?}
+
+\textbf{In pratica} è \textbf{euristica} (del prof). \textbf{In teoria}:
+\begin{itemize}
+  \item da \textbf{ipotesi concrete} (FATTORIZZAZIONE, LOGARITMO DISCRETO, \dots);
+  \item purtroppo è \textbf{IMPOSSIBILE} costruire CRH in modo generico dalle OWF!
+\end{itemize}
+
+\emph{(Non negli appunti del prof.)} ``In modo generico'' vuol dire usando una OWF qualsiasi come scatola nera, come abbiamo fatto con PRG e PRF. Per le hash CR servono ipotesi su problemi \textbf{specifici}, ed è uno dei motivi per cui oggi si comincia la teoria dei numeri.
+
+\textbf{Euristicamente si può usare AES} (del prof):
+\[
+\text{cmps}(s, x) = \text{AES}_s(x) \oplus x
+\]
+È \textbf{molto difficile dimostrarne la sicurezza}: la sicurezza PRF richiede una chiave \(s\) \textbf{segreta}, ma qui \(s\) è \textbf{pubblica} e scelta dall'avversario.
+
+\begin{nota}
+\emph{(Non negli appunti del prof.)} Nella funzione di compressione sia \(s\) sia \(x\) fanno parte dell'input, e l'avversario che cerca collisioni li sceglie entrambi. La definizione di PRF dice solo cosa succede quando la chiave è casuale e nascosta: con la chiave in mano all'avversario non garantisce niente. Lo XOR con \(x\) serve a rendere la funzione non invertibile: \(\text{AES}_s(x)\) da solo si inverte conoscendo \(s\).
+\end{nota}
+
+\section{Teoria dei numeri}
+
+\begin{inbreve}
+La teoria dei numeri è la principale fonte di problemi difficili ``concreti'', come la fattorizzazione e il logaritmo discreto. Si lavora con l'\textbf{aritmetica modulare}: numeri da \(0\) a \(n-1\), dove si somma e si moltiplica ``facendo il giro'' come su un orologio.
+\end{inbreve}
+
+\textbf{La principale fonte di difficoltà concreta} (del prof). La maggior parte di queste ipotesi sono \textbf{teoricamente rotte dai computer quantistici}.
+
+L'ingrediente principale è l'\textbf{ARITMETICA MODULARE}:
+\[
+\mathbb{Z}_n = \{0, 1, \dots, n-1\} \quad \text{con } + \text{ mod } n
+\]
+\((\mathbb{Z}_n, +)\) è un \textbf{GRUPPO}.
+
+\begin{nota}
+\textbf{Ripasso} \emph{(non negli appunti del prof)}.
+\begin{itemize}
+  \item \textbf{\(a \bmod n\)} è il resto della divisione di \(a\) per \(n\) (come il ``mod 2'' della Lezione 6). Esempio in \(\mathbb{Z}_7\): \(5 + 4 = 9 \bmod 7 = 2\). È un orologio con 7 ore.
+  \item \(a \equiv b \pmod n\) (``\(a\) congruo a \(b\) modulo \(n\)'') vuol dire che \(a\) e \(b\) hanno lo stesso resto, cioè \(n\) divide \(a - b\).
+  \item Un \textbf{gruppo} è un insieme con un'operazione che: dà sempre un risultato nell'insieme, è associativa, ha un \textbf{elemento neutro} (per \(+\) è \(0\), per \(\cdot\) è \(1\)), e in cui ogni elemento ha un \textbf{inverso}. In \((\mathbb{Z}_n, +)\) l'inverso di \(a\) è \(n - a\): in \(\mathbb{Z}_7\), \(3 + 4 = 7 \equiv 0\).
+\end{itemize}
+\end{nota}
+
+D'altra parte, \((\mathbb{Z}_n, \cdot)\) \textbf{non è un gruppo in generale}: l'inverso \textbf{non esiste sempre}.
+
+\emph{(Esempio, non negli appunti del prof.)} In \(\mathbb{Z}_6\): \(5 \cdot 5 = 25 \equiv 1\), quindi \(5\) ha inverso \(5\). Ma \(2\) no: \(2 \cdot 1 = 2\), \(2 \cdot 2 = 4\), \(2 \cdot 3 = 6 \equiv 0\), \(2 \cdot 4 = 8 \equiv 2\), \(2 \cdot 5 = 10 \equiv 4\). Non esce mai \(1\). E infatti \(2\) e \(6\) hanno un divisore in comune.
+
+\subsection{Quali elementi sono invertibili}
+
+\textbf{Lemma (del prof).} Se \(\gcd(a, n) > 1\), allora \(a \in \mathbb{Z}_n\) \textbf{non è invertibile}.
+
+(\(\gcd\) = \emph{greatest common divisor}, massimo comun divisore.)
+
+\textbf{Dimostrazione (del prof).} Supponiamo \(a\) invertibile: allora \(\exists\, b \in \mathbb{Z}_n\) tale che \(a \cdot b \equiv 1 \bmod n\). Questo significa:
+\[
+ab = 1 + q \cdot n, \qquad q \ge 0
+\]
+Ma allora \(\gcd(a, n)\) divide \(ab - qn = 1\). Quindi \(\gcd(a, n) = 1\). \(\blacksquare\)
+
+\emph{(Non negli appunti del prof.)} \(\gcd(a, n)\) divide sia \(a\) (quindi \(ab\)) sia \(n\) (quindi \(qn\)), e allora divide anche la loro differenza, che è \(1\). L'unico numero positivo che divide \(1\) è \(1\): contraddizione con \(\gcd(a, n) > 1\).
+
+Questo motiva (del prof):
+\[
+\mathbb{Z}_n^* = \{a \in \mathbb{Z}_n : \gcd(a, n) = 1\}, \qquad \varphi(n) = \# \mathbb{Z}_n^*
+\]
+(\(\#\) = numero di elementi; \(\varphi\) è la \textbf{funzione di Eulero}.) Per noi:
+\[
+\begin{cases}
+n = p \cdot q \ (p, q \text{ primi}) & \Rightarrow\ \varphi(n) = (p-1)(q-1) \\
+n = p \ (p \text{ primo}) & \Rightarrow\ \varphi(p) = p - 1
+\end{cases}
+\]
+
+\begin{esempio}
+\emph{(Non negli appunti del prof.)}
+\begin{itemize}
+  \item \(n = 7\) (primo): \(\mathbb{Z}_7^* = \{1, 2, 3, 4, 5, 6\}\), tutti tranne lo \(0\). \(\varphi(7) = 6\).
+  \item \(n = 15 = 3 \cdot 5\): si tolgono i multipli di 3 e di 5 (e lo 0). \(\mathbb{Z}_{15}^* = \{1, 2, 4, 7, 8, 11, 13, 14\}\), e \(\varphi(15) = 2 \cdot 4 = 8\) ✓.
+\end{itemize}
+\end{esempio}
+
+\subsection{L'algoritmo di Euclide esteso}
+
+\begin{inbreve}
+Il massimo comun divisore si calcola in tempo polinomiale con l'algoritmo di Euclide (divisioni con resto ripetute). La versione estesa trova anche due interi \(u, v\) con \(au + bv = \gcd(a, b)\), e questo dà l'\textbf{inverso} modulo \(n\).
+\end{inbreve}
+
+\textbf{Teorema (del prof).} Dati \(a, b\), si può calcolare \(\gcd(a, b)\) in tempo polinomiale. Si possono anche trovare due interi \(u, v\) tali che
+\[
+a u + b v = \gcd(a, b)
+\]
+
+\textbf{Corollario (del prof).} Se \(\gcd(a, n) = 1\), allora \(a\) è invertibile mod \(n\). Infatti:
+\[
+a \cdot u + n \cdot v = 1 \quad \Longrightarrow \quad a \cdot u \equiv 1 \bmod n \quad \Longrightarrow \quad u \equiv a^{-1} \bmod n
+\]
+(\emph{Non negli appunti del prof}: \(n \cdot v\) è un multiplo di \(n\), quindi modulo \(n\) vale \(0\). Insieme al lemma: \(a\) è invertibile mod \(n\) \textbf{se e solo se} \(\gcd(a, n) = 1\). Quindi \(\mathbb{Z}_n^*\) sono proprio gli elementi invertibili, ed è un gruppo con la moltiplicazione.)
+
+\textbf{Dimostrazione (del prof).} Usa il fatto che, per \(a \ge b > 0\):
+\[
+\gcd(a, b) = \gcd(b,\ a \bmod b)
+\]
+Fatto semplice: i divisori comuni di \(a, b\) sono gli stessi di \(b\) e \(a \bmod b\).
+
+Si può usare ricorsivamente:
+\[
+a = b q_1 + r_1, \ \ 0 \le r_1 < b \quad \Rightarrow \quad \gcd(a, b) = \gcd(b, r_1)
+\]
+\[
+b = r_1 q_2 + r_2, \ \ 0 \le r_2 < r_1 \quad \Rightarrow \quad \gcd(b, r_1) = \gcd(r_1, r_2)
+\]
+Si continua: \(\gcd(a, b) = \cdots = \gcd(r_t, r_{t+1})\) con \(r_{t+1} = 0\); allora \(\gcd(a, b) = r_t\).
+
+\textbf{Quanti passi?} Mostriamo che
+\[
+r_{i+2} \le r_i / 2 \qquad \forall\, 0 \le i \le t - 2
+\]
+Infatti:
+\begin{itemize}
+  \item se \(r_{i+1} \le r_i / 2\), abbiamo finito, perché \(r_{i+2} < r_{i+1} \le r_i / 2\);
+  \item supponiamo \(r_i > r_{i+1} > r_i / 2\). Allora:
+  \[
+  r_{i+2} = r_i \bmod r_{i+1} = r_i - q_{i+2}\, r_{i+1} < r_i - r_{i+1} < r_i - r_i/2 = r_i / 2
+  \]
+\end{itemize}
+\(\Rightarrow\) \textbf{tempo di esecuzione \(O(\log^3 a)\)}. \(\lambda\) = lunghezza dell'input: \(\text{poly}(\lambda)\) passi.
+
+Per trovare \(u, v\) basta \textbf{ripercorrere all'indietro} i passi dell'algoritmo.
+
+\begin{nota}
+\emph{(Non negli appunti del prof.)}
+\begin{itemize}
+  \item \textbf{Perché \(\gcd(a, b) = \gcd(b, a \bmod b)\).} \(a \bmod b = a - qb\). Un numero che divide \(a\) e \(b\) divide anche \(a - qb\); viceversa, uno che divide \(b\) e \(a - qb\) divide anche \(a = (a - qb) + qb\). Stessi divisori comuni, quindi stesso massimo.
+  \item \textbf{Nel secondo caso}, \(r_{i+1} > r_i/2\) implica che \(r_{i+1}\) ``ci sta'' una sola volta in \(r_i\): \(q_{i+2} = 1\) e \(r_{i+2} = r_i - r_{i+1}\).
+  \item \textbf{Da dove viene \(\log^3\).} Ogni due passi il resto si dimezza almeno, quindi i passi sono al massimo circa \(2 \log_2 a\). Ogni passo è una divisione tra numeri di \(\log a\) bit, che costa \(O(\log^2 a)\). In totale \(O(\log^3 a)\): \textbf{polinomiale} nella lunghezza dell'input, che è \(\log a\) bit. (Provare tutti i divisori da 1 ad \(a\) sarebbe invece \textbf{esponenziale} nella lunghezza.)
+\end{itemize}
+\end{nota}
+
+\begin{esempio}
+\textbf{Esempio (del prof)}: \(a = 14\), \(b = 10\).
+\[
+14 = 1 \cdot 10 + 4; \qquad 10 = 2 \cdot 4 + 2; \qquad 4 = 2 \cdot 2 + 0
+\]
+\[
+\gcd(14, 10) = 2
+\]
+All'indietro:
+\[
+2 = 10 - 2 \cdot 4 = 10 - 2 \cdot (14 - 1 \cdot 10) = (-2) \cdot 14 + 3 \cdot 10 \qquad \Rightarrow \qquad u = -2, \ v = 3
+\]
+
+\emph{(Esempio con l'inverso, non negli appunti del prof.)} Inverso di \(3\) mod \(7\): \(7 = 2 \cdot 3 + 1\), quindi \(1 = 7 - 2 \cdot 3 = 1 \cdot 7 + (-2) \cdot 3\). Allora \(u = -2 \equiv 5 \pmod 7\), e infatti \(3 \cdot 5 = 15 \equiv 1 \pmod 7\) ✓.
+\end{esempio}
+
+\subsection{Esponenziazione veloce: square and multiply}
+
+\textbf{Come si calcola l'esponenziazione \(a^b \bmod n\)?} Con \textbf{square and multiply} (del prof). Si scrive \(b\) in binario, \(b = (b_d, \dots, b_0)\):
+\[
+a^b = a^{\sum_{i=0}^{d} b_i \cdot 2^i} = \prod_i a^{b_i \cdot 2^i} = \big(a^{1}\big)^{b_0} \cdot \big(a^{2}\big)^{b_1} \cdot \big(a^{4}\big)^{b_2} \cdots \big(a^{2^d}\big)^{b_d}
+\]
+
+\begin{nota}
+\emph{(Non negli appunti del prof.)} Le potenze \(a, a^2, a^4, a^8, \dots\) si ottengono \textbf{elevando al quadrato} la precedente (``square''); poi si \textbf{moltiplicano} quelle dove il bit di \(b\) vale 1 (``multiply''). Servono circa \(2 \log b\) moltiplicazioni invece di \(b - 1\), riducendo mod \(n\) a ogni passo così i numeri restano piccoli.
+
+\textbf{Esempio}: \(3^{13} \bmod 7\). \(13 = 1101_2 = 8 + 4 + 1\).
+\[
+3^1 = 3, \quad 3^2 = 9 \equiv 2, \quad 3^4 \equiv 2^2 = 4, \quad 3^8 \equiv 4^2 = 16 \equiv 2
+\]
+\[
+3^{13} = 3^8 \cdot 3^4 \cdot 3^1 \equiv 2 \cdot 4 \cdot 3 = 24 \equiv 3 \pmod 7
+\]
+\end{nota}
+
+\subsection{Numeri primi}
+
+\textbf{Un'altra cosa importante: i numeri primi} (del prof).
+
+\textbf{Teorema dei numeri primi (PNT).} I primi sono infiniti e
+\[
+\pi(x) = \#\{\text{primi} \le x\} \ \ge\ \frac{x}{\log x}
+\]
+(circa). Quindi, scegliendo \(x\) a caso:
+\[
+\Pr\big[x \text{ primo} : x \in [2^\lambda - 1]\big] \ \ge\ \frac{\frac{2^\lambda - 1}{\log(2^\lambda - 1)}}{2^\lambda - 1} \ \approx\ \frac{1}{3\lambda}
+\]
+
+\emph{(Non negli appunti del prof.)} Cioè un numero di \(\lambda\) bit preso a caso è primo con probabilità circa \(1/\lambda\) (a meno di una costante): una frazione \textbf{polinomiale}. Provando in media \(O(\lambda)\) numeri a caso se ne trova uno primo. Con \(\lambda = 1024\), servono qualche migliaio di tentativi.
+
+\textbf{L'unica cosa che serve è verificare se \(n\) è primo}: PRIMALITY TESTING.
+
+\textbf{Fatto (del prof).} Il test di primalità è in \textbf{P} (si fa in tempo polinomiale).
+
+\(\Rightarrow\) Quindi si possono generare \(p, q\) primi casuali di \(\lambda\) bit e dare in output \(n = p \cdot q\).
+
+\subsection{L'ipotesi della fattorizzazione}
+
+\textbf{IPOTESI (del prof): la FATTORIZZAZIONE è una OWF.}
+
+\emph{(Non negli appunti del prof.)} La funzione è \((p, q) \mapsto p \cdot q\): moltiplicare è facile, ritrovare \(p\) e \(q\) dal prodotto è (si crede) difficile. È l'esempio 3233 = 61 · 53 della Lezione 5.
+
+Miglior algoritmo noto: il \textbf{Number Field Sieve} (classico), con complessità \textbf{sub-esponenziale}. \textbf{Shor}: \(\exists\) un algoritmo \textbf{quantistico} in tempo polinomiale.
+
+\emph{(Non negli appunti del prof.)} ``Sub-esponenziale'' vuol dire più veloce di \(2^\lambda\) ma più lento di qualsiasi polinomio. Per questo le chiavi RSA sono lunghe (2048 bit o più), mentre per AES ne bastano 128.
+
+Studieremo e useremo principalmente \textbf{2 strutture}:
+\begin{itemize}
+  \item \(\mathbb{Z}_n^*\) con la moltiplicazione mod \(n\);
+  \item \(\mathbb{Z}_p^* = \{1, \dots, p-1\}\).
+\end{itemize}
+
+\subsection{Eulero e Fermat}
+
+\textbf{Teorema (del prof).} Per ogni \(a \in \mathbb{Z}_n^*\):
+\begin{enumerate}
+  \item[(i)] \(a^{\varphi(n)} \equiv 1 \bmod n\) \quad (\textbf{teorema di Eulero});
+  \item[(ii)] \(a^b \equiv a^{\,b \bmod \varphi(n)}\);
+  \item[(iii)] \(a^{p-1} \equiv 1 \bmod p\) \quad (\textbf{piccolo teorema di Fermat}).
+\end{enumerate}
+
+In altre parole, \(\varphi(n)\) è l'\textbf{ordine} di \(\mathbb{Z}_n^*\) e \(p - 1\) è l'ordine di \(\mathbb{Z}_p^*\).
+
+\emph{(Non negli appunti del prof.)} L'\textbf{ordine} di un gruppo è il numero dei suoi elementi.
+
+\begin{esempio}
+\emph{(Non negli appunti del prof.)}
+\begin{itemize}
+  \item (i) con \(n = 15\), \(\varphi = 8\), \(a = 2\): \(2^8 = 256 = 17 \cdot 15 + 1 \equiv 1\) ✓.
+  \item (ii) con \(n = 7\), \(\varphi = 6\): \(3^{13} \equiv 3^{13 \bmod 6} = 3^1 = 3\), lo stesso risultato dello square and multiply ✓. Gli esponenti si possono ridurre modulo \(\varphi(n)\).
+  \item (iii) con \(p = 7\), \(a = 3\): \(3^6 = 729 = 104 \cdot 7 + 1 \equiv 1\) ✓.
+\end{itemize}
+\end{esempio}
+
+\textbf{(iii) segue da (i)} prendendo \(n = p\) primo (\(\varphi(p) = p - 1\)).
+
+\textbf{Nota (del prof)}: (iii) dà una specie di \textbf{TEST DI PRIMALITÀ}:
+\begin{itemize}
+  \item dato \(n\), si calcola \(a^{n-1} \bmod n\) per qualche \(a\);
+  \item se non è \(1\), allora \(n\) \textbf{non è primo};
+  \item se è \(1\), si dice \textbf{PROBABILMENTE PRIMO}.
+\end{itemize}
+
+\emph{(Non negli appunti del prof.)} Esempio: \(n = 15\), \(a = 2\): \(2^{14} \equiv 2^{14 \bmod 8} = 2^6 = 64 \equiv 4 \ne 1\), quindi 15 non è primo ✓. ``Probabilmente'' perché esistono numeri composti che superano il test per quasi tutti gli \(a\) (i numeri di Carmichael, il più piccolo è 561); i test usati davvero (Miller-Rabin) sono varianti più robuste.
+
+\textbf{Inoltre, (ii) segue da (i)} (del prof):
+\[
+a^b = a^{\,q \cdot \varphi(n) + (b \bmod \varphi(n))} = \big(a^{\varphi(n)}\big)^q \cdot a^{\,b \bmod \varphi(n)} = a^{\,b \bmod \varphi(n)}
+\]
+(si scrive \(b = q \cdot \varphi(n) + (b \bmod \varphi(n))\), e \(a^{\varphi(n)} \equiv 1\), quindi \(1^q = 1\)).
+
+\textbf{(i) segue da Lagrange} (del prof): il sottogruppo \(a^0, a^1, \dots, a^{d-1}\) ha ordine \(d\), con \(d \cdot k = \varphi(n)\).
+
+\begin{nota}
+\emph{(Non negli appunti del prof.)} Si moltiplica \(a\) per sé stesso finché si torna a \(1\): \(a^0 = 1, a^1, a^2, \dots, a^{d-1}\), e \(a^d = 1\). Questi \(d\) elementi formano un \textbf{sottogruppo}. Il \textbf{teorema di Lagrange} dice che l'ordine di un sottogruppo divide l'ordine del gruppo: \(d\) divide \(\varphi(n)\), cioè \(\varphi(n) = d \cdot k\). Allora \(a^{\varphi(n)} = (a^d)^k = 1^k = 1\).
+\end{nota}
+
+\subsection{\texorpdfstring{\(\mathbb{Z}_p^*\)}{Zp*} è ciclico}
+
+Passando a \(\mathbb{Z}_p^*\), servirà anche il fatto che \(\mathbb{Z}_p^*\) è \textbf{CICLICO} (del prof): \(\exists\, g \in G = \mathbb{Z}_p^*\) tale che
+\[
+\{g^0, g^1, g^2, \dots, g^{p-2}\} = \mathbb{Z}_p^*
+\]
+Un tale \(g\) si chiama \textbf{generatore}: le sue potenze danno \textbf{tutti} gli elementi del gruppo.
+
+\begin{esempio}
+\textbf{Esempio (del prof).} \(\mathbb{Z}_7^* = \{1, 2, \dots, 6\}\). \(g = 3\) è un generatore:
+\[
+3^0 = 1, \quad 3^1 = 3, \quad 3^2 = 2, \quad 3^3 = 6, \quad 3^4 = 4, \quad 3^5 = 5
+\]
+Escono tutti e sei. Invece \(2\) \textbf{non} è un generatore:
+\[
+2^0 = 1, \quad 2^1 = 2, \quad 2^2 = 4, \quad 2^3 = 1 \ !
+\]
+Dopo tre passi torna a 1 e non esce mai 3, 5 o 6.
+\end{esempio}
+
+\section{Diffie-Hellman e il logaritmo discreto}
+
+\begin{inbreve}
+Diffie e Hellman: due persone che non hanno nessun segreto in comune si scambiano in pubblico \(g^x\) e \(g^y\), e alla fine hanno entrambe la stessa chiave \(g^{xy}\). Eve, che vede solo \(g^x\) e \(g^y\), non dovrebbe riuscire a calcolarla. La sicurezza si basa sul \textbf{logaritmo discreto} e sulle sue varianti CDH e DDH.
+\end{inbreve}
+
+\subsection{Lo scambio di chiavi (del prof)}
+
+Diffie-Hellman considerarono \(G = \mathbb{Z}_p^*\):
+
+\begin{verbatim}
+Alice                                                 Bob
+x ← Z_(p-1)                                           y ← Z_(p-1)
+           ───────────── g^x mod p ─────────────→
+           ←──────────── g^y mod p ──────────────
+SK = (g^y)^x = g^(xy)          Eve           SK = (g^x)^y = g^(xy)
+                            (passiva)
+\end{verbatim}
+
+\begin{nota}
+\emph{(Non negli appunti del prof.)}
+\begin{itemize}
+  \item \(p\) e \(g\) (un generatore) sono \textbf{pubblici}. Alice sceglie un segreto \(x\), Bob un segreto \(y\).
+  \item Si mandano \(g^x\) e \(g^y\) \textbf{in chiaro}. Ognuno eleva quello che riceve al proprio segreto, e per le proprietà delle potenze ottengono lo \textbf{stesso} valore \(g^{xy}\), che diventa la chiave condivisa \(SK\) (\emph{shared key}).
+  \item \textbf{Eve passiva} vuol dire che legge i messaggi ma non li modifica.
+  \item Perché è importante: finora Alice e Bob dovevano \textbf{già} condividere la chiave. Con DH la costruiscono parlando in pubblico. È la base della crittografia a chiave pubblica, e lo scambio di chiavi di TLS lo usa ancora (in una variante).
+\end{itemize}
+\end{nota}
+
+\begin{esempio}
+\textbf{Esempio giocattolo} \emph{(non negli appunti del prof)}: \(p = 7\), \(g = 3\).
+\begin{itemize}
+  \item Alice sceglie \(x = 2\) e manda \(3^2 = 9 \equiv 2\).
+  \item Bob sceglie \(y = 4\) e manda \(3^4 = 81 \equiv 4\).
+  \item Alice calcola \(4^2 = 16 \equiv 2\). Bob calcola \(2^4 = 16 \equiv 2\). Stessa chiave: \(SK = 2\).
+  \item Verifica: \(g^{xy} = 3^8 \equiv 3^{8 \bmod 6} = 3^2 \equiv 2\) ✓.
+\end{itemize}
+\end{esempio}
+
+\subsection{Le ipotesi}
+
+\textbf{Osservazione (del prof)}: dato \(g^x \bmod p\), dovrebbe essere difficile calcolare \(x\). Questo è il problema del \textbf{LOGARITMO DISCRETO} (DL).
+
+\emph{(Non negli appunti del prof.)} Si chiama ``logaritmo'' perché \(x\) è l'esponente a cui elevare \(g\) per ottenere \(g^x\), come il logaritmo dei reali. ``Discreto'' perché si lavora con numeri interi modulo \(p\). Elevare è facile (square and multiply), tornare indietro (si crede) no.
+
+\textbf{IPOTESI (del prof): il problema DL è una OWF.}
+
+Miglior algoritmo: \textbf{Index Calculus}, che richiede tempo \textbf{sub-esponenziale}.
+
+Ecco due varianti (del prof):
+\begin{itemize}
+  \item \textbf{CDH} (\emph{Computational Diffie-Hellman}): dati \(g^x, g^y\), calcolare \(g^{xy}\) (con \(x, y\) casuali);
+  \item \textbf{DDH} (\emph{Decisional Diffie-Hellman}):
+  \[
+  (g^x, g^y, g^{xy}) \approx_c (g^x, g^y, g^z) \qquad (x, y, z \text{ casuali})
+  \]
+\end{itemize}
+
+\begin{nota}
+\emph{(Non negli appunti del prof.)}
+\begin{itemize}
+  \item \textbf{CDH} è esattamente ``Eve non riesce a calcolare la chiave di DH''.
+  \item \textbf{DDH} chiede di più: la chiave \(g^{xy}\) non deve solo essere difficile da calcolare, ma deve sembrare \textbf{un elemento casuale} del gruppo (\(g^z\)), anche a chi vede \(g^x\) e \(g^y\). È lo stesso spirito dell'hard-core bit e dei PRG: ``non si distingue dal casuale''.
+\end{itemize}
+\end{nota}
+
+\[
+\text{DDH} \Rightarrow \text{CDH} \Rightarrow \text{DL}
+\]
+\textbf{Nessuno sa se DL \(\Rightarrow\) CDH} (del prof).
+
+\begin{nota}
+\textbf{Come leggere le frecce} \emph{(non negli appunti del prof)}. ``DDH \(\Rightarrow\) CDH'' vuol dire: \textbf{se} l'ipotesi DDH è vera, \textbf{allora} è vera anche CDH. DDH è l'ipotesi più \textbf{forte} (chiede di più), DL la più \textbf{debole}. Il motivo si vede al contrario, sugli attacchi:
+\begin{itemize}
+  \item se sai risolvere \textbf{DL}, sai risolvere \textbf{CDH}: da \(g^x\) trovi \(x\), e calcoli \((g^y)^x = g^{xy}\);
+  \item se sai risolvere \textbf{CDH}, sai rompere \textbf{DDH}: calcoli \(g^{xy}\) e controlli se il terzo elemento è uguale.
+\end{itemize}
+Quindi chi rompe un'ipotesi più debole rompe anche quelle più forti. Non si sa invece se, partendo da un attacco a CDH, si possa risolvere DL.
+\end{nota}
+
+\textbf{Prossima lezione (del prof)}: vedremo che \textbf{DDH NON vale in \(\mathbb{Z}_p^*\)} :(
+
+\section{Riepilogo}
+
+\begin{itemize}
+  \item \textbf{MD con lunghezze variabili} si rompe: se \(\text{cmps}_s(0^{2n}) = 0^n\), allora \(H(x) = H(0^n \,\|\, x)\). Serve una codifica \textbf{suffix-free}: si aggiunge un blocco \(\langle \ell \rangle\) con la lunghezza. \textbf{Teorema}: MD rafforzato è CR per VIL (se \(d \ne d'\), l'ultimo passo è una collisione di cmps).
+  \item \textbf{Funzione di compressione}: euristica in pratica (es.\ \(\text{AES}_s(x) \oplus x\), difficile da dimostrare perché \(s\) è pubblica); in teoria da ipotesi concrete (fattorizzazione, DL), \textbf{impossibile} in modo generico dalle OWF.
+  \item \textbf{Aritmetica modulare}: \((\mathbb{Z}_n, +)\) è un gruppo, \((\mathbb{Z}_n, \cdot)\) no. \(a\) invertibile mod \(n\) \(\Leftrightarrow\) \(\gcd(a, n) = 1\). \(\mathbb{Z}_n^*\) e \(\varphi(n)\): \(\varphi(pq) = (p-1)(q-1)\), \(\varphi(p) = p - 1\).
+  \item \textbf{Euclide esteso}: \(\gcd(a, b) = \gcd(b, a \bmod b)\), resti che si dimezzano ogni due passi, \(O(\log^3 a)\); all'indietro trova \(u, v\) con \(au + bv = \gcd\), quindi l'inverso. \textbf{Square and multiply} per \(a^b \bmod n\).
+  \item \textbf{Primi}: PNT (un numero di \(\lambda\) bit è primo con probabilità \(\approx 1/\lambda\)), primalità in P, quindi si generano \(n = pq\). \textbf{Ipotesi}: fattorizzazione OWF (NFS sub-esponenziale, Shor quantistico).
+  \item \textbf{Eulero/Fermat}: \(a^{\varphi(n)} \equiv 1\), esponenti mod \(\varphi(n)\), \(a^{p-1} \equiv 1 \bmod p\) (test di primalità ``probabile''). Dimostrazione con Lagrange. \(\mathbb{Z}_p^*\) è \textbf{ciclico} (es.\ 3 genera \(\mathbb{Z}_7^*\), 2 no).
+  \item \textbf{Diffie-Hellman}: \(g^x\), \(g^y\) in pubblico, chiave \(g^{xy}\). Ipotesi \textbf{DL} (Index Calculus sub-esponenziale), \textbf{CDH}, \textbf{DDH}; DDH \(\Rightarrow\) CDH \(\Rightarrow\) DL. Prossima volta: DDH non vale in \(\mathbb{Z}_p^*\).
+\end{itemize}
